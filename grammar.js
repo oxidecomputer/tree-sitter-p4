@@ -31,6 +31,7 @@ module.exports = grammar({
     ),
 
     header_definition: $ => seq(
+      repeat($.annotation),
       'header', $.type_identifier,
       '{',
         repeat($.field),
@@ -38,6 +39,7 @@ module.exports = grammar({
     ),
 
     struct_definition: $ => seq(
+      repeat($.annotation),
       'struct', $.type_identifier,
       '{',
         repeat($.field),
@@ -45,6 +47,7 @@ module.exports = grammar({
     ),
 
     extern_definition: $ => seq(
+      repeat($.annotation),
       'extern', $.type_identifier,
       '{',
         repeat($.method),
@@ -52,6 +55,7 @@ module.exports = grammar({
     ),
 
     parser_definition: $ => seq(
+      repeat($.annotation),
       'parser', $.method_identifier,
       '(', repeat($.parameter), ')',
       '{',
@@ -60,6 +64,7 @@ module.exports = grammar({
     ),
 
     control_definition: $ => seq(
+      repeat($.annotation),
       'control',
       $.method_identifier,
       '(', repeat($.parameter), ')',
@@ -75,29 +80,38 @@ module.exports = grammar({
     ),
 
     control_body_element: $ => choice(
-      $.control_var,
-      $.table,
-      $.action,
+      seq(repeat($.annotation), $.control_var),
+      seq(repeat($.annotation), $.table),
+      seq(repeat($.annotation), $.action),
     ),
 
     table: $ => seq (
       'table',
       $.type_identifier,
-      '{',
-        'key', '=', '{', repeat1(seq($.lval, ':', $.key_type, ';')), '}',
-        'actions', '=', '{', repeat1(seq($.method_identifier, ';')), '}',
-        optional(seq(
-          'default_action', '=',
-          choice('NoAction', $.method_identifier), ';'
-        )),
-      '}'
+      '{', repeat($.table_element), '}'
     ),
+
+    table_element: $ => choice(
+        seq('key', '=', '{', repeat1(
+          seq($.expr, ':', $.key_type, repeat($.annotation), ';')), '}'
+        ),
+        seq('actions', '=', '{', repeat1(
+          seq(repeat($.annotation), $.action_item, ';')), '}'),
+        seq('size', '=', $.expr, ';'),
+        seq(optional('const'), 'default_action', '=',
+          choice('NoAction', $.method_identifier), ';'),
+        seq('meters', '=', $.identifier, ';'),
+        seq('counters', '=', $.identifier, ';'),
+    ),
+
+    action_item: $ => choice($.call, 'NoAction'),
 
     key_type: $ => choice (
       'range',
       'exact',
       'ternary',
-      'lpm'
+      'lpm',
+      'optional'
     ),
 
     state: $ => seq (
@@ -166,7 +180,8 @@ module.exports = grammar({
       '-',
       '*',
       '/',
-      '%'
+      '%',
+      '||',
     ),
 
     conditional: $ => seq($._if, optional($._else)),
@@ -259,6 +274,24 @@ module.exports = grammar({
 
     wdecimal: $ => seq($.decimal, 'w', $.decimal),
 
+    annotation: $ => seq(
+      '@', $.identifier, optional($.annotation_body),
+    ),
+
+    annotation_body: $ => seq(
+      '(',
+        optional($.annotation_content),
+        repeat(seq(',', $.annotation_content)),
+        optional(','),
+       ')',
+    ),
+
+    annotation_content: $ => choice(
+      $.expr,
+      /["][^"]*["]/,
+      $.annotation,
+    ),
+
     comment: _ => token(choice(
       seq('//', /(\\+(.|\r?\n)|[^\\\n])*/),
       seq(
@@ -270,6 +303,9 @@ module.exports = grammar({
 
     preproc: _ => choice(
       seq('#include', choice('<', '"'), /[^">]*/, choice('>', '"')),
+      seq('#if', /.*/),
+      seq('#else', /.*/),
+      '#endif',
     )
   }
 })
