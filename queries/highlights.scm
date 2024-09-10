@@ -17,15 +17,18 @@
 "lpm" @keyword
 "exact" @keyword
 "ternary" @keyword
+"async" @keyword
+"await" @keyword
 "actions" @keyword
 "default_action" @keyword
 "return" @keyword
 "NoAction" @keyword
 (direction) @keyword
 "bool" @type
+"sync" @type
 (bit_type) @type
 (number) @number
-(type_identifier) @type
+(type_identifier (identifier) @type)
 (method_identifier) @function
 (comment) @comment
 (preproc) @keyword.directive

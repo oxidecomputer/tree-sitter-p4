@@ -60,6 +60,7 @@ module.exports = grammar({
     ),
 
     control_definition: $ => seq(
+      optional('async'),
       'control',
       $.method_identifier,
       '(', repeat($.parameter), ')',
@@ -81,6 +82,7 @@ module.exports = grammar({
     ),
 
     table: $ => seq (
+      optional('async'),
       'table',
       $.type_identifier,
       '{',
@@ -200,7 +202,7 @@ module.exports = grammar({
         seq(
           $.identifier,
           repeat(seq('.', $.identifier)),
-          seq('.', $.method_identifier)
+          seq('.', choice($.method_identifier, 'await')),
         ),
         $.method_identifier,
       ),
@@ -231,14 +233,20 @@ module.exports = grammar({
       ';'
     ),
 
-    _type: $ => choice(
-      'bool',
-      $.bit_type
+    _type: $ => seq(
+      choice(
+        'bool',
+        seq('sync', '<', $.type_identifier, '>'),
+        $.bit_type,
+      )
     ),
 
     bit_type: $ => seq('bit', '<', $.number, '>'),
 
-    type_identifier: $ => $.identifier,
+    type_identifier: $ => seq(
+      $.identifier,
+      optional(seq('<', $.type_identifier, '>'))
+    ),
 
     method_identifier: $ => $.identifier,
 

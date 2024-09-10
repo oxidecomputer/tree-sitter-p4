@@ -250,6 +250,18 @@
       "type": "SEQ",
       "members": [
         {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "async"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
           "type": "STRING",
           "value": "control"
         },
@@ -357,6 +369,18 @@
     "table": {
       "type": "SEQ",
       "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "async"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
         {
           "type": "STRING",
           "value": "table"
@@ -1082,8 +1106,17 @@
                       "value": "."
                     },
                     {
-                      "type": "SYMBOL",
-                      "name": "method_identifier"
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "method_identifier"
+                        },
+                        {
+                          "type": "STRING",
+                          "value": "await"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -1253,15 +1286,41 @@
       ]
     },
     "_type": {
-      "type": "CHOICE",
+      "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "bool"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "bit_type"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "bool"
+            },
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "sync"
+                },
+                {
+                  "type": "STRING",
+                  "value": "<"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "type_identifier"
+                },
+                {
+                  "type": "STRING",
+                  "value": ">"
+                }
+              ]
+            },
+            {
+              "type": "SYMBOL",
+              "name": "bit_type"
+            }
+          ]
         }
       ]
     },
@@ -1287,8 +1346,38 @@
       ]
     },
     "type_identifier": {
-      "type": "SYMBOL",
-      "name": "identifier"
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "<"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "type_identifier"
+                },
+                {
+                  "type": "STRING",
+                  "value": ">"
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
     },
     "method_identifier": {
       "type": "SYMBOL",

@@ -644,11 +644,15 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
           "named": true
         }
       ]
@@ -816,6 +820,14 @@
     "named": false
   },
   {
+    "type": "async",
+    "named": false
+  },
+  {
+    "type": "await",
+    "named": false
+  },
+  {
     "type": "bit",
     "named": false
   },
@@ -905,6 +917,10 @@
   },
   {
     "type": "struct",
+    "named": false
+  },
+  {
+    "type": "sync",
     "named": false
   },
   {
