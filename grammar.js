@@ -245,7 +245,7 @@ module.exports = grammar({
 
     type_identifier: $ => seq(
       $.identifier,
-      optional(seq('<', $.type_identifier, '>'))
+      optional(seq('<', $.type_identifier, repeat(seq(',', $.type_identifier)), '>'))
     ),
 
     method_identifier: $ => $.identifier,
