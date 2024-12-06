@@ -1,0 +1,19 @@
+name: Tree-sitter P4
+
+on: [push, pull_request]
+
+jobs:
+  tree-sitter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: setup tree-sitter
+        uses: tree-sitter/setup-action@v2
+
+      - name: run tree-sitter stats
+        run: tree-sitter parse -q -s examples/*.p4 || exit 0
+
+      - name: run tree-sitter error check
+        run: tree-sitter parse -q examples/*.p4 | grep ERROR && exit 1 || exit 0

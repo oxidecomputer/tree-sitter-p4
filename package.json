@@ -33,14 +33,5 @@
     "bindings/node/*",
     "queries/*",
     "src/**"
-  ],
-  "tree-sitter": [
-    {
-      "scope": "source.p4",
-      "injection-regex": "^p4$",
-      "file-types": [
-          "p4"
-      ]
-    }
   ]
 }
