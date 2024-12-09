@@ -18,6 +18,8 @@ module.exports = grammar({
         $.parser_definition,
         $.control_definition,
         $.package,
+        $.action,
+        $.table,
       ),
 
     package: ($) =>
@@ -34,11 +36,10 @@ module.exports = grammar({
           ")",
           ";",
         ),
-
         seq(
-          $.type_identifier,
+          $.method_identifier,
           "(",
-          seq($.method_identifier, "(", ")"),
+          choice(seq($.method_identifier, "(", ")"), $.identifier),
           repeat(seq(",", $.method_identifier, "(", ")")),
           optional(","),
           ")",
@@ -117,7 +118,10 @@ module.exports = grammar({
         seq(
           repeat($.annotation),
           "parser",
-          $.method_identifier,
+          choice(
+            seq($.method_identifier, "<", $.type_identifier, ">"),
+            $.method_identifier,
+          ),
           "(",
           repeat($.parameter),
           ")",
@@ -212,28 +216,49 @@ module.exports = grammar({
 
     key_type: (_) => choice("range", "exact", "ternary", "lpm", "optional"),
 
-    state: ($) => seq("state", $.method_identifier, "{", repeat($.stmt), "}"),
+    state: ($) =>
+      choice(
+        seq($.method_identifier, "()", $.type_identifier, ";"),
+        seq("state", $.method_identifier, "{", repeat($.stmt), "}"),
+      ),
 
     stmt: ($) =>
       choice(
         $.conditional,
         $.action,
         $.var_decl,
+        $.type_decl,
         seq($.transition, ";"),
         seq($.call, ";"),
-        seq($.expr, ";"),
         seq("return", ";"),
       ),
 
+    type_decl: ($) =>
+      seq(
+        optional("("),
+        choice($._type, $.type_identifier),
+        optional(")"),
+        $.identifier,
+        ";",
+      ),
+
+    var_choice: ($) =>
+      seq(
+        optional("("),
+        optional(choice($._type, $.type_identifier)),
+        optional(")"),
+        optional("("),
+        $.expr,
+        optional(")"),
+      ),
+
     var_decl: ($) =>
-      prec(
-        1,
-        seq(
-          optional(choice($._type, $.type_identifier)),
-          $.identifier,
-          optional(seq("=", $.expr)),
-          ";",
-        ),
+      seq(
+        optional(choice($._type, $.type_identifier)),
+        $.lval,
+        "=",
+        $.var_choice,
+        ";",
       ),
 
     action: ($) =>
@@ -274,12 +299,12 @@ module.exports = grammar({
 
     expr: ($) =>
       choice(
-        prec.left(seq($.expr, $.binop, $.expr)),
+        prec.left(1, seq(optional($.expr), $.binop, $.expr)),
         prec(1, $.call),
         prec(1, $.slice),
         prec(1, $.tuple),
+        prec(1, $.identifier_preproc),
         $.number,
-        $.identifier_preproc,
         $.bool,
         $.lval,
       ),
@@ -300,28 +325,43 @@ module.exports = grammar({
         "&",
         "&&",
         "&&&",
+        "<<",
+        ">>",
+        "!",
       ),
 
-    conditional: ($) => seq($._if, optional($._else)),
+    conditional: ($) => seq($._if, optional($._elseif), optional($._else)),
+    conditional_binop: (_) => choice("&&", "|", "!"),
 
-    _if: ($) => seq("if", "(", $.expr, ")", "{", repeat($.stmt), "}"),
-
+    _if: ($) => seq("if", "(", repeat($.expr), ")", "{", repeat($.stmt), "}"),
+    _elseif: ($) =>
+      seq("else", "if", "(", repeat($.expr), ")", "{", repeat($.stmt), "}"),
     _else: ($) => seq("else", "{", repeat($.stmt), "}"),
 
     control_var: ($) =>
-      seq($.type_identifier, "(", repeat($.expr), ")", $.identifier, ";"),
+      choice(
+        seq(
+          $.type_identifier,
+          optional(seq("<", $.type_argument_list, ">")),
+          "(",
+          repeat(seq($.expr, optional(","))),
+          ")",
+          $.identifier,
+          ";",
+        ),
+        seq(choice($._type, $.type_identifier), $.identifier, ";"),
+      ),
 
     lval: ($) => seq($.identifier, repeat(seq(".", $.identifier))),
+
     fval: ($) =>
-      seq(
-        choice(
-          seq(
-            $.identifier,
-            repeat(seq(".", $.identifier)),
-            seq(".", $.method_identifier),
-          ),
-          $.method_identifier,
+      choice(
+        seq(
+          $.identifier,
+          repeat(seq(".", $.identifier)),
+          seq(".", $.method_identifier),
         ),
+        $.method_identifier,
       ),
 
     method: ($) =>
@@ -340,7 +380,16 @@ module.exports = grammar({
         seq($.direction, $.identifier, optional(",")),
         seq(
           $.direction,
+          optional("("),
           choice($._type, $.type_identifier),
+          optional(")"),
+          $.identifier,
+          optional(","),
+        ),
+        seq(
+          optional("("),
+          choice($._type, $.type_identifier),
+          optional(")"),
           $.identifier,
           optional(","),
         ),
@@ -362,7 +411,6 @@ module.exports = grammar({
           $.method_identifier,
           seq($.method_identifier, "<", $.type_identifier, ">"),
         ),
-
         $.identifier,
         ",",
       ),
@@ -383,11 +431,15 @@ module.exports = grammar({
     varbit_type: ($) => seq("varbit", "<", $.number, ">"),
     tuple_type: ($) => seq("tuple", "<", $.type_argument_list, ">"),
 
-    type_argument_list: ($) => seq($._type, repeat(seq(",", $._type))),
+    type_argument_list: ($) =>
+      seq(
+        choice($._type, $.type_identifier),
+        repeat(seq(",", choice($._type, $.type_identifier))),
+      ),
 
-    type_identifier: ($) => $.identifier,
+    type_identifier: ($) => prec(2, $.identifier),
 
-    method_identifier: ($) => $.identifier,
+    method_identifier: ($) => prec(1, $.identifier),
 
     selection_case: ($) =>
       choice(
@@ -436,13 +488,32 @@ module.exports = grammar({
 
     preproc: ($) =>
       choice(
+        seq("#define", $.identifier_preproc, $.number),
         seq(
           "#define",
-          choice($.identifier_preproc, $.identifier),
+          $.identifier,
+          optional($.line_continuation),
           choice(
-            $.number,
             seq("{", optional($.line_continuation), repeat($.field), "}"),
-            seq("(", repeat($.expr), ")", "(", repeat($.expr), ")"),
+            seq(
+              repeat(
+                seq(
+                  optional("("),
+                  optional(choice($._type, $.type_identifier)),
+                  optional(")"),
+                  choice($.method_identifier, $.lval),
+                  ",",
+                  optional($.line_continuation),
+                ),
+              ),
+              seq(
+                optional("("),
+                optional(choice($._type, $.type_identifier)),
+                optional(")"),
+                $.expr,
+                /\s/,
+              ),
+            ),
           ),
         ),
         seq("#include", choice("<", '"'), /[^">]*/, choice(">", '"')),

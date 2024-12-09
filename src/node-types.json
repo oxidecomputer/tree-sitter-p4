@@ -144,7 +144,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "expr",
@@ -282,6 +282,10 @@
       "required": true,
       "types": [
         {
+          "type": "bit_type",
+          "named": true
+        },
+        {
           "type": "expr",
           "named": true
         },
@@ -290,7 +294,19 @@
           "named": true
         },
         {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "type_argument_list",
+          "named": true
+        },
+        {
           "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
           "named": true
         }
       ]
@@ -678,6 +694,10 @@
       "required": false,
       "types": [
         {
+          "type": "bit_type",
+          "named": true
+        },
+        {
           "type": "expr",
           "named": true
         },
@@ -698,7 +718,27 @@
           "named": true
         },
         {
+          "type": "lval",
+          "named": true
+        },
+        {
+          "type": "method_identifier",
+          "named": true
+        },
+        {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
           "named": true
         }
       ]
@@ -792,6 +832,10 @@
         {
           "type": "stmt",
           "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
         }
       ]
     }
@@ -817,11 +861,11 @@
           "named": true
         },
         {
-          "type": "expr",
+          "type": "transition",
           "named": true
         },
         {
-          "type": "transition",
+          "type": "type_decl",
           "named": true
         },
         {
@@ -913,6 +957,10 @@
       "required": true,
       "types": [
         {
+          "type": "action",
+          "named": true
+        },
+        {
           "type": "const_definition",
           "named": true
         },
@@ -938,6 +986,10 @@
         },
         {
           "type": "struct_definition",
+          "named": true
+        },
+        {
+          "type": "table",
           "named": true
         },
         {
@@ -1013,6 +1065,41 @@
           "named": true
         },
         {
+          "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_decl",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
+        },
+        {
           "type": "varbit_type",
           "named": true
         }
@@ -1066,7 +1153,7 @@
     }
   },
   {
-    "type": "var_decl",
+    "type": "var_choice",
     "named": true,
     "fields": {},
     "children": {
@@ -1082,7 +1169,34 @@
           "named": true
         },
         {
-          "type": "identifier",
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "var_decl",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "lval",
           "named": true
         },
         {
@@ -1091,6 +1205,10 @@
         },
         {
           "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "var_choice",
           "named": true
         },
         {
@@ -1114,6 +1232,10 @@
         }
       ]
     }
+  },
+  {
+    "type": "!",
+    "named": false
   },
   {
     "type": "!=",
@@ -1164,6 +1286,10 @@
     "named": false
   },
   {
+    "type": "()",
+    "named": false
+  },
+  {
     "type": ")",
     "named": false
   },
@@ -1204,6 +1330,10 @@
     "named": false
   },
   {
+    "type": "<<",
+    "named": false
+  },
+  {
     "type": "=",
     "named": false
   },
@@ -1217,6 +1347,10 @@
   },
   {
     "type": ">=",
+    "named": false
+  },
+  {
+    "type": ">>",
     "named": false
   },
   {

@@ -43,5 +43,4 @@ control ingress(inout headers_t hdr) {
             hdr.udp,
         });
     }
-    
 }
