@@ -395,7 +395,7 @@ module.exports = grammar({
         ),
       ),
 
-    direction: (_) => choice("in", "out", "inout", "packet_in", "packet_out"),
+    direction: (_) => choice("in", "out", "inout"),
 
     field: ($) =>
       seq(
@@ -422,6 +422,8 @@ module.exports = grammar({
         "int",
         "bit",
         "varbit",
+        "packet_in",
+        "packet_out",
         $.bit_type,
         $.varbit_type,
         $.tuple_type,
@@ -437,9 +439,9 @@ module.exports = grammar({
         repeat(seq(",", choice($._type, $.type_identifier))),
       ),
 
-    type_identifier: ($) => prec(2, $.identifier),
+    type_identifier: ($) => prec(1, $.identifier),
 
-    method_identifier: ($) => prec(1, $.identifier),
+    method_identifier: ($) => $.identifier,
 
     selection_case: ($) =>
       choice(
@@ -449,7 +451,7 @@ module.exports = grammar({
       ),
 
     identifier: (_) => /[a-zA-Z_][a-zA-Z0-9_]*/,
-    identifier_preproc: (_) => /[A-Z][A-Z_]*/,
+    identifier_preproc: (_) => /[A-Z][A-Z0-9_]*/,
 
     bool: (_) => choice("true", "false"),
 
@@ -484,35 +486,50 @@ module.exports = grammar({
         ),
       ),
 
-    line_continuation: (_) => /s*\\?s*/,
+    line_continuation: (_) => /\s*\\\s*/,
 
     preproc: ($) =>
       choice(
-        seq("#define", $.identifier_preproc, $.number),
         seq(
           "#define",
-          $.identifier,
-          optional($.line_continuation),
           choice(
-            seq("{", optional($.line_continuation), repeat($.field), "}"),
+            seq($.identifier_preproc, $.number),
             seq(
+              $.identifier_preproc,
+              "{",
+              $.line_continuation,
+              repeat($.field),
+              "}",
+            ),
+            seq(
+              /[a-zA-Z_]*[a-z][a-zA-Z]*/,
+              "(",
+              repeat(seq($.identifier, optional(","))),
+              ")",
+              "(",
+              $.expr,
+              ")",
+            ),
+            seq(
+              $.identifier_preproc,
+              $.line_continuation,
               repeat(
                 seq(
                   optional("("),
                   optional(choice($._type, $.type_identifier)),
                   optional(")"),
-                  choice($.method_identifier, $.lval),
+                  $.lval,
                   ",",
-                  optional($.line_continuation),
+                  $.line_continuation,
                 ),
               ),
               seq(
                 optional("("),
                 optional(choice($._type, $.type_identifier)),
                 optional(")"),
-                $.expr,
-                /\s/,
+                $.lval,
               ),
+              /\s/,
             ),
           ),
         ),

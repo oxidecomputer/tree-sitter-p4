@@ -33,7 +33,7 @@
 "_" @keyword
 "true" @constant
 "false" @constant
-(direction) @constant
+(direction) @keyword
 (number) @number
 (bit_type) @type
 (varbit_type) @type

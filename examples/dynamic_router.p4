@@ -91,7 +91,6 @@ control local(
             is_local = true;
         }
     }
-    
 }
 
 control router(
