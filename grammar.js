@@ -487,6 +487,7 @@ module.exports = grammar({
       ),
 
     line_continuation: (_) => /\s*\\\s*/,
+    method_not_constant: (_) => /[a-zA-Z_]*[a-z][a-zA-Z]*/,
 
     preproc: ($) =>
       choice(
@@ -502,7 +503,7 @@ module.exports = grammar({
               "}",
             ),
             seq(
-              /[a-zA-Z_]*[a-z][a-zA-Z]*/,
+              $.method_not_constant,
               "(",
               repeat(seq($.identifier, optional(","))),
               ")",

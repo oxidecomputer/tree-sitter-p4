@@ -722,6 +722,10 @@
           "named": true
         },
         {
+          "type": "method_not_constant",
+          "named": true
+        },
+        {
           "type": "number",
           "named": true
         },
@@ -1484,6 +1488,10 @@
   {
     "type": "meters",
     "named": false
+  },
+  {
+    "type": "method_not_constant",
+    "named": true
   },
   {
     "type": "optional",

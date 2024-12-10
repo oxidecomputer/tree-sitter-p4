@@ -2995,6 +2995,10 @@
       "type": "PATTERN",
       "value": "\\s*\\\\\\s*"
     },
+    "method_not_constant": {
+      "type": "PATTERN",
+      "value": "[a-zA-Z_]*[a-z][a-zA-Z]*"
+    },
     "preproc": {
       "type": "CHOICE",
       "members": [
@@ -3053,8 +3057,8 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "PATTERN",
-                      "value": "[a-zA-Z_]*[a-z][a-zA-Z]*"
+                      "type": "SYMBOL",
+                      "name": "method_not_constant"
                     },
                     {
                       "type": "STRING",

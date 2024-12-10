@@ -33,7 +33,7 @@
 "_" @keyword
 "true" @constant
 "false" @constant
-(direction) @keyword
+(direction) @
 (number) @number
 (bit_type) @type
 (varbit_type) @type
@@ -46,6 +46,7 @@
 "varbit" @type
 (type_identifier) @type
 (method_identifier) @function
+(method_not_constant) @function
 (comment) @comment
 (preproc) @keyword
 (annotation) @attribute
