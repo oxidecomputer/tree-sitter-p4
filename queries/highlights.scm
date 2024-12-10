@@ -44,9 +44,10 @@
 "bit" @type
 "tuple" @type
 "varbit" @type
+"packet_in" @type
+"packet_out" @type
 (type_identifier) @type
 (method_identifier) @function
-(method_not_constant) @function
 (comment) @comment
-(preproc) @keyword
+(preproc) @keyword.directive
 (annotation) @attribute
