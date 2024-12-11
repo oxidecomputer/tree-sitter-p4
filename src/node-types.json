@@ -33,6 +33,10 @@
         {
           "type": "call",
           "named": true
+        },
+        {
+          "type": "method_identifier",
+          "named": true
         }
       ]
     }
@@ -111,6 +115,11 @@
     }
   },
   {
+    "type": "bool",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "call",
     "named": true,
     "fields": {},
@@ -135,7 +144,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "expr",
@@ -143,6 +152,45 @@
         },
         {
           "type": "stmt",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "const_definition",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "annotation",
+          "named": true
+        },
+        {
+          "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
           "named": true
         }
       ]
@@ -217,6 +265,10 @@
         {
           "type": "parameter",
           "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
         }
       ]
     }
@@ -230,6 +282,10 @@
       "required": true,
       "types": [
         {
+          "type": "bit_type",
+          "named": true
+        },
+        {
           "type": "expr",
           "named": true
         },
@@ -238,7 +294,19 @@
           "named": true
         },
         {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "type_argument_list",
+          "named": true
+        },
+        {
           "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
           "named": true
         }
       ]
@@ -262,11 +330,19 @@
           "named": true
         },
         {
+          "type": "bool",
+          "named": true
+        },
+        {
           "type": "call",
           "named": true
         },
         {
           "type": "expr",
+          "named": true
+        },
+        {
+          "type": "identifier_preproc",
           "named": true
         },
         {
@@ -279,6 +355,10 @@
         },
         {
           "type": "slice",
+          "named": true
+        },
+        {
+          "type": "tuple",
           "named": true
         }
       ]
@@ -324,7 +404,19 @@
           "named": true
         },
         {
+          "type": "line_continuation",
+          "named": true
+        },
+        {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
           "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
           "named": true
         }
       ]
@@ -363,6 +455,10 @@
         },
         {
           "type": "field",
+          "named": true
+        },
+        {
+          "type": "identifier_preproc",
           "named": true
         },
         {
@@ -410,6 +506,37 @@
         },
         {
           "type": "parameter",
+          "named": true
+        },
+        {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "method_field",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "method_identifier",
           "named": true
         },
         {
@@ -470,7 +597,15 @@
       "required": true,
       "types": [
         {
+          "type": "annotation",
+          "named": true
+        },
+        {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "method_field",
           "named": true
         },
         {
@@ -505,7 +640,15 @@
           "named": true
         },
         {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
           "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
           "named": true
         }
       ]
@@ -534,6 +677,10 @@
         {
           "type": "state",
           "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
         }
       ]
     }
@@ -541,7 +688,99 @@
   {
     "type": "preproc",
     "named": true,
-    "fields": {}
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "field",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "identifier_preproc",
+          "named": true
+        },
+        {
+          "type": "line_continuation",
+          "named": true
+        },
+        {
+          "type": "lval",
+          "named": true
+        },
+        {
+          "type": "method_not_constant",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "select_case",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "select_expr",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "select_case",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "slice",
@@ -565,6 +804,7 @@
   {
     "type": "source_file",
     "named": true,
+    "root": true,
     "fields": {},
     "children": {
       "multiple": true,
@@ -592,6 +832,10 @@
         {
           "type": "stmt",
           "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
         }
       ]
     }
@@ -617,11 +861,11 @@
           "named": true
         },
         {
-          "type": "expr",
+          "type": "transition",
           "named": true
         },
         {
-          "type": "transition",
+          "type": "type_decl",
           "named": true
         },
         {
@@ -679,7 +923,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "action_item",
@@ -700,10 +944,6 @@
         {
           "type": "key_type",
           "named": true
-        },
-        {
-          "type": "method_identifier",
-          "named": true
         }
       ]
     }
@@ -716,6 +956,14 @@
       "multiple": false,
       "required": true,
       "types": [
+        {
+          "type": "action",
+          "named": true
+        },
+        {
+          "type": "const_definition",
+          "named": true
+        },
         {
           "type": "control_definition",
           "named": true
@@ -739,6 +987,14 @@
         {
           "type": "struct_definition",
           "named": true
+        },
+        {
+          "type": "table",
+          "named": true
+        },
+        {
+          "type": "typedef_definition",
+          "named": true
         }
       ]
     }
@@ -753,6 +1009,98 @@
       "types": [
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "select_expr",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "tuple",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "tuple_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "type_argument_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_argument_list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_decl",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
           "named": true
         }
       ]
@@ -774,7 +1122,38 @@
     }
   },
   {
-    "type": "var_decl",
+    "type": "typedef_definition",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "annotation",
+          "named": true
+        },
+        {
+          "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "var_choice",
     "named": true,
     "fields": {},
     "children": {
@@ -790,33 +1169,22 @@
           "named": true
         },
         {
-          "type": "identifier",
+          "type": "tuple_type",
           "named": true
         },
         {
           "type": "type_identifier",
           "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "wdecimal",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
+        },
         {
-          "type": "decimal",
+          "type": "varbit_type",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "whex",
+    "type": "var_decl",
     "named": true,
     "fields": {},
     "children": {
@@ -824,15 +1192,50 @@
       "required": true,
       "types": [
         {
-          "type": "decimal",
+          "type": "bit_type",
           "named": true
         },
         {
-          "type": "hex",
+          "type": "lval",
+          "named": true
+        },
+        {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "var_choice",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
           "named": true
         }
       ]
     }
+  },
+  {
+    "type": "varbit_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "number",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "!",
+    "named": false
   },
   {
     "type": "!=",
@@ -840,6 +1243,10 @@
   },
   {
     "type": "\"",
+    "named": false
+  },
+  {
+    "type": "#define",
     "named": false
   },
   {
@@ -863,7 +1270,23 @@
     "named": false
   },
   {
+    "type": "&",
+    "named": false
+  },
+  {
+    "type": "&&",
+    "named": false
+  },
+  {
+    "type": "&&&",
+    "named": false
+  },
+  {
     "type": "(",
+    "named": false
+  },
+  {
+    "type": "()",
     "named": false
   },
   {
@@ -907,6 +1330,10 @@
     "named": false
   },
   {
+    "type": "<<",
+    "named": false
+  },
+  {
     "type": "=",
     "named": false
   },
@@ -923,6 +1350,10 @@
     "named": false
   },
   {
+    "type": ">>",
+    "named": false
+  },
+  {
     "type": "@",
     "named": false
   },
@@ -936,6 +1367,10 @@
   },
   {
     "type": "]",
+    "named": false
+  },
+  {
+    "type": "_",
     "named": false
   },
   {
@@ -979,6 +1414,10 @@
     "named": true
   },
   {
+    "type": "default",
+    "named": false
+  },
+  {
     "type": "default_action",
     "named": false
   },
@@ -987,11 +1426,19 @@
     "named": false
   },
   {
+    "type": "error",
+    "named": false
+  },
+  {
     "type": "exact",
     "named": false
   },
   {
     "type": "extern",
+    "named": false
+  },
+  {
+    "type": "false",
     "named": false
   },
   {
@@ -1007,6 +1454,10 @@
     "named": true
   },
   {
+    "type": "identifier_preproc",
+    "named": true
+  },
+  {
     "type": "if",
     "named": false
   },
@@ -1019,8 +1470,16 @@
     "named": false
   },
   {
+    "type": "int",
+    "named": false
+  },
+  {
     "type": "key",
     "named": false
+  },
+  {
+    "type": "line_continuation",
+    "named": true
   },
   {
     "type": "lpm",
@@ -1031,11 +1490,27 @@
     "named": false
   },
   {
+    "type": "method_not_constant",
+    "named": true
+  },
+  {
     "type": "optional",
     "named": false
   },
   {
     "type": "out",
+    "named": false
+  },
+  {
+    "type": "package",
+    "named": false
+  },
+  {
+    "type": "packet_in",
+    "named": false
+  },
+  {
+    "type": "packet_out",
     "named": false
   },
   {
@@ -1048,6 +1523,10 @@
   },
   {
     "type": "return",
+    "named": false
+  },
+  {
+    "type": "select",
     "named": false
   },
   {
@@ -1075,11 +1554,35 @@
     "named": false
   },
   {
-    "type": "w",
+    "type": "true",
     "named": false
   },
   {
+    "type": "tuple",
+    "named": false
+  },
+  {
+    "type": "typedef",
+    "named": false
+  },
+  {
+    "type": "varbit",
+    "named": false
+  },
+  {
+    "type": "wdecimal",
+    "named": true
+  },
+  {
+    "type": "whex",
+    "named": true
+  },
+  {
     "type": "{",
+    "named": false
+  },
+  {
+    "type": "|",
     "named": false
   },
   {
