@@ -423,6 +423,45 @@
     }
   },
   {
+    "type": "function_declaration",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "method_identifier",
+          "named": true
+        },
+        {
+          "type": "parameter",
+          "named": true
+        },
+        {
+          "type": "stmt",
+          "named": true
+        },
+        {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "fval",
     "named": true,
     "fields": {},
@@ -970,6 +1009,10 @@
         },
         {
           "type": "extern_definition",
+          "named": true
+        },
+        {
+          "type": "function_declaration",
           "named": true
         },
         {
