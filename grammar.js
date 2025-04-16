@@ -10,6 +10,7 @@ module.exports = grammar({
 
     _definition: ($) =>
       choice(
+        $.function_declaration,
         $.header_definition,
         $.struct_definition,
         $.typedef_definition,
@@ -46,6 +47,19 @@ module.exports = grammar({
           $.identifier,
           ";",
         ),
+      ),
+
+    // Function declaration rule for P4 functions with any return type
+    function_declaration: ($) =>
+      seq(
+        choice($._type, $.type_identifier), // Any type as return type
+        $.method_identifier,
+        "(",
+        repeat($.parameter),
+        ")",
+        "{",
+        repeat($.stmt),
+        "}",
       ),
 
     header_definition: ($) =>
