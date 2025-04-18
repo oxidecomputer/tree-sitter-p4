@@ -43,6 +43,14 @@ parser Top(packet_in b, out Parsed_headers headers) {
        // of bits to extract
        b.extract(headers.ipv4options); //,
                  // TODO (bit<32>)(((bit<16>)headers.ipv4.ihl - 5) * 32));
-       transition dispatch_on_protocol;
+        transition dispatch_on_protocol;
    }
+
+   state dispatch_on_overlay_ipv4 {
+        transition select(hdr.overlay_ipv4.ihl) {
+            5 : parse_overlay_ipv4_no_options;
+            6 .. 15 : parse_overlay_ipv4_options;
+            default : reject; // invalid IHL value
+        }
+    }
 }

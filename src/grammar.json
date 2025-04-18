@@ -1888,6 +1888,14 @@
           "value": 1,
           "content": {
             "type": "SYMBOL",
+            "name": "range"
+          }
+        },
+        {
+          "type": "PREC",
+          "value": 1,
+          "content": {
+            "type": "SYMBOL",
             "name": "identifier_preproc"
           }
         },
@@ -1902,6 +1910,23 @@
         {
           "type": "SYMBOL",
           "name": "lval"
+        }
+      ]
+    },
+    "range": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "number"
+        },
+        {
+          "type": "STRING",
+          "value": ".."
+        },
+        {
+          "type": "SYMBOL",
+          "name": "number"
         }
       ]
     },
