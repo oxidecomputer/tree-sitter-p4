@@ -49,10 +49,9 @@ module.exports = grammar({
         ),
       ),
 
-    // Function declaration rule for P4 functions with any return type
     function_declaration: ($) =>
       seq(
-        choice($._type, $.type_identifier), // Any type as return type
+        choice($._type, $.type_identifier),
         $.method_identifier,
         "(",
         repeat($.parameter),
@@ -317,11 +316,14 @@ module.exports = grammar({
         prec(1, $.call),
         prec(1, $.slice),
         prec(1, $.tuple),
+        prec(1, $.range),
         prec(1, $.identifier_preproc),
         $.number,
         $.bool,
         $.lval,
       ),
+
+    range: ($) => seq($.number, "..", $.number),
 
     binop: (_) =>
       choice(
