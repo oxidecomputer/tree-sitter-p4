@@ -3,6 +3,12 @@ module.exports = grammar({
 
   extras: ($) => [/\s|\\\r?\n/, $.comment, $.preproc],
 
+  precedences: ($) => [
+    [$.expr, $.method_identifier],
+    [$.bit_type, $._type],
+    [$.varbit_type, $._type],
+  ],
+
   rules: {
     source_file: ($) => repeat($.top),
 
@@ -312,12 +318,13 @@ module.exports = grammar({
 
     expr: ($) =>
       choice(
-        prec.left(1, seq(optional($.expr), $.binop, $.expr)),
+        prec.left(2, seq(optional($.expr), $.binop, $.expr)),
         prec(1, $.call),
         prec(1, $.slice),
         prec(1, $.tuple),
         prec(1, $.range),
         prec(1, $.identifier_preproc),
+        prec(1, $.string_literal),
         $.number,
         $.bool,
         $.lval,
@@ -325,11 +332,28 @@ module.exports = grammar({
 
     range: ($) => seq($.number, "..", $.number),
 
+    string_literal: (_) =>
+      token(
+        seq(
+          '"',
+          repeat(
+            choice(
+              /[^"\\]+/, // any characters except " or \
+              seq("\\", /./), // escaped character (any character after backslash)
+            ),
+          ),
+          '"',
+        ),
+      ),
+
     binop: (_) =>
       choice(
         "==",
         "!=",
         ">=",
+        "<=",
+        ">",
+        "<",
         "=",
         "+",
         "-",

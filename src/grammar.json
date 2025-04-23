@@ -1832,7 +1832,7 @@
       "members": [
         {
           "type": "PREC_LEFT",
-          "value": 1,
+          "value": 2,
           "content": {
             "type": "SEQ",
             "members": [
@@ -1900,6 +1900,14 @@
           }
         },
         {
+          "type": "PREC",
+          "value": 1,
+          "content": {
+            "type": "SYMBOL",
+            "name": "string_literal"
+          }
+        },
+        {
           "type": "SYMBOL",
           "name": "number"
         },
@@ -1930,6 +1938,47 @@
         }
       ]
     },
+    "string_literal": {
+      "type": "TOKEN",
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "\""
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "[^\"\\\\]+"
+                },
+                {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "STRING",
+                      "value": "\\"
+                    },
+                    {
+                      "type": "PATTERN",
+                      "value": "."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "type": "STRING",
+            "value": "\""
+          }
+        ]
+      }
+    },
     "binop": {
       "type": "CHOICE",
       "members": [
@@ -1944,6 +1993,18 @@
         {
           "type": "STRING",
           "value": ">="
+        },
+        {
+          "type": "STRING",
+          "value": "<="
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        },
+        {
+          "type": "STRING",
+          "value": "<"
         },
         {
           "type": "STRING",
@@ -3414,7 +3475,38 @@
     }
   ],
   "conflicts": [],
-  "precedences": [],
+  "precedences": [
+    [
+      {
+        "type": "SYMBOL",
+        "name": "expr"
+      },
+      {
+        "type": "SYMBOL",
+        "name": "method_identifier"
+      }
+    ],
+    [
+      {
+        "type": "SYMBOL",
+        "name": "bit_type"
+      },
+      {
+        "type": "SYMBOL",
+        "name": "_type"
+      }
+    ],
+    [
+      {
+        "type": "SYMBOL",
+        "name": "varbit_type"
+      },
+      {
+        "type": "SYMBOL",
+        "name": "_type"
+      }
+    ]
+  ],
   "externals": [],
   "inline": [],
   "supertypes": []

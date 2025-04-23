@@ -49,5 +49,6 @@
 (type_identifier) @type
 (method_identifier) @function
 (comment) @comment
+(string_literal) @string
 (preproc) @keyword.directive
 (annotation) @attribute
