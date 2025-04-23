@@ -362,6 +362,10 @@
           "named": true
         },
         {
+          "type": "string_literal",
+          "named": true
+        },
+        {
           "type": "tuple",
           "named": true
         }
@@ -1400,6 +1404,10 @@
     "named": false
   },
   {
+    "type": "<=",
+    "named": false
+  },
+  {
     "type": "=",
     "named": false
   },
@@ -1602,6 +1610,10 @@
   {
     "type": "state",
     "named": false
+  },
+  {
+    "type": "string_literal",
+    "named": true
   },
   {
     "type": "struct",
