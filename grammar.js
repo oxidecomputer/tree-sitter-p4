@@ -233,7 +233,7 @@ module.exports = grammar({
 
     action_item: ($) => choice($.method_identifier, $.call, "NoAction"),
 
-    key_type: (_) => choice("range", "exact", "ternary", "lpm", "optional"),
+    key_type: (_) => choice("range", "exact", "ternary", "lpm", "optional", "selector"),
 
     state: ($) =>
       choice(

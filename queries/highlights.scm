@@ -20,6 +20,7 @@
 "range" @keyword
 "lpm" @keyword
 "exact" @keyword
+"selector" @keyword
 "ternary" @keyword
 "optional" @keyword
 "actions" @keyword

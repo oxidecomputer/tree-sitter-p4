@@ -1238,6 +1238,10 @@
         {
           "type": "STRING",
           "value": "optional"
+        },
+        {
+          "type": "STRING",
+          "value": "selector"
         }
       ]
     },

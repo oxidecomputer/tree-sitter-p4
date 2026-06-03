@@ -1604,6 +1604,10 @@
     "named": false
   },
   {
+    "type": "selector",
+    "named": false
+  },
+  {
     "type": "size",
     "named": false
   },
