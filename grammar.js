@@ -7,6 +7,7 @@ module.exports = grammar({
     [$.expr, $.method_identifier],
     [$.bit_type, $._type],
     [$.varbit_type, $._type],
+    [$.int_type, $._type],
   ],
 
   rules: {
@@ -19,6 +20,7 @@ module.exports = grammar({
         $.function_declaration,
         $.header_definition,
         $.struct_definition,
+        $.enum_definition,
         $.typedef_definition,
         $.const_definition,
         $.extern_definition,
@@ -88,6 +90,47 @@ module.exports = grammar({
         "{",
         repeat($.field),
         "}",
+      ),
+
+    enum_definition: ($) =>
+      seq(
+        repeat($.annotation),
+        "enum",
+        choice(
+          // Standard enum form
+          seq(
+            $.type_identifier,
+            "{",
+            seq(
+              $.identifier,
+              repeat(seq(",", $.identifier)),
+              optional(","),
+            ),
+            "}",
+          ),
+
+          // Serializable enum form
+          seq(
+            choice(
+              $.type_identifier,
+              $.bit_type,
+              $.int_type,
+            ),
+            $.type_identifier,
+            "{",
+            seq(
+              // int<W> types allow negative values. Although this would also
+              // allow negatives on unsigned types, for simplicity of the
+              // grammar, allow "-" here.
+              seq($.identifier, "=", $.signed_number),
+              repeat(
+                seq(",", $.identifier, "=", $.signed_number),
+              ),
+              optional(","),
+            ),
+            "}",
+          ),
+        ),
       ),
 
     typedef_definition: ($) =>
@@ -467,11 +510,13 @@ module.exports = grammar({
         $.bit_type,
         $.varbit_type,
         $.tuple_type,
+        $.int_type,
       ),
 
     bit_type: ($) => seq("bit", "<", $.number, ">"),
     varbit_type: ($) => seq("varbit", "<", $.number, ">"),
     tuple_type: ($) => seq("tuple", "<", $.type_argument_list, ">"),
+    int_type: ($) => seq("int", "<", $.number, ">"),
 
     type_argument_list: ($) =>
       seq(
@@ -496,6 +541,8 @@ module.exports = grammar({
     bool: (_) => choice("true", "false"),
 
     number: ($) => choice($.decimal, $.hex, $.whex, $.wdecimal),
+
+    signed_number: ($) => seq(optional("-"), $.number),
 
     decimal: (_) => /\d+/,
 
