@@ -221,7 +221,15 @@ module.exports = grammar({
           $.identifier,
           "=",
           "{",
-          repeat1(seq($.expr, ":", repeat($.annotation), $.action_item, ";")),
+          repeat1(
+            seq(
+              choice($.expr, $.tuple_keyset),
+              ":",
+              repeat($.annotation),
+              $.action_item,
+              ";",
+            ),
+          ),
           "}",
         ),
         seq(optional("const"), "default_action", "=", $.action_item, ";"),
@@ -247,7 +255,7 @@ module.exports = grammar({
         $.action,
         $.var_decl,
         $.type_decl,
-        seq($.transition, ";"),
+        $.transition,
         seq($.call, ";"),
         seq("return", ";"),
       ),
@@ -292,8 +300,14 @@ module.exports = grammar({
         "}",
       ),
 
+    // The select form takes no trailing semicolon in the P4-16 grammar,
+    // where selectExpression ends at the closing brace. One is accepted
+    // anyway since it is common in existing code.
     transition: ($) =>
-      choice(seq("transition", $.identifier), seq("transition", $.select_expr)),
+      choice(
+        seq("transition", $.identifier, ";"),
+        seq("transition", $.select_expr, optional(";")),
+      ),
 
     select_expr: ($) =>
       seq("select", "(", $.expr, ")", "{", repeat($.select_case), "}"),
@@ -314,7 +328,13 @@ module.exports = grammar({
       ),
 
     slice: ($) => seq($.lval, "[", $.number, ":", $.number, "]"),
-    tuple: ($) => seq("{", $.expr, repeat(seq(",", $.expr)), "}"),
+    tuple: ($) =>
+      seq("{", $.expr, repeat(seq(",", $.expr)), optional(","), "}"),
+
+    // Parenthesized key for table entries, the tupleKeysetExpression
+    // production in the P4-16 grammar.
+    tuple_keyset: ($) =>
+      seq("(", $.expr, repeat(seq(",", $.expr)), optional(","), ")"),
 
     expr: ($) =>
       choice(

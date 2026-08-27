@@ -1006,6 +1006,10 @@
         {
           "type": "key_type",
           "named": true
+        },
+        {
+          "type": "tuple_keyset",
+          "named": true
         }
       ]
     }
@@ -1086,6 +1090,21 @@
   },
   {
     "type": "tuple",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "tuple_keyset",
     "named": true,
     "fields": {},
     "children": {
