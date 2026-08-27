@@ -1,0 +1,5 @@
+src/
+bindings/
+prebuilds/
+examples/
+package-lock.json

@@ -1,13 +1,21 @@
 name: Tree-sitter P4
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Limit the GITHUB_TOKEN to reads because the workflow only checks out
+# and parses.
+permissions:
+  contents: read
 
 jobs:
   tree-sitter:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: setup tree-sitter
         uses: tree-sitter/setup-action@v2
@@ -15,5 +23,11 @@ jobs:
       - name: run tree-sitter stats
         run: tree-sitter parse -q -s examples/*.p4 || exit 0
 
+      # Match MISSING as well as ERROR: error recovery for an absent
+      # token inserts a zero-width missing node, and those summaries
+      # print MISSING instead of ERROR.
       - name: run tree-sitter error check
-        run: tree-sitter parse -q examples/*.p4 | grep ERROR && exit 1 || exit 0
+        run: tree-sitter parse -q examples/*.p4 | grep -E "ERROR|MISSING" && exit 1 || exit 0
+
+      - name: check formatting
+        run: npx -y prettier@3.2.4 --check .

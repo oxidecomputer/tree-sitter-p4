@@ -5,9 +5,7 @@
       "camelcase": "P4",
       "scope": "source.p4",
       "path": ".",
-      "file-types": [
-        "p4"
-      ],
+      "file-types": ["p4"],
       "injection-regex": "^p4$"
     }
   ],
