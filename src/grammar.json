@@ -3208,7 +3208,7 @@
     },
     "line_continuation": {
       "type": "PATTERN",
-      "value": "\\s*\\\\\\s*"
+      "value": "\\\\\\s*"
     },
     "method_not_constant": {
       "type": "PATTERN",

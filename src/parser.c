@@ -2670,7 +2670,7 @@ static bool ts_lex(TSLexer *lexer, TSStateId state) {
         '}', 166,
       );
       if (('\t' <= lookahead && lookahead <= '\r') ||
-          lookahead == ' ') ADVANCE(57);
+          lookahead == ' ') SKIP(57);
       if (('1' <= lookahead && lookahead <= '9')) ADVANCE(459);
       if (('A' <= lookahead && lookahead <= 'Z') ||
           lookahead == '_' ||
