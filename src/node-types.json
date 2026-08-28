@@ -342,15 +342,15 @@
           "named": true
         },
         {
+          "type": "expr",
+          "named": true
+        },
+        {
           "type": "identifier",
           "named": true
         },
         {
           "type": "int_type",
-          "named": true
-        },
-        {
-          "type": "signed_number",
           "named": true
         },
         {
@@ -917,21 +917,6 @@
         },
         {
           "type": "select_case",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "signed_number",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "number",
           "named": true
         }
       ]

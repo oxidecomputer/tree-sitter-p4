@@ -27,3 +27,11 @@ enum int<8> MyEnum {
     a = -42,
     b = 42,
 }
+
+// Initializers are compile-time-known expressions, not just literals
+const bit<8> BASE = 8;
+enum bit<8> Offsets {
+    first  = BASE,
+    second = BASE + 1,
+    third  = 1 << 2,
+}

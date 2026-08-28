@@ -482,7 +482,7 @@
                         },
                         {
                           "type": "SYMBOL",
-                          "name": "signed_number"
+                          "name": "expr"
                         }
                       ]
                     },
@@ -505,7 +505,7 @@
                           },
                           {
                             "type": "SYMBOL",
-                            "name": "signed_number"
+                            "name": "expr"
                           }
                         ]
                       }

@@ -119,13 +119,8 @@ module.exports = grammar({
             $.type_identifier,
             "{",
             seq(
-              // int<W> types allow negative values. Although this would also
-              // allow negatives on unsigned types, for simplicity of the
-              // grammar, allow "-" here.
-              seq($.identifier, "=", $.signed_number),
-              repeat(
-                seq(",", $.identifier, "=", $.signed_number),
-              ),
+              seq($.identifier, "=", $.expr),
+              repeat(seq(",", $.identifier, "=", $.expr)),
               optional(","),
             ),
             "}",
