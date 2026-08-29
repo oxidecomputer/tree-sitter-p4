@@ -3203,6 +3203,14 @@
         {
           "type": "SYMBOL",
           "name": "wdecimal"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "shex"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "sdecimal"
         }
       ]
     },
@@ -3242,6 +3250,14 @@
     "wdecimal": {
       "type": "PATTERN",
       "value": "\\d+w\\d+"
+    },
+    "shex": {
+      "type": "PATTERN",
+      "value": "\\d+s0x(\\d|[a-fA-F])+"
+    },
+    "sdecimal": {
+      "type": "PATTERN",
+      "value": "\\d+s\\d+"
     },
     "annotation": {
       "type": "SEQ",

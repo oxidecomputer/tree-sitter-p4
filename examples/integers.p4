@@ -22,3 +22,9 @@ const bit<(1 << 4)> BAR = 1;
 
 // Dynamically sized bit string with expression max width
 const varbit<(32 / 2)> BAZ = 1;
+
+// Signed integer literal
+const int<16> QUX = 16s42;
+
+// Unsigned integer literal
+const bit<16> QUUX = 16w1;

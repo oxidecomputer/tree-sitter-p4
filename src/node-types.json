@@ -718,6 +718,14 @@
           "named": true
         },
         {
+          "type": "sdecimal",
+          "named": true
+        },
+        {
+          "type": "shex",
+          "named": true
+        },
+        {
           "type": "wdecimal",
           "named": true
         },
@@ -1752,8 +1760,16 @@
     "named": false
   },
   {
+    "type": "sdecimal",
+    "named": true
+  },
+  {
     "type": "select",
     "named": false
+  },
+  {
+    "type": "shex",
+    "named": true
   },
   {
     "type": "size",

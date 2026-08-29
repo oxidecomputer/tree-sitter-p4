@@ -543,7 +543,8 @@ module.exports = grammar({
 
     bool: (_) => choice("true", "false"),
 
-    number: ($) => choice($.decimal, $.hex, $.whex, $.wdecimal),
+    number: ($) =>
+      choice($.decimal, $.hex, $.whex, $.wdecimal, $.shex, $.sdecimal),
 
     signed_number: ($) => seq(optional("-"), $.number),
 
@@ -554,6 +555,10 @@ module.exports = grammar({
     whex: (_) => /\d+w0x(\d|[a-fA-F])+/,
 
     wdecimal: (_) => /\d+w\d+/,
+
+    shex: (_) => /\d+s0x(\d|[a-fA-F])+/,
+
+    sdecimal: (_) => /\d+s\d+/,
 
     annotation: ($) => seq("@", $.identifier, optional($.annotation_body)),
 
