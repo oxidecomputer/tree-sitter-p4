@@ -2931,6 +2931,32 @@
         }
       ]
     },
+    "_type_width": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "number"
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "("
+            },
+            {
+              "type": "SYMBOL",
+              "name": "expr"
+            },
+            {
+              "type": "STRING",
+              "value": ")"
+            }
+          ]
+        }
+      ]
+    },
     "bit_type": {
       "type": "SEQ",
       "members": [
@@ -2944,7 +2970,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "number"
+          "name": "_type_width"
         },
         {
           "type": "STRING",
@@ -2965,7 +2991,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "number"
+          "name": "_type_width"
         },
         {
           "type": "STRING",
@@ -3007,7 +3033,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "number"
+          "name": "_type_width"
         },
         {
           "type": "STRING",

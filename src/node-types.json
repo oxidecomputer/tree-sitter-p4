@@ -108,6 +108,10 @@
       "required": true,
       "types": [
         {
+          "type": "expr",
+          "named": true
+        },
+        {
           "type": "number",
           "named": true
         }
@@ -589,6 +593,10 @@
       "multiple": false,
       "required": true,
       "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
         {
           "type": "number",
           "named": true
@@ -1428,6 +1436,10 @@
       "multiple": false,
       "required": true,
       "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
         {
           "type": "number",
           "named": true

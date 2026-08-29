@@ -510,10 +510,16 @@ module.exports = grammar({
         $.int_type,
       ),
 
-    bit_type: ($) => seq("bit", "<", $.number, ">"),
-    varbit_type: ($) => seq("varbit", "<", $.number, ">"),
+    _type_width: ($) =>
+      choice(
+        $.number,
+        seq("(", $.expr, ")"),
+      ),
+
+    bit_type: ($) => seq("bit", "<", $._type_width, ">"),
+    varbit_type: ($) => seq("varbit", "<", $._type_width, ">"),
     tuple_type: ($) => seq("tuple", "<", $.type_argument_list, ">"),
-    int_type: ($) => seq("int", "<", $.number, ">"),
+    int_type: ($) => seq("int", "<", $._type_width, ">"),
 
     type_argument_list: ($) =>
       seq(
