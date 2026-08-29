@@ -1,3 +1,5 @@
+// Copyright 2026 Oxide Computer Company
+
 module.exports = grammar({
   name: "p4",
 
