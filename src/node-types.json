@@ -294,6 +294,10 @@
           "named": true
         },
         {
+          "type": "stack_type",
+          "named": true
+        },
+        {
           "type": "tuple_type",
           "named": true
         },
@@ -354,10 +358,6 @@
           "named": true
         },
         {
-          "type": "range",
-          "named": true
-        },
-        {
           "type": "slice",
           "named": true
         },
@@ -367,6 +367,21 @@
         },
         {
           "type": "tuple",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "expression_list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
           "named": true
         }
       ]
@@ -413,6 +428,10 @@
         },
         {
           "type": "line_continuation",
+          "named": true
+        },
+        {
+          "type": "stack_type",
           "named": true
         },
         {
@@ -521,6 +540,25 @@
     "fields": {}
   },
   {
+    "type": "keyset_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "simple_keyset_expression",
+          "named": true
+        },
+        {
+          "type": "tuple_keyset",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "lval",
     "named": true,
     "fields": {},
@@ -528,6 +566,10 @@
       "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
         {
           "type": "identifier",
           "named": true
@@ -687,6 +729,10 @@
           "named": true
         },
         {
+          "type": "stack_type",
+          "named": true
+        },
+        {
           "type": "tuple_type",
           "named": true
         },
@@ -735,6 +781,7 @@
   {
     "type": "preproc",
     "named": true,
+    "extra": true,
     "fields": {},
     "children": {
       "multiple": true,
@@ -800,7 +847,7 @@
       "required": true,
       "types": [
         {
-          "type": "number",
+          "type": "expr",
           "named": true
         }
       ]
@@ -815,11 +862,11 @@
       "required": true,
       "types": [
         {
-          "type": "expr",
+          "type": "identifier",
           "named": true
         },
         {
-          "type": "identifier",
+          "type": "keyset_expression",
           "named": true
         }
       ]
@@ -834,11 +881,30 @@
       "required": true,
       "types": [
         {
-          "type": "expr",
+          "type": "expression_list",
           "named": true
         },
         {
           "type": "select_case",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "simple_keyset_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "range",
           "named": true
         }
       ]
@@ -874,6 +940,37 @@
       "types": [
         {
           "type": "top",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "stack_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
           "named": true
         }
       ]
@@ -1006,6 +1103,10 @@
         {
           "type": "key_type",
           "named": true
+        },
+        {
+          "type": "keyset_expression",
+          "named": true
         }
       ]
     }
@@ -1094,6 +1195,21 @@
       "types": [
         {
           "type": "expr",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "tuple_keyset",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "simple_keyset_expression",
           "named": true
         }
       ]
@@ -1428,6 +1544,10 @@
     "named": false
   },
   {
+    "type": "?",
+    "named": false
+  },
+  {
     "type": "@",
     "named": false
   },
@@ -1441,6 +1561,10 @@
   },
   {
     "type": "]",
+    "named": false
+  },
+  {
+    "type": "^",
     "named": false
   },
   {
@@ -1469,7 +1593,8 @@
   },
   {
     "type": "comment",
-    "named": true
+    "named": true,
+    "extra": true
   },
   {
     "type": "const",
@@ -1669,6 +1794,10 @@
   },
   {
     "type": "}",
+    "named": false
+  },
+  {
+    "type": "~",
     "named": false
   }
 ]

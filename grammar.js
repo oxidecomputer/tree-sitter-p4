@@ -1,13 +1,21 @@
+// Copyright 2026 Oxide Computer Company
+
 module.exports = grammar({
   name: "p4",
 
   extras: ($) => [/\s|\\\r?\n/, $.comment, $.preproc],
+
+  word: ($) => $.identifier,
 
   precedences: ($) => [
     [$.expr, $.method_identifier],
     [$.bit_type, $._type],
     [$.varbit_type, $._type],
   ],
+
+  // `a.b.c` is a prefix of both a member reference and a method call; the
+  // parser cannot tell them apart until it reaches the `(` or the end.
+  conflicts: ($) => [[$.fval, $.lval], [$.lval]],
 
   rules: {
     source_file: ($) => repeat($.top),
@@ -221,7 +229,15 @@ module.exports = grammar({
           $.identifier,
           "=",
           "{",
-          repeat1(seq($.expr, ":", repeat($.annotation), $.action_item, ";")),
+          repeat1(
+            seq(
+              $.keyset_expression,
+              ":",
+              repeat($.annotation),
+              $.action_item,
+              ";",
+            ),
+          ),
           "}",
         ),
         seq(optional("const"), "default_action", "=", $.action_item, ";"),
@@ -247,7 +263,7 @@ module.exports = grammar({
         $.action,
         $.var_decl,
         $.type_decl,
-        seq($.transition, ";"),
+        $.transition,
         seq($.call, ";"),
         seq("return", ";"),
       ),
@@ -262,13 +278,12 @@ module.exports = grammar({
       ),
 
     var_choice: ($) =>
-      seq(
-        optional("("),
-        optional(choice($._type, $.type_identifier)),
-        optional(")"),
-        optional("("),
+      choice(
+        // Cast: the parenthesised type has to be matched as a unit, or the
+        // optional parens swallow the opening paren of a call instead.
+        seq("(", choice($._type, $.type_identifier), ")", $.expr),
+        seq("(", $.expr, ")"),
         $.expr,
-        optional(")"),
       ),
 
     var_decl: ($) =>
@@ -292,18 +307,30 @@ module.exports = grammar({
         "}",
       ),
 
+    // The select form takes no trailing semicolon in the P4-16 grammar,
+    // where selectExpression ends at the closing brace. One is accepted
+    // anyway since it is common in existing code.
     transition: ($) =>
-      choice(seq("transition", $.identifier), seq("transition", $.select_expr)),
+      choice(
+        seq("transition", $.identifier, ";"),
+        seq("transition", $.select_expr, optional(";")),
+      ),
 
     select_expr: ($) =>
-      seq("select", "(", $.expr, ")", "{", repeat($.select_case), "}"),
-
-    select_case: ($) =>
-      choice(
-        seq($.expr, ":", $.identifier, ";"),
-        seq("default", ":", $.identifier, ";"),
-        seq("_", ":", $.identifier, ";"),
+      seq(
+        "select",
+        "(",
+        $.expression_list,
+        ")",
+        "{",
+        repeat($.select_case),
+        "}",
       ),
+
+    select_case: ($) => seq($.keyset_expression, ":", $.identifier, ";"),
+
+    expression_list: ($) =>
+      seq($.expr, repeat(seq(",", $.expr)), optional(",")),
 
     call: ($) =>
       seq(
@@ -314,23 +341,40 @@ module.exports = grammar({
       ),
 
     slice: ($) => seq($.lval, "[", $.number, ":", $.number, "]"),
-    tuple: ($) => seq("{", $.expr, repeat(seq(",", $.expr)), "}"),
+    tuple: ($) =>
+      seq("{", $.expr, repeat(seq(",", $.expr)), optional(","), "}"),
+
+    // Parenthesized keysets use the tupleKeysetExpression production in the
+    // P4-16 grammar. A single element remains valid for existing table keys.
+    tuple_keyset: ($) =>
+      seq(
+        "(",
+        $.simple_keyset_expression,
+        repeat(seq(",", $.simple_keyset_expression)),
+        optional(","),
+        ")",
+      ),
+
+    keyset_expression: ($) =>
+      choice($.tuple_keyset, $.simple_keyset_expression),
+
+    simple_keyset_expression: ($) => choice($.range, "default", "_", $.expr),
 
     expr: ($) =>
       choice(
+        prec.right(-1, seq($.expr, "?", $.expr, ":", $.expr)),
         prec.left(2, seq(optional($.expr), $.binop, $.expr)),
-        prec(1, $.call),
-        prec(1, $.slice),
+        prec(3, $.call),
+        $.slice,
+        $.lval,
         prec(1, $.tuple),
-        prec(1, $.range),
         prec(1, $.identifier_preproc),
         prec(1, $.string_literal),
         $.number,
         $.bool,
-        $.lval,
       ),
 
-    range: ($) => seq($.number, "..", $.number),
+    range: ($) => prec.left(1, seq($.expr, "..", $.expr)),
 
     string_literal: (_) =>
       token(
@@ -368,10 +412,11 @@ module.exports = grammar({
         "<<",
         ">>",
         "!",
+        "^",
+        "~",
       ),
 
     conditional: ($) => seq($._if, optional($._elseif), optional($._else)),
-    conditional_binop: (_) => choice("&&", "|", "!"),
 
     _if: ($) => seq("if", "(", repeat($.expr), ")", "{", repeat($.stmt), "}"),
     _elseif: ($) =>
@@ -389,10 +434,19 @@ module.exports = grammar({
           $.identifier,
           ";",
         ),
-        seq(choice($._type, $.type_identifier), $.identifier, ";"),
+        seq(
+          choice($.stack_type, $._type, $.type_identifier),
+          $.identifier,
+          ";",
+        ),
       ),
 
-    lval: ($) => seq($.identifier, repeat(seq(".", $.identifier))),
+    lval: ($) =>
+      seq(
+        $.identifier,
+        optional(seq("[", $.expr, "]")),
+        repeat(seq(".", $.identifier, optional(seq("[", $.expr, "]")))),
+      ),
 
     fval: ($) =>
       choice(
@@ -421,14 +475,14 @@ module.exports = grammar({
         seq(
           $.direction,
           optional("("),
-          choice($._type, $.type_identifier),
+          choice($.stack_type, $._type, $.type_identifier),
           optional(")"),
           $.identifier,
           optional(","),
         ),
         seq(
           optional("("),
-          choice($._type, $.type_identifier),
+          choice($.stack_type, $._type, $.type_identifier),
           optional(")"),
           $.identifier,
           optional(","),
@@ -439,7 +493,7 @@ module.exports = grammar({
 
     field: ($) =>
       seq(
-        choice($._type, $.type_identifier),
+        choice($.stack_type, $._type, $.type_identifier),
         $.identifier,
         ";",
         optional($.line_continuation),
@@ -481,14 +535,12 @@ module.exports = grammar({
 
     type_identifier: ($) => prec(1, $.identifier),
 
-    method_identifier: ($) => $.identifier,
+    // A header stack: `h_t[4]`. P4-16 allows any compile-time-known size
+    // expression, not just a literal.
+    stack_type: ($) =>
+      seq(choice($._type, $.type_identifier), "[", $.expr, "]"),
 
-    selection_case: ($) =>
-      choice(
-        seq($.expr, ":", $.identifier, ";"),
-        seq("default", ":", $.identifier, ";"),
-        seq("_", ":", $.identifier, ";"),
-      ),
+    method_identifier: ($) => $.identifier,
 
     identifier: (_) => /[a-zA-Z_][a-zA-Z0-9_]*/,
     identifier_preproc: (_) => /[A-Z][A-Z0-9_]*/,
@@ -526,7 +578,11 @@ module.exports = grammar({
         ),
       ),
 
-    line_continuation: (_) => /\s*\\\s*/,
+    // Anchored at the backslash. A token whose pattern can begin with
+    // whitespace is a lexer candidate at every position, which makes the
+    // whitespace part of the following token rather than an extra, and
+    // leaves node boundaries carrying the preceding indentation.
+    line_continuation: (_) => /\\\s*/,
     method_not_constant: (_) => /[a-zA-Z_]*[a-z][a-zA-Z]*/,
 
     preproc: ($) =>
