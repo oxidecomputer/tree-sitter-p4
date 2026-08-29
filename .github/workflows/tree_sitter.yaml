@@ -17,17 +17,45 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: setup tree-sitter
+      # Pinned: src/ is committed, so the CLI that regenerates it in the
+      # check below has to be the one that produced it. Bumping this means
+      # regenerating src/ in the same commit.
+      - name: setup Tree-sitter
         uses: tree-sitter/setup-action@v2
+        with:
+          tree-sitter-ref: v0.26.8
 
-      - name: run tree-sitter stats
+      # src/ is generated from grammar.js and committed so that consumers
+      # build without the CLI. Nothing else here regenerates it, so a commit
+      # that edits the grammar without running `tree-sitter generate` would
+      # otherwise parse against a stale parser.c.
+      - name: check generated parser is current
+        run: |
+          tree-sitter generate
+          git diff --exit-code src/
+
+      - name: run Tree-sitter stats
         run: tree-sitter parse -q -s examples/*.p4 || exit 0
 
       # Match MISSING as well as ERROR: error recovery for an absent
       # token inserts a zero-width missing node, and those summaries
       # print MISSING instead of ERROR.
-      - name: run tree-sitter error check
-        run: tree-sitter parse -q examples/*.p4 | grep -E "ERROR|MISSING" && exit 1 || exit 0
+      - name: run Tree-sitter error check
+        run: |
+          set +e
+          output=$(tree-sitter parse -q examples/*.p4 2>&1)
+          status=$?
+          set -e
+          printf '%s\n' "$output"
+
+          if [ "$status" -ne 0 ]; then
+            echo "tree-sitter parse failed with status $status"
+            exit "$status"
+          fi
+
+          if grep -Eq "ERROR|MISSING" <<<"$output"; then
+            exit 1
+          fi
 
       - name: check formatting
         run: npx -y prettier@3.2.4 --check .
