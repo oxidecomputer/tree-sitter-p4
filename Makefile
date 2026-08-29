@@ -86,6 +86,12 @@ $(LANGUAGE_NAME).pc: bindings/c/$(LANGUAGE_NAME).pc.in
 $(PARSER): $(SRC_DIR)/grammar.json
 	$(TS) generate $^
 
+# Shared library for Topiary, under a name that does not vary by platform.
+# topiary/languages.ncl has to name the file it loads, and dlopen loads by path
+# without caring about the suffix.
+topiary/grammar.so: $(PARSER) $(EXTRAS)
+	$(CC) $(CFLAGS) -shared $^ -o $@
+
 install: all
 	install -d '$(DESTDIR)$(INCLUDEDIR)'/tree_sitter '$(DESTDIR)$(PCLIBDIR)' '$(DESTDIR)$(LIBDIR)'
 	install -m644 bindings/c/$(LANGUAGE_NAME).h '$(DESTDIR)$(INCLUDEDIR)'/tree_sitter/$(LANGUAGE_NAME).h
@@ -104,7 +110,7 @@ uninstall:
 		'$(DESTDIR)$(PCLIBDIR)'/$(LANGUAGE_NAME).pc
 
 clean:
-	$(RM) $(OBJS) $(LANGUAGE_NAME).pc lib$(LANGUAGE_NAME).a lib$(LANGUAGE_NAME).$(SOEXT)
+	$(RM) $(OBJS) $(LANGUAGE_NAME).pc lib$(LANGUAGE_NAME).a lib$(LANGUAGE_NAME).$(SOEXT) topiary/grammar.so
 
 test:
 	$(TS) test

@@ -57,5 +57,54 @@ jobs:
             exit 1
           fi
 
+      # A query naming a node type the grammar no longer has fails to compile
+      # outright rather than degrading, and `parse` stays green either way.
+      - name: check queries compile
+        run: |
+          tree-sitter query queries/highlights.scm examples/parser.p4 >/dev/null
+          tree-sitter query topiary/p4.scm examples/parser.p4 >/dev/null
+
+      # The formatting queries name a couple of dozen node types, so a change
+      # to the grammar can degrade the formatter without breaking a parse.
+      # Topiary already checks that formatting twice (idempotence) gives the
+      # same result and exits non-zero when it does not, so this step adds
+      # only the guarantee that no text is lost.
+      - name: cache Topiary
+        id: cache-topiary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/topiary
+          key: topiary-${{ runner.os }}-0.7.3
+
+      - name: install Topiary
+        if: steps.cache-topiary.outputs.cache-hit != 'true'
+        run: cargo install topiary-cli --version 0.7.3 --locked
+
+      - name: run formatter check
+        run: |
+          make topiary/grammar.so
+
+          # The fixture pins the layout: changing it has to be deliberate, by
+          # updating expected.p4. The loop below is weaker, and only checks
+          # that real programs come through with their text intact.
+          cp topiary/tests/input.p4 "$RUNNER_TEMP/fixture.p4"
+          TOPIARY_LANGUAGE_DIR=topiary topiary format \
+            -C topiary/languages.ncl "$RUNNER_TEMP/fixture.p4"
+          diff -u topiary/tests/expected.p4 "$RUNNER_TEMP/fixture.p4"
+
+          for f in examples/*.p4; do
+            staged="$RUNNER_TEMP/$(basename "$f")"
+            cp "$f" "$staged"
+            TOPIARY_LANGUAGE_DIR=topiary topiary format \
+              -C topiary/languages.ncl "$staged"
+            before=$(tr -d '[:space:]' < "$f" | sha256sum)
+            after=$(tr -d '[:space:]' < "$staged" | sha256sum)
+            if [ "$before" != "$after" ]; then
+              echo "$f: formatting changed more than whitespace"
+              diff -u "$f" "$staged" || true
+              exit 1
+            fi
+          done
+
       - name: check formatting
         run: npx -y prettier@3.2.4 --check .
