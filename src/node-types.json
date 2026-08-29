@@ -342,11 +342,7 @@
           "named": true
         },
         {
-          "type": "expr",
-          "named": true
-        },
-        {
-          "type": "identifier",
+          "type": "enum_member",
           "named": true
         },
         {
@@ -354,7 +350,26 @@
           "named": true
         },
         {
+          "type": "serializable_enum_member",
+          "named": true
+        },
+        {
           "type": "type_identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "enum_member",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
           "named": true
         }
       ]
@@ -917,6 +932,25 @@
         },
         {
           "type": "select_case",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "serializable_enum_member",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "identifier",
           "named": true
         }
       ]

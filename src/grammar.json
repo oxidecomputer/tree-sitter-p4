@@ -367,6 +367,27 @@
         }
       ]
     },
+    "enum_member": {
+      "type": "SYMBOL",
+      "name": "identifier"
+    },
+    "serializable_enum_member": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "STRING",
+          "value": "="
+        },
+        {
+          "type": "SYMBOL",
+          "name": "expr"
+        }
+      ]
+    },
     "enum_definition": {
       "type": "SEQ",
       "members": [
@@ -400,7 +421,7 @@
                   "members": [
                     {
                       "type": "SYMBOL",
-                      "name": "identifier"
+                      "name": "enum_member"
                     },
                     {
                       "type": "REPEAT",
@@ -413,7 +434,7 @@
                           },
                           {
                             "type": "SYMBOL",
-                            "name": "identifier"
+                            "name": "enum_member"
                           }
                         ]
                       }
@@ -470,21 +491,8 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "SEQ",
-                      "members": [
-                        {
-                          "type": "SYMBOL",
-                          "name": "identifier"
-                        },
-                        {
-                          "type": "STRING",
-                          "value": "="
-                        },
-                        {
-                          "type": "SYMBOL",
-                          "name": "expr"
-                        }
-                      ]
+                      "type": "SYMBOL",
+                      "name": "serializable_enum_member"
                     },
                     {
                       "type": "REPEAT",
@@ -497,15 +505,7 @@
                           },
                           {
                             "type": "SYMBOL",
-                            "name": "identifier"
-                          },
-                          {
-                            "type": "STRING",
-                            "value": "="
-                          },
-                          {
-                            "type": "SYMBOL",
-                            "name": "expr"
+                            "name": "serializable_enum_member"
                           }
                         ]
                       }

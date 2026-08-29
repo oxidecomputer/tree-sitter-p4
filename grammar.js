@@ -92,6 +92,8 @@ module.exports = grammar({
         "}",
       ),
 
+    enum_member: ($) => $.identifier,
+    serializable_enum_member: ($) => seq($.identifier, "=", $.expr),
     enum_definition: ($) =>
       seq(
         repeat($.annotation),
@@ -102,8 +104,8 @@ module.exports = grammar({
             $.type_identifier,
             "{",
             seq(
-              $.identifier,
-              repeat(seq(",", $.identifier)),
+              $.enum_member,
+              repeat(seq(",", $.enum_member)),
               optional(","),
             ),
             "}",
@@ -119,8 +121,8 @@ module.exports = grammar({
             $.type_identifier,
             "{",
             seq(
-              seq($.identifier, "=", $.expr),
-              repeat(seq(",", $.identifier, "=", $.expr)),
+              $.serializable_enum_member,
+              repeat(seq(",", $.serializable_enum_member)),
               optional(","),
             ),
             "}",
