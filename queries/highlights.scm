@@ -2,6 +2,7 @@
 
 "header" @keyword
 "struct" @keyword
+"enum" @keyword
 "typedef" @keyword
 "extern" @keyword
 "parser" @keyword
@@ -38,6 +39,7 @@
 (bit_type) @type
 (varbit_type) @type
 (tuple_type) @type
+(int_type) @type
 "bool" @type
 "error" @type
 "int" @type
