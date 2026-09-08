@@ -108,6 +108,10 @@
       "required": true,
       "types": [
         {
+          "type": "expr",
+          "named": true
+        },
+        {
           "type": "number",
           "named": true
         }
@@ -179,6 +183,10 @@
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "int_type",
           "named": true
         },
         {
@@ -294,6 +302,10 @@
           "named": true
         },
         {
+          "type": "int_type",
+          "named": true
+        },
+        {
           "type": "tuple_type",
           "named": true
         },
@@ -316,6 +328,56 @@
     "type": "direction",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "enum_definition",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "annotation",
+          "named": true
+        },
+        {
+          "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "enum_member",
+          "named": true
+        },
+        {
+          "type": "int_type",
+          "named": true
+        },
+        {
+          "type": "serializable_enum_member",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "enum_member",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "expr",
@@ -412,6 +474,10 @@
           "named": true
         },
         {
+          "type": "int_type",
+          "named": true
+        },
+        {
           "type": "line_continuation",
           "named": true
         },
@@ -440,6 +506,10 @@
       "types": [
         {
           "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "int_type",
           "named": true
         },
         {
@@ -516,6 +586,25 @@
     }
   },
   {
+    "type": "int_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "key_type",
     "named": true,
     "fields": {}
@@ -545,6 +634,10 @@
       "types": [
         {
           "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "int_type",
           "named": true
         },
         {
@@ -625,6 +718,14 @@
           "named": true
         },
         {
+          "type": "sdecimal",
+          "named": true
+        },
+        {
+          "type": "shex",
+          "named": true
+        },
+        {
           "type": "wdecimal",
           "named": true
         },
@@ -684,6 +785,10 @@
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "int_type",
           "named": true
         },
         {
@@ -758,6 +863,10 @@
         },
         {
           "type": "identifier_preproc",
+          "named": true
+        },
+        {
+          "type": "int_type",
           "named": true
         },
         {
@@ -839,6 +948,25 @@
         },
         {
           "type": "select_case",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "serializable_enum_member",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "identifier",
           "named": true
         }
       ]
@@ -1031,6 +1159,10 @@
           "named": true
         },
         {
+          "type": "enum_definition",
+          "named": true
+        },
+        {
           "type": "extern_definition",
           "named": true
         },
@@ -1127,6 +1259,10 @@
           "named": true
         },
         {
+          "type": "int_type",
+          "named": true
+        },
+        {
           "type": "tuple_type",
           "named": true
         },
@@ -1155,6 +1291,10 @@
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "int_type",
           "named": true
         },
         {
@@ -1204,6 +1344,10 @@
           "named": true
         },
         {
+          "type": "int_type",
+          "named": true
+        },
+        {
           "type": "tuple_type",
           "named": true
         },
@@ -1235,6 +1379,10 @@
           "named": true
         },
         {
+          "type": "int_type",
+          "named": true
+        },
+        {
           "type": "tuple_type",
           "named": true
         },
@@ -1259,6 +1407,10 @@
       "types": [
         {
           "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "int_type",
           "named": true
         },
         {
@@ -1292,6 +1444,10 @@
       "multiple": false,
       "required": true,
       "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
         {
           "type": "number",
           "named": true
@@ -1500,6 +1656,10 @@
     "named": false
   },
   {
+    "type": "enum",
+    "named": false
+  },
+  {
     "type": "error",
     "named": false
   },
@@ -1600,8 +1760,16 @@
     "named": false
   },
   {
+    "type": "sdecimal",
+    "named": true
+  },
+  {
     "type": "select",
     "named": false
+  },
+  {
+    "type": "shex",
+    "named": true
   },
   {
     "type": "size",
