@@ -85,12 +85,14 @@ control MyIngress(inout headers hdr,inout metadata meta){
 		hdr.ipv4.dstAddr,
 	);
         csum.run({hdr.ipv4.srcAddr,hdr.ipv4.dstAddr});
+        csum.run({hdr.ipv4.srcAddr, // source first
+            hdr.ipv4.dstAddr});
         if(!hdr.ipv4.isValid()){ return; }
     }
 
     table ipv4_lpm{
         key={
-            hdr.ipv4.dstAddr:lpm;
+            hdr.ipv4.dstAddr:lpm; // longest prefix
             hdr.ipv4.ttl:range;
         }
         actions={ipv4_forward;drop;NoAction;}

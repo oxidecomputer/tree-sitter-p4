@@ -128,20 +128,21 @@
 ; Entries of the braced forms of table_element (`key`, `actions`, entry lists)
 ; are separated by semicolons, unlike the one in `size = 1024;`, which closes
 ; the element and breaks by the rule above.
-(
-  (table_element
-    "{"
-    ";" @append_spaced_softline
-  )
+;
+; A trailing comment is a sibling of the separator, so the anchor that keeps it
+; on the line sits inside the parent. Anchoring a quantified comment after the
+; parent instead matched the wrong node and took time cubic in the number of
+; entries: about 3 s for a table of 400 const entries.
+(table_element
+  "{"
+  ";" @append_spaced_softline
   .
   (comment)* @do_nothing
 )
 
 ; Elements of a tuple literal.
-(
-  (tuple
-    "," @append_spaced_softline
-  )
+(tuple
+  "," @append_spaced_softline
   .
   (comment)* @do_nothing
 )
