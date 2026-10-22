@@ -236,11 +236,19 @@
           "named": true
         },
         {
+          "type": "const_definition",
+          "named": true
+        },
+        {
           "type": "control_var",
           "named": true
         },
         {
           "type": "table",
+          "named": true
+        },
+        {
+          "type": "var_decl",
           "named": true
         }
       ]

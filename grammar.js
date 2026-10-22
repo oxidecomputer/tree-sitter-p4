@@ -224,6 +224,8 @@ module.exports = grammar({
         seq(repeat($.annotation), $.control_var),
         seq(repeat($.annotation), $.table),
         seq(repeat($.annotation), $.action),
+        $.const_definition,
+        $.var_decl,
       ),
 
     table: ($) =>

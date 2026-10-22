@@ -921,6 +921,14 @@
               "name": "action"
             }
           ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "const_definition"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "var_decl"
         }
       ]
     },

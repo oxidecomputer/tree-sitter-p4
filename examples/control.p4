@@ -54,3 +54,12 @@ control ingress(
     }
 
 }
+
+// Constants and variables among a control's declarations.
+control locals(inout Header_t h) {
+    const bit<8> K = 1;
+    bit<16> mask = 16w0xff;
+    apply {
+        h.h.t = mask;
+    }
+}
