@@ -5,6 +5,9 @@ module.exports = grammar({
 
   extras: ($) => [/\s|\\\r?\n/, $.comment, $.preproc],
 
+  // See src/scanner.c.
+  externals: ($) => [$._define_end, $._error_sentinel],
+
   word: ($) => $.identifier,
 
   precedences: ($) => [
@@ -615,7 +618,16 @@ module.exports = grammar({
         seq(
           "#define",
           choice(
-            seq($.identifier_preproc, choice($.number, $.identifier_preproc)),
+            // An object-like macro with a number, another macro, or nothing
+            // as its value. Include guards such as `_P4_METER_` begin with
+            // an underscore, which `identifier_preproc` does not allow.
+            seq(
+              choice(
+                $.identifier_preproc,
+                alias(/_[A-Za-z0-9_]*/, $.identifier_preproc),
+              ),
+              choice($.number, $.identifier_preproc, $._define_end),
+            ),
             seq(
               $.identifier_preproc,
               "{",

@@ -3315,8 +3315,22 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "SYMBOL",
-                      "name": "identifier_preproc"
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "identifier_preproc"
+                        },
+                        {
+                          "type": "ALIAS",
+                          "content": {
+                            "type": "PATTERN",
+                            "value": "_[A-Za-z0-9_]*"
+                          },
+                          "named": true,
+                          "value": "identifier_preproc"
+                        }
+                      ]
                     },
                     {
                       "type": "CHOICE",
@@ -3328,6 +3342,10 @@
                         {
                           "type": "SYMBOL",
                           "name": "identifier_preproc"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_define_end"
                         }
                       ]
                     }
@@ -3734,7 +3752,16 @@
       }
     ]
   ],
-  "externals": [],
+  "externals": [
+    {
+      "type": "SYMBOL",
+      "name": "_define_end"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_error_sentinel"
+    }
+  ],
   "inline": [],
   "supertypes": [],
   "reserved": {}
