@@ -37,3 +37,5 @@ const bit<47> enterprise = ENTERPRISE;
 	hdr.inner_ipv6
 
 header starship STARSHIP
+
+#define ALIAS ENTERPRISE

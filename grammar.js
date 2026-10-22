@@ -616,7 +616,7 @@ module.exports = grammar({
         seq(
           "#define",
           choice(
-            seq($.identifier_preproc, $.number),
+            seq($.identifier_preproc, choice($.number, $.identifier_preproc)),
             seq(
               $.identifier_preproc,
               "{",

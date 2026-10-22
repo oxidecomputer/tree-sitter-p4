@@ -3316,8 +3316,17 @@
                       "name": "identifier_preproc"
                     },
                     {
-                      "type": "SYMBOL",
-                      "name": "number"
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "number"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "identifier_preproc"
+                        }
+                      ]
                     }
                   ]
                 },
