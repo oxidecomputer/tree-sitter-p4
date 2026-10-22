@@ -244,6 +244,10 @@
           "named": true
         },
         {
+          "type": "macro_invocation",
+          "named": true
+        },
+        {
           "type": "table",
           "named": true
         },
@@ -622,6 +626,33 @@
     }
   },
   {
+    "type": "macro_invocation",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "fval",
+          "named": true
+        },
+        {
+          "type": "method_identifier",
+          "named": true
+        },
+        {
+          "type": "type_argument_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "method",
     "named": true,
     "fields": {},
@@ -753,6 +784,10 @@
           "named": true
         },
         {
+          "type": "expr",
+          "named": true
+        },
+        {
           "type": "identifier",
           "named": true
         },
@@ -867,6 +902,10 @@
         },
         {
           "type": "control_var",
+          "named": true
+        },
+        {
+          "type": "macro_invocation",
           "named": true
         },
         {
@@ -1110,6 +1149,10 @@
           "named": true
         },
         {
+          "type": "macro_invocation",
+          "named": true
+        },
+        {
           "type": "switch_statement",
           "named": true
         },
@@ -1273,6 +1316,10 @@
         },
         {
           "type": "header_definition",
+          "named": true
+        },
+        {
+          "type": "macro_invocation",
           "named": true
         },
         {

@@ -30,6 +30,8 @@ module.exports = grammar({
     [$.lval, $.method_identifier],
     [$._member_or_index, $.method_identifier],
     [$._cast_type, $.lval],
+    [$.macro_invocation, $.package],
+    [$._macro_declaration, $.control_var],
   ],
 
   rules: {
@@ -50,6 +52,32 @@ module.exports = grammar({
         $.package,
         $.action,
         $.table,
+        $.macro_invocation,
+      ),
+
+    // A macro expanding to declarations or statements, invoked without a
+    // trailing semicolon, as in `ROTATE_BY_N(1)`. The grammar does not expand
+    // macros, so this is the closest it gets to the expansion. It shares its
+    // prefix with a call, and is told apart only by the missing semicolon.
+    macro_invocation: ($) =>
+      seq(
+        $.method_identifier,
+        "(",
+        optional(seq($.expr, repeat(seq(",", $.expr)), optional(","))),
+        ")",
+      ),
+
+    // The same among declarations, where it shares its prefix with an
+    // instantiation, `T(args) name;`, and is told apart only by the missing
+    // name. The prefix has to be the instantiation's, type and all, because
+    // `type_identifier` would otherwise win statically before the parser
+    // reaches the token that decides.
+    _macro_declaration: ($) =>
+      seq(
+        alias($.type_identifier, $.method_identifier),
+        "(",
+        repeat(seq($.expr, optional(","))),
+        ")",
       ),
 
     package: ($) =>
@@ -66,12 +94,13 @@ module.exports = grammar({
           ")",
           ";",
         ),
+        // An instantiation, as in `V1Switch(p(), c()) main;`. Its arguments
+        // are expressions so that it shares its prefix with a macro
+        // invocation, from which only the instance name tells it apart.
         seq(
           $.method_identifier,
           "(",
-          choice(seq($.method_identifier, "(", ")"), $.identifier),
-          repeat(seq(",", $.method_identifier, "(", ")")),
-          optional(","),
+          optional(seq($.expr, repeat(seq(",", $.expr)), optional(","))),
           ")",
           $.identifier,
           ";",
@@ -182,6 +211,7 @@ module.exports = grammar({
         $.const_definition,
         $.var_decl,
         seq(repeat($.annotation), $.control_var),
+        alias($._macro_declaration, $.macro_invocation),
       ),
 
     control_definition: ($) =>
@@ -231,6 +261,7 @@ module.exports = grammar({
         seq(repeat($.annotation), $.action),
         $.const_definition,
         $.var_decl,
+        alias($._macro_declaration, $.macro_invocation),
       ),
 
     table: ($) =>
@@ -290,6 +321,8 @@ module.exports = grammar({
         $.type_decl,
         $.transition,
         seq($.call, ";"),
+        // A macro invocation: a call without its semicolon.
+        alias($.call, $.macro_invocation),
         seq("return", ";"),
       ),
 

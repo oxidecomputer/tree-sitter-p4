@@ -1,0 +1,68 @@
+================================================================================
+Macro invocations beside instantiations and calls
+================================================================================
+
+DECLARE(1)
+control c() {
+    ROTATE(1)
+    Checksum() csum;
+    apply {
+        APPLY(2)
+        f(3);
+    }
+}
+V1Switch(c()) main;
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (top
+    (macro_invocation
+      (method_identifier
+        (identifier))
+      (expr
+        (number
+          (decimal)))))
+  (top
+    (control_definition
+      (method_identifier
+        (identifier))
+      (control_body
+        (control_body_element
+          (macro_invocation
+            (method_identifier
+              (identifier))
+            (expr
+              (number
+                (decimal)))))
+        (control_body_element
+          (control_var
+            (type_identifier
+              (identifier))
+            (identifier)))
+        (stmt
+          (macro_invocation
+            (fval
+              (method_identifier
+                (identifier)))
+            (expr
+              (number
+                (decimal)))))
+        (stmt
+          (call
+            (fval
+              (method_identifier
+                (identifier)))
+            (expr
+              (number
+                (decimal))))))))
+  (top
+    (package
+      (method_identifier
+        (identifier))
+      (expr
+        (call
+          (fval
+            (method_identifier
+              (identifier)))))
+      (identifier))))

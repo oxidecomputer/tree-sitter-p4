@@ -189,6 +189,7 @@
 (
   [
     (call "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
+    (macro_invocation "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
     (tuple_keyset "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
   ]
   (#scope_id! "argument_list")
@@ -197,6 +198,7 @@
 (
   [
     (call ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
+    (macro_invocation ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
     (tuple_keyset ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
   ]
   (#scope_id! "argument_list")
@@ -205,6 +207,7 @@
 (
   [
     (call "," @append_spaced_scoped_softline)
+    (macro_invocation "," @append_spaced_scoped_softline)
     (tuple_keyset "," @append_spaced_scoped_softline)
   ]
   (#scope_id! "argument_list")
@@ -313,6 +316,7 @@
 [
   (action "(" @prepend_antispace)
   (call "(" @prepend_antispace)
+  (macro_invocation "(" @prepend_antispace)
   (control_definition "(" @prepend_antispace)
   (control_var "(" @prepend_antispace)
   (function_declaration "(" @prepend_antispace)

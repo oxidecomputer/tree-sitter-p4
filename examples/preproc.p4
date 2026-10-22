@@ -69,3 +69,10 @@ control Egress(inout headers hdr) {
     }
 
 #define switch_hash_width 16
+
+// Macros invoked without a semicolon, where they expand to declarations.
+control Rotations(inout headers hdr) {
+    ROTATE(1)
+    ROTATE(2)
+    apply { }
+}
