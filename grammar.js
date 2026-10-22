@@ -14,7 +14,9 @@ module.exports = grammar({
   ],
 
   // `a.b.c` is a prefix of both a member reference and a method call; the
-  // parser cannot tell them apart until it reaches the `(` or the end.
+  // parser cannot tell them apart until it reaches the `(` or the end. The
+  // same holds after `a.b <`, which opens either a comparison or the type
+  // arguments of a call such as `pkt.lookahead<bit<16>>()`.
   //
   // `(t)` is a cast when `t` names a type and an expression follows, and a
   // parenthesized expression otherwise. Without a symbol table the parser keeps
@@ -335,6 +337,7 @@ module.exports = grammar({
     call: ($) =>
       seq(
         $.fval,
+        optional(seq("<", $.type_argument_list, ">")),
         "(",
         optional(seq($.expr, repeat(seq(",", $.expr)), optional(","))),
         ")",

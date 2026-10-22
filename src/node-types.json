@@ -134,6 +134,10 @@
         {
           "type": "fval",
           "named": true
+        },
+        {
+          "type": "type_argument_list",
+          "named": true
         }
       ]
     }

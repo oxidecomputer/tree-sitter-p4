@@ -66,5 +66,9 @@ control c(inout hdr_t[4] stack) {
             x = a;
         }
         x = u.apply().miss;
+
+        // Type arguments on a method call, including a closing `>>`.
+        x = pkt.lookahead<bit<16>>();
+        pkt.extract<hdr_t>(_);
     }
 }
