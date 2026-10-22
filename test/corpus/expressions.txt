@@ -1,0 +1,60 @@
+================================================================================
+Casts and parenthesized expressions
+================================================================================
+
+control c() {
+    apply {
+        x = (a) == b;
+        x = (a) - b;
+        x = (T)a << 8;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (top
+    (control_definition
+      (method_identifier
+        (identifier))
+      (control_body
+        (stmt
+          (var_decl
+            (lval
+              (identifier))
+            (expr
+              (expr
+                (expr
+                  (lval
+                    (identifier))))
+              (binop)
+              (expr
+                (lval
+                  (identifier))))))
+        (stmt
+          (var_decl
+            (lval
+              (identifier))
+            (expr
+              (expr
+                (expr
+                  (lval
+                    (identifier))))
+              (binop)
+              (expr
+                (lval
+                  (identifier))))))
+        (stmt
+          (var_decl
+            (lval
+              (identifier))
+            (expr
+              (expr
+                (type_identifier)
+                (expr
+                  (lval
+                    (identifier))))
+              (binop)
+              (expr
+                (number
+                  (decimal))))))))))

@@ -34,6 +34,12 @@ jobs:
           tree-sitter generate
           git diff --exit-code src/
 
+      # The examples below are checked only for errors. The corpus pins the
+      # trees of inputs that parse cleanly under more than one reading, such
+      # as a cast against a parenthesized expression.
+      - name: run Tree-sitter corpus tests
+        run: tree-sitter test
+
       - name: run Tree-sitter stats
         run: tree-sitter parse -q -s examples/*.p4 || exit 0
 
