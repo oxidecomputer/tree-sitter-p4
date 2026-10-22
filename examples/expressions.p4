@@ -60,5 +60,11 @@ control c(inout hdr_t[4] stack) {
         if ((a)) {
             x = a;
         }
+
+        // Members of a call's result.
+        if (!t.apply().hit) {
+            x = a;
+        }
+        x = u.apply().miss;
     }
 }

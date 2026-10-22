@@ -350,6 +350,10 @@
           "named": true
         },
         {
+          "type": "identifier",
+          "named": true
+        },
+        {
           "type": "identifier_preproc",
           "named": true
         },

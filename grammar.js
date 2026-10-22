@@ -365,6 +365,8 @@ module.exports = grammar({
         prec.right(-1, seq($.expr, "?", $.expr, ":", $.expr)),
         prec.left(2, seq(optional($.expr), $.binop, $.expr)),
         prec(3, $.call),
+        // Members of a call's result, as in `t.apply().hit`.
+        prec(3, seq($.call, repeat1(seq(".", $.identifier)))),
         // A cast binds tighter than any binary operator. When the operand
         // could also begin a binary operation, as in `(x) - y`, the
         // parenthesized reading wins.
