@@ -63,6 +63,16 @@ jobs:
             exit 1
           fi
 
+      # The bindings declare the language function by name, and nothing else
+      # here links them: a misspelled symbol or a source file missing from a
+      # build script surfaces only in a consumer's build.
+      - name: test Rust binding
+        run: cargo test
+
+      - name: test Go binding
+        working-directory: bindings/go
+        run: GOFLAGS=-mod=mod go test ./...
+
       # A query naming a node type the grammar no longer has fails to compile
       # outright rather than degrading, and `parse` stays green either way.
       - name: check queries compile
