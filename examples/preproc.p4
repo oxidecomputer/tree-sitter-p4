@@ -67,3 +67,5 @@ control Egress(inout headers hdr) {
     action rotate_by_##n() { \
         x = y[##n-1:0]; \
     }
+
+#define switch_hash_width 16

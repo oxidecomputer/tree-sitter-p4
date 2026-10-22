@@ -620,11 +620,13 @@ module.exports = grammar({
           choice(
             // An object-like macro with a number, another macro, or nothing
             // as its value. Include guards such as `_P4_METER_` begin with
-            // an underscore, which `identifier_preproc` does not allow.
+            // an underscore, and some names are lowercase, neither of which
+            // `identifier_preproc` allows.
             seq(
               choice(
                 $.identifier_preproc,
                 alias(/_[A-Za-z0-9_]*/, $.identifier_preproc),
+                alias($.method_not_constant, $.identifier_preproc),
               ),
               choice($.number, $.identifier_preproc, $._define_end),
             ),
