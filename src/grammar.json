@@ -3343,12 +3343,24 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "SYMBOL",
-                      "name": "method_not_constant"
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "method_not_constant"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "identifier_preproc"
+                        }
+                      ]
                     },
                     {
-                      "type": "STRING",
-                      "value": "("
+                      "type": "IMMEDIATE_TOKEN",
+                      "content": {
+                        "type": "STRING",
+                        "value": "("
+                      }
                     },
                     {
                       "type": "REPEAT",
@@ -3379,16 +3391,11 @@
                       "value": ")"
                     },
                     {
-                      "type": "STRING",
-                      "value": "("
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "expr"
-                    },
-                    {
-                      "type": "STRING",
-                      "value": ")"
+                      "type": "IMMEDIATE_TOKEN",
+                      "content": {
+                        "type": "PATTERN",
+                        "value": "([^\\\\\\n/]|\\/[^*\\n]|\\\\(.|\\r?\\n))*"
+                      }
                     }
                   ]
                 },

@@ -60,3 +60,10 @@ control Egress(inout headers hdr) {
     apply { }
 #endif
 }
+
+// A function-like macro keeps its body as text: it need not be an expression.
+#define IS_SERVICE(p) ((p) == USER_SPACE_SERVICE_PORT)
+#define ROTATE(n) \
+    action rotate_by_##n() { \
+        x = y[##n-1:0]; \
+    }
