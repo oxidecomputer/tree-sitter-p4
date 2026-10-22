@@ -416,11 +416,11 @@ module.exports = grammar({
         "~",
       ),
 
-    conditional: ($) => seq($._if, optional($._elseif), optional($._else)),
+    conditional: ($) => seq($._if, repeat($._elseif), optional($._else)),
 
-    _if: ($) => seq("if", "(", repeat($.expr), ")", "{", repeat($.stmt), "}"),
+    _if: ($) => seq("if", "(", $.expr, ")", "{", repeat($.stmt), "}"),
     _elseif: ($) =>
-      seq("else", "if", "(", repeat($.expr), ")", "{", repeat($.stmt), "}"),
+      seq("else", "if", "(", $.expr, ")", "{", repeat($.stmt), "}"),
     _else: ($) => seq("else", "{", repeat($.stmt), "}"),
 
     control_var: ($) =>

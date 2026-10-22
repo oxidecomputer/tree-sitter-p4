@@ -37,5 +37,16 @@ control c(inout hdr_t[4] stack) {
 
         // Bit slices still parse alongside indexing.
         x = a[7:0];
+
+        // A chain of `else if`.
+        if (a == 1) {
+            x = a;
+        } else if (a == 2) {
+            x = b;
+        } else if (a == 3) {
+            x = a;
+        } else {
+            x = b;
+        }
     }
 }

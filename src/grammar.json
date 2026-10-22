@@ -2168,16 +2168,11 @@
           "name": "_if"
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_elseif"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_elseif"
+          }
         },
         {
           "type": "CHOICE",
@@ -2205,11 +2200,8 @@
           "value": "("
         },
         {
-          "type": "REPEAT",
-          "content": {
-            "type": "SYMBOL",
-            "name": "expr"
-          }
+          "type": "SYMBOL",
+          "name": "expr"
         },
         {
           "type": "STRING",
@@ -2248,11 +2240,8 @@
           "value": "("
         },
         {
-          "type": "REPEAT",
-          "content": {
-            "type": "SYMBOL",
-            "name": "expr"
-          }
+          "type": "SYMBOL",
+          "name": "expr"
         },
         {
           "type": "STRING",
