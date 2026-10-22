@@ -96,3 +96,51 @@ control c() {
                 (expr
                   (number
                     (decimal)))))))))))
+
+================================================================================
+Unary operators bind tighter than binary ones
+================================================================================
+
+control c() {
+    apply {
+        x = !a && b;
+        x = a - -b;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (top
+    (control_definition
+      (method_identifier
+        (identifier))
+      (control_body
+        (stmt
+          (var_decl
+            (lval
+              (identifier))
+            (expr
+              (expr
+                (unop)
+                (expr
+                  (lval
+                    (identifier))))
+              (binop)
+              (expr
+                (lval
+                  (identifier))))))
+        (stmt
+          (var_decl
+            (lval
+              (identifier))
+            (expr
+              (expr
+                (lval
+                  (identifier)))
+              (binop)
+              (expr
+                (unop)
+                (expr
+                  (lval
+                    (identifier)))))))))))

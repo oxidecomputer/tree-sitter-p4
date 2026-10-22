@@ -85,6 +85,7 @@ control MyIngress(inout headers hdr, inout metadata meta) {
             hdr.ipv4.dstAddr,
         );
         csum.run({hdr.ipv4.srcAddr, hdr.ipv4.dstAddr});
+        if (!hdr.ipv4.isValid()) { return; }
     }
 
     table ipv4_lpm {

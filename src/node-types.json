@@ -398,6 +398,10 @@
           "named": true
         },
         {
+          "type": "unop",
+          "named": true
+        },
+        {
           "type": "varbit_type",
           "named": true
         }
@@ -1392,6 +1396,11 @@
         }
       ]
     }
+  },
+  {
+    "type": "unop",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "var_decl",

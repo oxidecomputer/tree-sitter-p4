@@ -1903,20 +1903,29 @@
             "type": "SEQ",
             "members": [
               {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "expr"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
+                "type": "SYMBOL",
+                "name": "expr"
               },
               {
                 "type": "SYMBOL",
                 "name": "binop"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "expr"
+              }
+            ]
+          }
+        },
+        {
+          "type": "PREC",
+          "value": 4,
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "unop"
               },
               {
                 "type": "SYMBOL",
@@ -2220,15 +2229,28 @@
         },
         {
           "type": "STRING",
+          "value": "^"
+        }
+      ]
+    },
+    "unop": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "STRING",
           "value": "!"
         },
         {
           "type": "STRING",
-          "value": "^"
+          "value": "~"
         },
         {
           "type": "STRING",
-          "value": "~"
+          "value": "-"
+        },
+        {
+          "type": "STRING",
+          "value": "+"
         }
       ]
     },

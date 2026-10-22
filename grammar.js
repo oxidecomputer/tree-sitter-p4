@@ -374,7 +374,8 @@ module.exports = grammar({
     expr: ($) =>
       choice(
         prec.right(-1, seq($.expr, "?", $.expr, ":", $.expr)),
-        prec.left(2, seq(optional($.expr), $.binop, $.expr)),
+        prec.left(2, seq($.expr, $.binop, $.expr)),
+        prec(4, seq($.unop, $.expr)),
         prec(3, $.call),
         // Members of a call's result, as in `t.apply().hit`.
         prec(3, seq($.call, repeat1(seq(".", $.identifier)))),
@@ -436,10 +437,10 @@ module.exports = grammar({
         "&&&",
         "<<",
         ">>",
-        "!",
         "^",
-        "~",
       ),
+
+    unop: (_) => choice("!", "~", "-", "+"),
 
     conditional: ($) => seq($._if, repeat($._elseif), optional($._else)),
 
