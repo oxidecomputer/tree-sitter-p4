@@ -25,6 +25,7 @@ module.exports = grammar({
     [$.fval, $.lval],
     [$.lval],
     [$.lval, $.method_identifier],
+    [$._member_or_index, $.method_identifier],
     [$._cast_type, $.lval],
   ],
 
@@ -343,7 +344,9 @@ module.exports = grammar({
         ")",
       ),
 
-    slice: ($) => seq($.lval, "[", $.number, ":", $.number, "]"),
+    // `x[7:0]` and `x[W - 1:0]`. Whether `[` opens an index or a slice is
+    // known only at the `]` or `:`.
+    slice: ($) => seq($.lval, "[", $.expr, ":", $.expr, "]"),
     tuple: ($) =>
       seq("{", $.expr, repeat(seq(",", $.expr)), optional(","), "}"),
 
@@ -458,22 +461,21 @@ module.exports = grammar({
         ),
       ),
 
-    lval: ($) =>
-      seq(
-        $.identifier,
-        optional(seq("[", $.expr, "]")),
-        repeat(seq(".", $.identifier, optional(seq("[", $.expr, "]")))),
-      ),
+    // A member and index chain such as `hdr.vlan_tag[0].vid`.
+    lval: ($) => seq($.identifier, repeat($._member_or_index)),
 
     fval: ($) =>
       choice(
         seq(
           $.identifier,
-          repeat(seq(".", $.identifier)),
+          repeat($._member_or_index),
           seq(".", $.method_identifier),
         ),
         $.method_identifier,
       ),
+
+    _member_or_index: ($) =>
+      choice(seq(".", $.identifier), seq("[", $.expr, "]")),
 
     method: ($) =>
       seq(

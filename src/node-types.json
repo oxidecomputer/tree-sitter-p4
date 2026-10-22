@@ -521,6 +521,10 @@
       "required": true,
       "types": [
         {
+          "type": "expr",
+          "named": true
+        },
+        {
           "type": "identifier",
           "named": true
         },
@@ -943,11 +947,11 @@
       "required": true,
       "types": [
         {
-          "type": "lval",
+          "type": "expr",
           "named": true
         },
         {
-          "type": "number",
+          "type": "lval",
           "named": true
         }
       ]

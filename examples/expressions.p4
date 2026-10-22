@@ -70,5 +70,13 @@ control c(inout hdr_t[4] stack) {
         // Type arguments on a method call, including a closing `>>`.
         x = pkt.lookahead<bit<16>>();
         pkt.extract<hdr_t>(_);
+
+        // Indexing within a member chain, in value and call position, and a
+        // slice with expression bounds.
+        x = hdr.stack[0].f;
+        if (hdr.stack[0].isValid()) {
+            x = hdr.stack[0].f[3:0];
+        }
+        x = hdr.f[W - 1:0];
     }
 }
