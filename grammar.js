@@ -15,7 +15,16 @@ module.exports = grammar({
 
   // `a.b.c` is a prefix of both a member reference and a method call; the
   // parser cannot tell them apart until it reaches the `(` or the end.
-  conflicts: ($) => [[$.fval, $.lval], [$.lval]],
+  //
+  // `(t)` is a cast when `t` names a type and an expression follows, and a
+  // parenthesized expression otherwise. Without a symbol table the parser keeps
+  // both readings until the next token settles it.
+  conflicts: ($) => [
+    [$.fval, $.lval],
+    [$.lval],
+    [$.lval, $.method_identifier],
+    [$._cast_type, $.lval],
+  ],
 
   rules: {
     source_file: ($) => repeat($.top),
@@ -277,21 +286,12 @@ module.exports = grammar({
         ";",
       ),
 
-    var_choice: ($) =>
-      choice(
-        // Cast: the parenthesised type has to be matched as a unit, or the
-        // optional parens swallow the opening paren of a call instead.
-        seq("(", choice($._type, $.type_identifier), ")", $.expr),
-        seq("(", $.expr, ")"),
-        $.expr,
-      ),
-
     var_decl: ($) =>
       seq(
         optional(choice($._type, $.type_identifier)),
         $.lval,
         "=",
-        $.var_choice,
+        $.expr,
         ";",
       ),
 
@@ -365,6 +365,11 @@ module.exports = grammar({
         prec.right(-1, seq($.expr, "?", $.expr, ":", $.expr)),
         prec.left(2, seq(optional($.expr), $.binop, $.expr)),
         prec(3, $.call),
+        // A cast binds tighter than any binary operator. When the operand
+        // could also begin a binary operation, as in `(x) - y`, the
+        // parenthesized reading wins.
+        prec(4, seq($._cast_type, $.expr)),
+        prec.dynamic(1, prec(-1, seq("(", $.expr, ")"))),
         $.slice,
         $.lval,
         prec(1, $.tuple),
@@ -373,6 +378,13 @@ module.exports = grammar({
         $.number,
         $.bool,
       ),
+
+    // Kept free of precedence so that `(x)` stays ambiguous between a cast
+    // and a parenthesized expression until the next token. For the same
+    // reason the name is an aliased identifier: `type_identifier` carries a
+    // static precedence that would always win over `lval`.
+    _cast_type: ($) =>
+      seq("(", choice($._type, alias($.identifier, $.type_identifier)), ")"),
 
     range: ($) => prec.left(1, seq($.expr, "..", $.expr)),
 

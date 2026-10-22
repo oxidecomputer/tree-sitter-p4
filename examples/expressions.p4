@@ -1,5 +1,6 @@
 // Expression forms the grammar has to cover: the bitwise and conditional
-// operators, header stack indexing, and calls in value position.
+// operators, header stack indexing, calls in value position, casts and
+// parentheses, and conditionals.
 
 header hdr_t {
     bit<8> f;
@@ -47,6 +48,17 @@ control c(inout hdr_t[4] stack) {
             x = a;
         } else {
             x = b;
+        }
+
+        // Casts and parenthesized expressions. `(a) == b` and `(a) - b` are
+        // parenthesized; `(T)a` and `(bit<8>)a` are casts.
+        x = (bit<128>)a << 8 | (bit<128>)b;
+        x = m | ((bit<48>)a);
+        x = (T)a;
+        x = (a) == b;
+        x = (a) - b;
+        if ((a)) {
+            x = a;
         }
     }
 }
