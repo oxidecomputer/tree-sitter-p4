@@ -796,11 +796,42 @@
           "named": true
         },
         {
+          "type": "parser_local_element",
+          "named": true
+        },
+        {
           "type": "state",
           "named": true
         },
         {
           "type": "type_identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "parser_local_element",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "annotation",
+          "named": true
+        },
+        {
+          "type": "const_definition",
+          "named": true
+        },
+        {
+          "type": "control_var",
+          "named": true
+        },
+        {
+          "type": "var_decl",
           "named": true
         }
       ]
@@ -1018,10 +1049,6 @@
         },
         {
           "type": "stmt",
-          "named": true
-        },
-        {
-          "type": "type_identifier",
           "named": true
         }
       ]
@@ -1462,10 +1489,6 @@
   },
   {
     "type": "(",
-    "named": false
-  },
-  {
-    "type": "()",
     "named": false
   },
   {

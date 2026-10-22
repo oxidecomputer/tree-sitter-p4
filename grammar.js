@@ -165,9 +165,18 @@ module.exports = grammar({
           repeat($.parameter),
           ")",
           "{",
-          repeat1($.state),
+          repeat1(choice($.parser_local_element, $.state)),
           "}",
         ),
+      ),
+
+    // parserLocalElement in the P4-16 grammar: declarations that precede or
+    // sit between the states.
+    parser_local_element: ($) =>
+      choice(
+        $.const_definition,
+        $.var_decl,
+        seq(repeat($.annotation), $.control_var),
       ),
 
     control_definition: ($) =>
@@ -263,11 +272,7 @@ module.exports = grammar({
 
     key_type: (_) => choice("range", "exact", "ternary", "lpm", "optional"),
 
-    state: ($) =>
-      choice(
-        seq($.method_identifier, "()", $.type_identifier, ";"),
-        seq("state", $.method_identifier, "{", repeat($.stmt), "}"),
-      ),
+    state: ($) => seq("state", $.method_identifier, "{", repeat($.stmt), "}"),
 
     stmt: ($) =>
       choice(
