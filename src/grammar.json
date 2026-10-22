@@ -3660,7 +3660,7 @@
     },
     "method_not_constant": {
       "type": "PATTERN",
-      "value": "[a-zA-Z_]*[a-z][a-zA-Z]*"
+      "value": "[a-zA-Z0-9_]*[a-z][a-zA-Z0-9_]*"
     },
     "preproc": {
       "type": "CHOICE",

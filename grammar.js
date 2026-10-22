@@ -673,7 +673,7 @@ module.exports = grammar({
     // whitespace part of the following token rather than an extra, and
     // leaves node boundaries carrying the preceding indentation.
     line_continuation: (_) => /\\\s*/,
-    method_not_constant: (_) => /[a-zA-Z_]*[a-z][a-zA-Z]*/,
+    method_not_constant: (_) => /[a-zA-Z0-9_]*[a-z][a-zA-Z0-9_]*/,
 
     preproc: ($) =>
       choice(

@@ -76,3 +76,4 @@ control Rotations(inout headers hdr) {
     ROTATE(2)
     apply { }
 }
+#define ipv4_lpm_partitions 2048
