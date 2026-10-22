@@ -765,6 +765,10 @@
           "named": true
         },
         {
+          "type": "expr",
+          "named": true
+        },
+        {
           "type": "identifier",
           "named": true
         },

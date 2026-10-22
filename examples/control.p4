@@ -63,3 +63,8 @@ control locals(inout Header_t h) {
         h.h.t = mask;
     }
 }
+
+// Constructor parameters, one with a default value.
+control sized(inout Header_t h)(bit<32> table_size, bit<32> meter_size = 1024) {
+    apply { }
+}

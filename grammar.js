@@ -167,6 +167,8 @@ module.exports = grammar({
           "(",
           repeat($.parameter),
           ")",
+          // Constructor parameters, as for a control.
+          optional(seq("(", repeat($.parameter), ")")),
           "{",
           repeat1(choice($.parser_local_element, $.state)),
           "}",
@@ -206,6 +208,8 @@ module.exports = grammar({
           "(",
           repeat($.parameter),
           ")",
+          // Constructor parameters, as in `control C(...)(bit<32> size)`.
+          optional(seq("(", repeat($.parameter), ")")),
           "{",
           optional($.control_body),
           "}",
@@ -506,6 +510,8 @@ module.exports = grammar({
           choice($.stack_type, $._type, $.type_identifier),
           optional(")"),
           $.identifier,
+          // A default value, as for a constructor parameter.
+          optional(seq("=", $.expr)),
           optional(","),
         ),
         seq(
@@ -513,6 +519,7 @@ module.exports = grammar({
           choice($.stack_type, $._type, $.type_identifier),
           optional(")"),
           $.identifier,
+          optional(seq("=", $.expr)),
           optional(","),
         ),
       ),

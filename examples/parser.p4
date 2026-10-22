@@ -69,3 +69,10 @@ parser Locals(packet_in pkt, out Parsed_headers hdr) {
         transition accept;
     }
 }
+
+// Constructor parameters on a parser.
+parser Sized(packet_in pkt, out Parsed_headers hdr)(bit<8> depth = 4) {
+    state start {
+        transition accept;
+    }
+}

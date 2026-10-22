@@ -255,6 +255,10 @@
   "=" @prepend_space @append_space
 )
 
+(parameter
+  "=" @prepend_space @append_space
+)
+
 (table_element
   "=" @prepend_space @append_space
 )
