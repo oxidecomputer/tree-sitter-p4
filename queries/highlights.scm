@@ -10,6 +10,7 @@
 "state" @keyword
 "if" @keyword
 "else" @keyword
+"switch" @keyword
 "transition" @keyword
 "select" @keyword
 "apply" @keyword

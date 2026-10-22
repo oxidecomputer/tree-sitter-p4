@@ -1087,6 +1087,10 @@
           "named": true
         },
         {
+          "type": "switch_statement",
+          "named": true
+        },
+        {
           "type": "transition",
           "named": true
         },
@@ -1119,6 +1123,44 @@
         },
         {
           "type": "type_identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "switch_case",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "stmt",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "switch_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "switch_case",
           "named": true
         }
       ]
@@ -1799,6 +1841,10 @@
   },
   {
     "type": "struct",
+    "named": false
+  },
+  {
+    "type": "switch",
     "named": false
   },
   {

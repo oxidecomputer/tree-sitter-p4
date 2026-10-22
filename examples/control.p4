@@ -68,3 +68,22 @@ control locals(inout Header_t h) {
 control sized(inout Header_t h)(bit<32> table_size, bit<32> meter_size = 1024) {
     apply { }
 }
+
+// A switch on the action a table ran, with a label that falls through.
+control dispatch(inout Header_t h) {
+    action a() { }
+    action b() { }
+    table t {
+        actions = { a; b; NoAction; }
+    }
+    apply {
+        switch (t.apply().action_run) {
+            a: { h.h.e = 1; }
+            b:
+            NoAction: {
+                h.h.e = 2;
+            }
+            default: { }
+        }
+    }
+}

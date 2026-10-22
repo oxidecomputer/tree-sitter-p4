@@ -284,12 +284,28 @@ module.exports = grammar({
     stmt: ($) =>
       choice(
         $.conditional,
+        $.switch_statement,
         $.action,
         $.var_decl,
         $.type_decl,
         $.transition,
         seq($.call, ";"),
         seq("return", ";"),
+      ),
+
+    switch_statement: ($) =>
+      seq("switch", "(", $.expr, ")", "{", repeat($.switch_case), "}"),
+
+    // A label with no block falls through to the next one. A `{` after the
+    // colon always opens the block: P4-16 forbids a label that begins with a
+    // brace, so it cannot be the next label's tuple.
+    switch_case: ($) =>
+      prec.right(
+        seq(
+          choice("default", $.expr),
+          ":",
+          optional(seq("{", repeat($.stmt), "}")),
+        ),
       ),
 
     type_decl: ($) =>

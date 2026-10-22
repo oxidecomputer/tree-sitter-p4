@@ -27,6 +27,7 @@
   (select_case)
   (state)
   (stmt)
+  (switch_case)
   (table_element)
   (top)
 ] @allow_blank_line_before
@@ -56,6 +57,7 @@
     (select_case)
     (state)
     (stmt)
+    (switch_case)
     (table_element)
     (top)
   ] @append_spaced_softline
@@ -82,6 +84,8 @@
   (select_expr "{" @prepend_space)
   (state "{" @prepend_space)
   (struct_definition "{" @prepend_space)
+  (switch_case "{" @prepend_space)
+  (switch_statement "{" @prepend_space)
   (table "{" @prepend_space)
   (table_element "{" @prepend_space)
 ]
@@ -98,6 +102,8 @@
   (select_expr "{" @append_spaced_softline @append_indent_start)
   (state "{" @append_spaced_softline @append_indent_start)
   (struct_definition "{" @append_spaced_softline @append_indent_start)
+  (switch_case "{" @append_spaced_softline @append_indent_start)
+  (switch_statement "{" @append_spaced_softline @append_indent_start)
   (table "{" @append_spaced_softline @append_indent_start)
   (table_element "{" @append_spaced_softline @append_indent_start)
   (tuple "{" @append_empty_softline @append_indent_start)
@@ -115,6 +121,8 @@
   (select_expr "}" @prepend_spaced_softline @prepend_indent_end)
   (state "}" @prepend_spaced_softline @prepend_indent_end)
   (struct_definition "}" @prepend_spaced_softline @prepend_indent_end)
+  (switch_case "}" @prepend_spaced_softline @prepend_indent_end)
+  (switch_statement "}" @prepend_spaced_softline @prepend_indent_end)
   (table "}" @prepend_spaced_softline @prepend_indent_end)
   (table_element "}" @prepend_spaced_softline @prepend_indent_end)
   (tuple "}" @prepend_empty_softline @prepend_indent_end)
@@ -225,6 +233,7 @@
   "parser"
   "state"
   "struct"
+  "switch"
   "table"
   "transition"
   "typedef"
@@ -312,6 +321,7 @@
 ; a bit slice it separates the bounds of a range and takes no space.
 [
   (select_case ":" @prepend_antispace @append_space)
+  (switch_case ":" @prepend_antispace @append_space)
   (table_element ":" @prepend_antispace @append_space)
 ]
 
