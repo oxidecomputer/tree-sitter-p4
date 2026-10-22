@@ -481,6 +481,7 @@ module.exports = grammar({
           repeat(seq($.expr, optional(","))),
           ")",
           $.identifier,
+          optional(seq("=", $.obj_initializer)),
           ";",
         ),
         seq(
@@ -489,6 +490,11 @@ module.exports = grammar({
           ";",
         ),
       ),
+
+    // The methods an instance defines, as in
+    // `RegisterAction<...>(reg) ra = { void apply(...) { ... } };`.
+    obj_initializer: ($) =>
+      seq("{", repeat(choice($.function_declaration, $.control_var)), "}"),
 
     // A member and index chain such as `hdr.vlan_tag[0].vid`.
     lval: ($) => seq($.identifier, repeat($._member_or_index)),

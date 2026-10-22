@@ -87,3 +87,17 @@ control dispatch(inout Header_t h) {
         }
     }
 }
+
+// An instance whose initializer defines a method.
+control stateful(inout Header_t h) {
+    Register<bit<32>, bit<32>>(1024) reg;
+    RegisterAction<bit<32>, bit<32>, bit<32>>(reg) count = {
+        void apply(inout bit<32> value, out bit<32> read_value) {
+            read_value = value;
+            value = value + 1;
+        }
+    };
+    apply {
+        count.execute(0);
+    }
+}

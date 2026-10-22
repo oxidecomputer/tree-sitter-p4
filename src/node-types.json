@@ -306,6 +306,10 @@
           "named": true
         },
         {
+          "type": "obj_initializer",
+          "named": true
+        },
+        {
           "type": "stack_type",
           "named": true
         },
@@ -712,6 +716,25 @@
         },
         {
           "type": "whex",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "obj_initializer",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "control_var",
+          "named": true
+        },
+        {
+          "type": "function_declaration",
           "named": true
         }
       ]
