@@ -39,3 +39,9 @@ const bit<47> enterprise = ENTERPRISE;
 header starship STARSHIP
 
 #define ALIAS ENTERPRISE
+#undef ALIAS
+#if ENTERPRISE == 1
+#error "unreachable"
+#elif ENTERPRISE == 1701
+#pragma once
+#endif

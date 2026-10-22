@@ -659,6 +659,7 @@ module.exports = grammar({
         seq("#include", choice("<", '"'), /[^">]*/, choice(">", '"')),
         seq("#if", /.*/),
         seq("#else", /.*/),
+        seq(choice("#elif", "#undef", "#error", "#warning", "#pragma"), /.*/),
         "#endif",
       ),
   },

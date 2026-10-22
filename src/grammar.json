@@ -3617,6 +3617,40 @@
           ]
         },
         {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "#elif"
+                },
+                {
+                  "type": "STRING",
+                  "value": "#undef"
+                },
+                {
+                  "type": "STRING",
+                  "value": "#error"
+                },
+                {
+                  "type": "STRING",
+                  "value": "#warning"
+                },
+                {
+                  "type": "STRING",
+                  "value": "#pragma"
+                }
+              ]
+            },
+            {
+              "type": "PATTERN",
+              "value": ".*"
+            }
+          ]
+        },
+        {
           "type": "STRING",
           "value": "#endif"
         }

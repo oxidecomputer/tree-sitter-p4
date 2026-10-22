@@ -1464,6 +1464,10 @@
     "named": false
   },
   {
+    "type": "#elif",
+    "named": false
+  },
+  {
     "type": "#else",
     "named": false
   },
@@ -1472,11 +1476,27 @@
     "named": false
   },
   {
+    "type": "#error",
+    "named": false
+  },
+  {
     "type": "#if",
     "named": false
   },
   {
     "type": "#include",
+    "named": false
+  },
+  {
+    "type": "#pragma",
+    "named": false
+  },
+  {
+    "type": "#undef",
+    "named": false
+  },
+  {
+    "type": "#warning",
     "named": false
   },
   {
