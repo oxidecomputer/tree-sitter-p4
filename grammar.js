@@ -209,14 +209,12 @@ module.exports = grammar({
         ),
       ),
 
+    // P4-16 allows exactly one apply block, but the preprocessor directives
+    // are extras, so `#if ... apply {...} #else apply {...} #endif` reaches the
+    // parser as two of them.
     control_body: ($) =>
-      choice(
-        seq(
-          repeat($.control_body_element),
-          seq("apply", "{", repeat($.stmt), "}"),
-          repeat($.control_body_element),
-        ),
-        repeat1($.control_body_element),
+      repeat1(
+        choice($.control_body_element, seq("apply", "{", repeat($.stmt), "}")),
       ),
 
     control_body_element: ($) =>

@@ -45,3 +45,18 @@ header starship STARSHIP
 #elif ENTERPRISE == 1701
 #pragma once
 #endif
+
+// Directives are extras, so both branches of a conditional reach the parser,
+// here as two apply blocks.
+control Egress(inout headers hdr) {
+#if __TARGET_TOFINO__ == 2
+    apply {
+        hdr.a.setValid();
+    }
+#elif __TARGET_TOFINO__ == 3
+    apply {
+    }
+#else
+    apply { }
+#endif
+}
