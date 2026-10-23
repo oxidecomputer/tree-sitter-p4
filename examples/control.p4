@@ -101,3 +101,16 @@ control stateful(inout Header_t h) {
         count.execute(0);
     }
 }
+
+// Properties an architecture defines, beside the standard ones.
+control profiled(inout Header_t h) {
+    action a() { }
+    table t {
+        key = { h.h.e: exact; }
+        actions = { a; }
+        implementation = action_profile;
+        idle_timeout = true;
+        @name(".t_timeout") supports_timeout = true;
+    }
+    apply { t.apply(); }
+}

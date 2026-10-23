@@ -305,10 +305,20 @@ module.exports = grammar({
           "}",
         ),
         seq(optional("const"), "default_action", "=", $.action_item, ";"),
-        seq("const", $.identifier, "=", $.expr, ";"),
         seq("size", "=", $.expr, ";"),
         seq("meters", "=", $.identifier, ";"),
         seq("counters", "=", $.identifier, ";"),
+        // Any other property, as P4-16 allows: an architecture's own, such
+        // as `implementation = profile;` or `idle_timeout = true;`, with an
+        // optional annotation and `const`.
+        seq(
+          repeat($.annotation),
+          optional("const"),
+          $.identifier,
+          "=",
+          $.expr,
+          ";",
+        ),
       ),
 
     action_item: ($) => choice($.method_identifier, $.call, "NoAction"),
