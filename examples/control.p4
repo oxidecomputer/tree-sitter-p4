@@ -114,3 +114,16 @@ control profiled(inout Header_t h) {
     }
     apply { t.apply(); }
 }
+
+// Entries kept in a separate file.
+control included(inout Header_t h) {
+    action a() { }
+    table t {
+        key = { h.h.e: exact; }
+        actions = { a; }
+        const entries = {
+            #include "entries.p4"
+        }
+    }
+    apply { t.apply(); }
+}

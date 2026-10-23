@@ -297,7 +297,8 @@ module.exports = grammar({
           $.identifier,
           "=",
           "{",
-          repeat1(
+          // Possibly empty, as when the entries come from an `#include`.
+          repeat(
             seq(
               $.keyset_expression,
               ":",
