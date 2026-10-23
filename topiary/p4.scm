@@ -16,6 +16,22 @@
   (string_literal)
 ] @leaf
 
+; An annotation is separated from its neighbors, except for the semicolon
+; after the annotations of a key element.
+(annotation) @append_space
+
+(
+  (annotation)
+  .
+  ";" @prepend_antispace
+)
+
+(table_element
+  (key_type) @append_space
+  .
+  (annotation)
+)
+
 ; A directive has to begin a line. As an extra it may follow any token, such as
 ; the brace before `#endif` that closes an apply block inside `#if`.
 (preproc) @prepend_hardline

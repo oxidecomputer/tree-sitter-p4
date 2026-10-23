@@ -71,6 +71,8 @@ parser MyParser(
 
 control MyIngress(inout headers hdr,inout metadata meta){
     Checksum()csum;
+    @name(".hits")Counter<bit<32>,bit<8>>(8)hits;
+    @flexible bit<8>    scratch;
 
     action drop(){
         mark_to_drop();
@@ -93,7 +95,7 @@ control MyIngress(inout headers hdr,inout metadata meta){
     table ipv4_lpm{
         key={
             hdr.ipv4.dstAddr:lpm; // longest prefix
-            hdr.ipv4.ttl:range;
+            hdr.ipv4.ttl:range@name("ttl");
         }
         actions={ipv4_forward;drop;NoAction;}
         size=1024;
