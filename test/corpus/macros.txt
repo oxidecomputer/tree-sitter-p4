@@ -19,9 +19,8 @@ V1Switch(c()) main;
   (macro_invocation
     (method_identifier
       (identifier))
-    (expr
-      (number
-        (decimal))))
+    (number
+      (decimal)))
   (control_definition
     (method_identifier
       (identifier))
@@ -30,9 +29,8 @@ V1Switch(c()) main;
         (macro_invocation
           (method_identifier
             (identifier))
-          (expr
-            (number
-              (decimal)))))
+          (number
+            (decimal))))
       (control_body_element
         (control_var
           (type_identifier
@@ -43,23 +41,20 @@ V1Switch(c()) main;
           (fval
             (method_identifier
               (identifier)))
-          (expr
-            (number
-              (decimal))))
+          (number
+            (decimal)))
         (call_statement
           (call
             (fval
               (method_identifier
                 (identifier)))
-            (expr
-              (number
-                (decimal))))))))
+            (number
+              (decimal)))))))
   (package
     (method_identifier
       (identifier))
-    (expr
-      (call
-        (fval
-          (method_identifier
-            (identifier)))))
+    (call
+      (fval
+        (method_identifier
+          (identifier))))
     (identifier)))

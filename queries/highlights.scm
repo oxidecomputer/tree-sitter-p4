@@ -73,7 +73,7 @@
   .
   (identifier) @variable.other.member)
 
-(expr
+(member_expression
   "."
   .
   (identifier) @variable.other.member)
@@ -266,7 +266,7 @@
   ";"
 ] @punctuation.delimiter
 
-(expr
+(conditional_expression
   [
     "?"
     ":"

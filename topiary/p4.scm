@@ -258,7 +258,7 @@
 (return_statement
   "return" @append_space
   .
-  (expr)
+  (_expression)
 )
 
 ; Append spaces

@@ -22,7 +22,6 @@ const bit<8> A = 1;
       (number
         (decimal)))
     (identifier)
-    (expr
-      (number
-        (decimal))))
+    (number
+      (decimal)))
   (preproc))

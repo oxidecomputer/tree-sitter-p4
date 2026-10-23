@@ -11,10 +11,10 @@ module.exports = grammar({
   word: ($) => $.identifier,
 
   // Hidden rules that queries may still name, as in `(_definition)`.
-  supertypes: ($) => [$._definition, $._statement],
+  supertypes: ($) => [$._definition, $._statement, $._expression],
 
   precedences: ($) => [
-    [$.expr, $.method_identifier],
+    [$._expression, $.method_identifier],
     [$.bit_type, $._type],
     [$.int_type, $._type],
     [$.varbit_type, $._type],
@@ -67,7 +67,9 @@ module.exports = grammar({
       seq(
         $.method_identifier,
         "(",
-        optional(seq($.expr, repeat(seq(",", $.expr)), optional(","))),
+        optional(
+          seq($._expression, repeat(seq(",", $._expression)), optional(",")),
+        ),
         ")",
       ),
 
@@ -80,7 +82,7 @@ module.exports = grammar({
       seq(
         alias($.type_identifier, $.method_identifier),
         "(",
-        repeat(seq($.expr, optional(","))),
+        repeat(seq($._expression, optional(","))),
         ")",
       ),
 
@@ -102,7 +104,9 @@ module.exports = grammar({
         seq(
           $.method_identifier,
           "(",
-          optional(seq($.expr, repeat(seq(",", $.expr)), optional(","))),
+          optional(
+            seq($._expression, repeat(seq(",", $._expression)), optional(",")),
+          ),
           ")",
           $.identifier,
           ";",
@@ -170,7 +174,7 @@ module.exports = grammar({
         choice($._type, $.type_identifier),
         $.identifier,
         "=",
-        $.expr,
+        $._expression,
         ";",
       ),
 
@@ -276,7 +280,9 @@ module.exports = grammar({
           "key",
           "=",
           "{",
-          repeat1(seq($.expr, ":", $.key_type, repeat($.annotation), ";")),
+          repeat1(
+            seq($._expression, ":", $.key_type, repeat($.annotation), ";"),
+          ),
           "}",
         ),
         seq(
@@ -303,7 +309,7 @@ module.exports = grammar({
           "}",
         ),
         seq(optional("const"), "default_action", "=", $.action_item, ";"),
-        seq("size", "=", $.expr, ";"),
+        seq("size", "=", $._expression, ";"),
         seq("meters", "=", $.identifier, ";"),
         seq("counters", "=", $.identifier, ";"),
         // Any other property, as P4-16 allows: an architecture's own, such
@@ -314,7 +320,7 @@ module.exports = grammar({
           optional("const"),
           $.identifier,
           "=",
-          $.expr,
+          $._expression,
           ";",
         ),
       ),
@@ -350,20 +356,20 @@ module.exports = grammar({
     // Preferred to a macro invocation followed by an empty statement.
     call_statement: ($) => prec(1, seq($.call, ";")),
 
-    return_statement: ($) => seq("return", optional($.expr), ";"),
+    return_statement: ($) => seq("return", optional($._expression), ";"),
 
     exit_statement: (_) => seq("exit", ";"),
 
     empty_statement: (_) => ";",
 
     switch_statement: ($) =>
-      seq("switch", "(", $.expr, ")", "{", repeat($.switch_case), "}"),
+      seq("switch", "(", $._expression, ")", "{", repeat($.switch_case), "}"),
 
     // A label with no block falls through to the next one. A `{` after the
     // colon always opens the block: P4-16 forbids a label that begins with a
     // brace, so it cannot be the next label's tuple.
     switch_case: ($) =>
-      prec.right(seq(choice("default", $.expr), ":", optional($.block))),
+      prec.right(seq(choice("default", $._expression), ":", optional($.block))),
 
     type_decl: ($) =>
       seq(
@@ -380,7 +386,7 @@ module.exports = grammar({
         // A slice may be assigned to, as in `x[15:8] = y;`.
         choice($.lval, $.slice),
         "=",
-        $.expr,
+        $._expression,
         ";",
       ),
 
@@ -417,22 +423,30 @@ module.exports = grammar({
     select_case: ($) => seq($.keyset_expression, ":", $.identifier, ";"),
 
     expression_list: ($) =>
-      seq($.expr, repeat(seq(",", $.expr)), optional(",")),
+      seq($._expression, repeat(seq(",", $._expression)), optional(",")),
 
     call: ($) =>
       seq(
         $.fval,
         optional(seq("<", $.type_argument_list, ">")),
         "(",
-        optional(seq($.expr, repeat(seq(",", $.expr)), optional(","))),
+        optional(
+          seq($._expression, repeat(seq(",", $._expression)), optional(",")),
+        ),
         ")",
       ),
 
     // `x[7:0]` and `x[W - 1:0]`. Whether `[` opens an index or a slice is
     // known only at the `]` or `:`.
-    slice: ($) => seq($.lval, "[", $.expr, ":", $.expr, "]"),
+    slice: ($) => seq($.lval, "[", $._expression, ":", $._expression, "]"),
     tuple: ($) =>
-      seq("{", $.expr, repeat(seq(",", $.expr)), optional(","), "}"),
+      seq(
+        "{",
+        $._expression,
+        repeat(seq(",", $._expression)),
+        optional(","),
+        "}",
+      ),
 
     // Parenthesized keysets use the tupleKeysetExpression production in the
     // P4-16 grammar. A single element remains valid for existing table keys.
@@ -448,21 +462,18 @@ module.exports = grammar({
     keyset_expression: ($) =>
       choice($.tuple_keyset, $.simple_keyset_expression),
 
-    simple_keyset_expression: ($) => choice($.range, "default", "_", $.expr),
+    simple_keyset_expression: ($) =>
+      choice($.range, "default", "_", $._expression),
 
-    expr: ($) =>
+    _expression: ($) =>
       choice(
-        prec.right(-1, seq($.expr, "?", $.expr, ":", $.expr)),
-        prec.left(2, seq($.expr, $.binop, $.expr)),
-        prec(4, seq($.unop, $.expr)),
+        $.conditional_expression,
+        $.binary_expression,
+        $.unary_expression,
         prec(3, $.call),
-        // Members of a call's result, as in `t.apply().hit`.
-        prec(3, seq($.call, repeat1(seq(".", $.identifier)))),
-        // A cast binds tighter than any binary operator. When the operand
-        // could also begin a binary operation, as in `(x) - y`, the
-        // parenthesized reading wins.
-        prec(4, seq($._cast_type, $.expr)),
-        prec.dynamic(1, prec(-1, seq("(", $.expr, ")"))),
+        $.member_expression,
+        $.cast_expression,
+        $.parenthesized_expression,
         $.slice,
         $.lval,
         prec(1, $.tuple),
@@ -472,6 +483,29 @@ module.exports = grammar({
         $.bool,
       ),
 
+    conditional_expression: ($) =>
+      prec.right(
+        -1,
+        seq($._expression, "?", $._expression, ":", $._expression),
+      ),
+
+    binary_expression: ($) =>
+      prec.left(2, seq($._expression, $.binop, $._expression)),
+
+    unary_expression: ($) => prec(4, seq($.unop, $._expression)),
+
+    // Members of a call's result, as in `t.apply().hit`.
+    member_expression: ($) =>
+      prec(3, seq($.call, repeat1(seq(".", $.identifier)))),
+
+    // A cast binds tighter than any binary operator. When the operand could
+    // also begin a binary operation, as in `(x) - y`, the parenthesized
+    // reading wins.
+    cast_expression: ($) => prec(4, seq($._cast_type, $._expression)),
+
+    parenthesized_expression: ($) =>
+      prec.dynamic(1, prec(-1, seq("(", $._expression, ")"))),
+
     // Kept free of precedence so that `(x)` stays ambiguous between a cast
     // and a parenthesized expression until the next token. For the same
     // reason the name is an aliased identifier: `type_identifier` carries a
@@ -479,7 +513,7 @@ module.exports = grammar({
     _cast_type: ($) =>
       seq("(", choice($._type, alias($.identifier, $.type_identifier)), ")"),
 
-    range: ($) => prec.left(1, seq($.expr, "..", $.expr)),
+    range: ($) => prec.left(1, seq($._expression, "..", $._expression)),
 
     string_literal: (_) =>
       token(
@@ -533,7 +567,7 @@ module.exports = grammar({
         seq(
           "if",
           "(",
-          $.expr,
+          $._expression,
           ")",
           $._statement,
           optional(seq("else", $._statement)),
@@ -546,7 +580,7 @@ module.exports = grammar({
           $.type_identifier,
           optional(seq("<", $.type_argument_list, ">")),
           "(",
-          repeat(seq($.expr, optional(","))),
+          repeat(seq($._expression, optional(","))),
           ")",
           $.identifier,
           optional(seq("=", $.obj_initializer)),
@@ -578,7 +612,7 @@ module.exports = grammar({
       ),
 
     _member_or_index: ($) =>
-      choice(seq(".", $.identifier), seq("[", $.expr, "]")),
+      choice(seq(".", $.identifier), seq("[", $._expression, "]")),
 
     // A method of an extern. A constructor has no return type, as in
     // `Register(bit<32> size);`.
@@ -603,7 +637,7 @@ module.exports = grammar({
           optional(")"),
           $.identifier,
           // A default value, as for a constructor parameter.
-          optional(seq("=", $.expr)),
+          optional(seq("=", $._expression)),
           optional(","),
         ),
         seq(
@@ -611,7 +645,7 @@ module.exports = grammar({
           choice($.stack_type, $._type, $.type_identifier),
           optional(")"),
           $.identifier,
-          optional(seq("=", $.expr)),
+          optional(seq("=", $._expression)),
           optional(","),
         ),
       ),
@@ -655,7 +689,7 @@ module.exports = grammar({
 
     // A width is a number, a name such as a macro, or, per P4-16, any
     // expression in parentheses, as in `bit<(4 * 8)>`.
-    _width: ($) => choice($.number, $.identifier, seq("(", $.expr, ")")),
+    _width: ($) => choice($.number, $.identifier, seq("(", $._expression, ")")),
     tuple_type: ($) => seq("tuple", "<", $.type_argument_list, ">"),
 
     // The type parameters of a generic declaration, as in
@@ -674,7 +708,7 @@ module.exports = grammar({
     // A header stack: `h_t[4]`. P4-16 allows any compile-time-known size
     // expression, not just a literal.
     stack_type: ($) =>
-      seq(choice($._type, $.type_identifier), "[", $.expr, "]"),
+      seq(choice($._type, $.type_identifier), "[", $._expression, "]"),
 
     method_identifier: ($) => $.identifier,
 
@@ -721,7 +755,8 @@ module.exports = grammar({
         ")",
       ),
 
-    annotation_content: ($) => choice($.expr, /["][^"]*["]/, $.annotation),
+    annotation_content: ($) =>
+      choice($._expression, /["][^"]*["]/, $.annotation),
 
     comment: (_) =>
       token(

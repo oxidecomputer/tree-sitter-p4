@@ -21,40 +21,34 @@ control c() {
         (var_decl
           (lval
             (identifier))
-          (expr
-            (expr
-              (expr
-                (lval
-                  (identifier))))
-            (binop)
-            (expr
+          (binary_expression
+            (parenthesized_expression
               (lval
-                (identifier)))))
+                (identifier)))
+            (binop)
+            (lval
+              (identifier))))
         (var_decl
           (lval
             (identifier))
-          (expr
-            (expr
-              (expr
-                (lval
-                  (identifier))))
-            (binop)
-            (expr
+          (binary_expression
+            (parenthesized_expression
               (lval
-                (identifier)))))
+                (identifier)))
+            (binop)
+            (lval
+              (identifier))))
         (var_decl
           (lval
             (identifier))
-          (expr
-            (expr
+          (binary_expression
+            (cast_expression
               (type_identifier)
-              (expr
-                (lval
-                  (identifier))))
+              (lval
+                (identifier)))
             (binop)
-            (expr
-              (number
-                (decimal)))))))))
+            (number
+              (decimal))))))))
 
 ================================================================================
 Index within a member chain, and a slice
@@ -77,21 +71,17 @@ control c() {
         (var_decl
           (lval
             (identifier))
-          (expr
-            (slice
-              (lval
-                (identifier)
-                (identifier)
-                (expr
-                  (number
-                    (decimal)))
-                (identifier))
-              (expr
-                (number
-                  (decimal)))
-              (expr
-                (number
-                  (decimal))))))))))
+          (slice
+            (lval
+              (identifier)
+              (identifier)
+              (number
+                (decimal))
+              (identifier))
+            (number
+              (decimal))
+            (number
+              (decimal))))))))
 
 ================================================================================
 Unary operators bind tighter than binary ones
@@ -115,26 +105,22 @@ control c() {
         (var_decl
           (lval
             (identifier))
-          (expr
-            (expr
+          (binary_expression
+            (unary_expression
               (unop)
-              (expr
-                (lval
-                  (identifier))))
-            (binop)
-            (expr
-              (lval
-                (identifier)))))
-        (var_decl
-          (lval
-            (identifier))
-          (expr
-            (expr
               (lval
                 (identifier)))
             (binop)
-            (expr
+            (lval
+              (identifier))))
+        (var_decl
+          (lval
+            (identifier))
+          (binary_expression
+            (lval
+              (identifier))
+            (binop)
+            (unary_expression
               (unop)
-              (expr
-                (lval
-                  (identifier))))))))))
+              (lval
+                (identifier)))))))))
