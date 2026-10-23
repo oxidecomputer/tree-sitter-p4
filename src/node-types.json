@@ -1682,6 +1682,10 @@
           "named": true
         },
         {
+          "type": "slice",
+          "named": true
+        },
+        {
           "type": "tuple_type",
           "named": true
         },

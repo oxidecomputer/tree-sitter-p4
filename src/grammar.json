@@ -1709,8 +1709,17 @@
           ]
         },
         {
-          "type": "SYMBOL",
-          "name": "lval"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "lval"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "slice"
+            }
+          ]
         },
         {
           "type": "STRING",

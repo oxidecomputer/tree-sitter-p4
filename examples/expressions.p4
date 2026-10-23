@@ -83,5 +83,6 @@ control c(inout hdr_t[4] stack) {
             x = hdr.stack[0].f[3:0];
         }
         x = hdr.f[W - 1:0];
+        hdr.f[7:4] = a;
     }
 }

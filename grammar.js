@@ -371,7 +371,8 @@ module.exports = grammar({
     var_decl: ($) =>
       seq(
         optional(choice($._type, $.type_identifier)),
-        $.lval,
+        // A slice may be assigned to, as in `x[15:8] = y;`.
+        choice($.lval, $.slice),
         "=",
         $.expr,
         ";",
