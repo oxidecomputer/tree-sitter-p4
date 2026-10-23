@@ -1,0 +1,29 @@
+================================================================================
+A define without a value ends at the end of its line
+================================================================================
+
+#ifndef _GUARD_
+#define _GUARD_
+#define ENABLE_X
+const bit<8> A = 1;
+#endif
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (identifier_preproc))
+  (preproc
+    (identifier_preproc))
+  (preproc
+    (identifier_preproc))
+  (top
+    (const_definition
+      (bit_type
+        (number
+          (decimal)))
+      (identifier)
+      (expr
+        (number
+          (decimal)))))
+  (preproc))

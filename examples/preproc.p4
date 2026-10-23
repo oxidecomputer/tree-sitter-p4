@@ -37,3 +37,43 @@ const bit<47> enterprise = ENTERPRISE;
 	hdr.inner_ipv6
 
 header starship STARSHIP
+
+#define ALIAS ENTERPRISE
+#undef ALIAS
+#if ENTERPRISE == 1
+#error "unreachable"
+#elif ENTERPRISE == 1701
+#pragma once
+#endif
+
+// Directives are extras, so both branches of a conditional reach the parser,
+// here as two apply blocks.
+control Egress(inout headers hdr) {
+#if __TARGET_TOFINO__ == 2
+    apply {
+        hdr.a.setValid();
+    }
+#elif __TARGET_TOFINO__ == 3
+    apply {
+    }
+#else
+    apply { }
+#endif
+}
+
+// A function-like macro keeps its body as text: it need not be an expression.
+#define IS_SERVICE(p) ((p) == USER_SPACE_SERVICE_PORT)
+#define ROTATE(n) \
+    action rotate_by_##n() { \
+        x = y[##n-1:0]; \
+    }
+
+#define switch_hash_width 16
+
+// Macros invoked without a semicolon, where they expand to declarations.
+control Rotations(inout headers hdr) {
+    ROTATE(1)
+    ROTATE(2)
+    apply { }
+}
+#define ipv4_lpm_partitions 2048

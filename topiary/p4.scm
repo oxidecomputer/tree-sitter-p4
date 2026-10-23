@@ -22,10 +22,12 @@
   (control_body_element)
   (field)
   (method)
+  (parser_local_element)
   (preproc)
   (select_case)
   (state)
   (stmt)
+  (switch_case)
   (table_element)
   (top)
 ] @allow_blank_line_before
@@ -50,10 +52,12 @@
     (control_body_element)
     (field)
     (method)
+    (parser_local_element)
     (preproc)
     (select_case)
     (state)
     (stmt)
+    (switch_case)
     (table_element)
     (top)
   ] @append_spaced_softline
@@ -76,10 +80,13 @@
   (extern_definition "{" @prepend_space)
   (function_declaration "{" @prepend_space)
   (header_definition "{" @prepend_space)
+  (obj_initializer "{" @prepend_space)
   (parser_definition "{" @prepend_space)
   (select_expr "{" @prepend_space)
   (state "{" @prepend_space)
   (struct_definition "{" @prepend_space)
+  (switch_case "{" @prepend_space)
+  (switch_statement "{" @prepend_space)
   (table "{" @prepend_space)
   (table_element "{" @prepend_space)
 ]
@@ -92,10 +99,13 @@
   (extern_definition "{" @append_spaced_softline @append_indent_start)
   (function_declaration "{" @append_spaced_softline @append_indent_start)
   (header_definition "{" @append_spaced_softline @append_indent_start)
+  (obj_initializer "{" @append_spaced_softline @append_indent_start)
   (parser_definition "{" @append_spaced_softline @append_indent_start)
   (select_expr "{" @append_spaced_softline @append_indent_start)
   (state "{" @append_spaced_softline @append_indent_start)
   (struct_definition "{" @append_spaced_softline @append_indent_start)
+  (switch_case "{" @append_spaced_softline @append_indent_start)
+  (switch_statement "{" @append_spaced_softline @append_indent_start)
   (table "{" @append_spaced_softline @append_indent_start)
   (table_element "{" @append_spaced_softline @append_indent_start)
   (tuple "{" @append_empty_softline @append_indent_start)
@@ -109,10 +119,13 @@
   (extern_definition "}" @prepend_spaced_softline @prepend_indent_end)
   (function_declaration "}" @prepend_spaced_softline @prepend_indent_end)
   (header_definition "}" @prepend_spaced_softline @prepend_indent_end)
+  (obj_initializer "}" @prepend_spaced_softline @prepend_indent_end)
   (parser_definition "}" @prepend_spaced_softline @prepend_indent_end)
   (select_expr "}" @prepend_spaced_softline @prepend_indent_end)
   (state "}" @prepend_spaced_softline @prepend_indent_end)
   (struct_definition "}" @prepend_spaced_softline @prepend_indent_end)
+  (switch_case "}" @prepend_spaced_softline @prepend_indent_end)
+  (switch_statement "}" @prepend_spaced_softline @prepend_indent_end)
   (table "}" @prepend_spaced_softline @prepend_indent_end)
   (table_element "}" @prepend_spaced_softline @prepend_indent_end)
   (tuple "}" @prepend_empty_softline @prepend_indent_end)
@@ -126,20 +139,21 @@
 ; Entries of the braced forms of table_element (`key`, `actions`, entry lists)
 ; are separated by semicolons, unlike the one in `size = 1024;`, which closes
 ; the element and breaks by the rule above.
-(
-  (table_element
-    "{"
-    ";" @append_spaced_softline
-  )
+;
+; A trailing comment is a sibling of the separator, so the anchor that keeps it
+; on the line sits inside the parent. Anchoring a quantified comment after the
+; parent instead matched the wrong node and took time cubic in the number of
+; entries: about 3 s for a table of 400 const entries.
+(table_element
+  "{"
+  ";" @append_spaced_softline
   .
   (comment)* @do_nothing
 )
 
 ; Elements of a tuple literal.
-(
-  (tuple
-    "," @append_spaced_softline
-  )
+(tuple
+  "," @append_spaced_softline
   .
   (comment)* @do_nothing
 )
@@ -175,6 +189,7 @@
 (
   [
     (call "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
+    (macro_invocation "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
     (tuple_keyset "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
   ]
   (#scope_id! "argument_list")
@@ -183,6 +198,7 @@
 (
   [
     (call ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
+    (macro_invocation ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
     (tuple_keyset ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
   ]
   (#scope_id! "argument_list")
@@ -191,6 +207,7 @@
 (
   [
     (call "," @append_spaced_scoped_softline)
+    (macro_invocation "," @append_spaced_scoped_softline)
     (tuple_keyset "," @append_spaced_scoped_softline)
   ]
   (#scope_id! "argument_list")
@@ -222,6 +239,7 @@
   "parser"
   "state"
   "struct"
+  "switch"
   "table"
   "transition"
   "typedef"
@@ -252,6 +270,24 @@
   "=" @prepend_space @append_space
 )
 
+(parameter
+  "=" @prepend_space @append_space
+)
+
+(control_var
+  "=" @prepend_space @append_space
+)
+
+; The methods of an instance's initializer, one per line.
+(obj_initializer
+  [
+    (control_var)
+    (function_declaration)
+  ] @allow_blank_line_before @append_spaced_softline
+  .
+  (comment)* @do_nothing
+)
+
 (table_element
   "=" @prepend_space @append_space
 )
@@ -280,6 +316,7 @@
 [
   (action "(" @prepend_antispace)
   (call "(" @prepend_antispace)
+  (macro_invocation "(" @prepend_antispace)
   (control_definition "(" @prepend_antispace)
   (control_var "(" @prepend_antispace)
   (function_declaration "(" @prepend_antispace)
@@ -305,6 +342,7 @@
 ; a bit slice it separates the bounds of a range and takes no space.
 [
   (select_case ":" @prepend_antispace @append_space)
+  (switch_case ":" @prepend_antispace @append_space)
   (table_element ":" @prepend_antispace @append_space)
 ]
 
@@ -316,6 +354,7 @@
 ; operators are reached through (binop).
 [
   (bit_type "<" @prepend_antispace @append_antispace)
+  (call "<" @prepend_antispace @append_antispace)
   (control_definition "<" @prepend_antispace @append_antispace)
   (control_var "<" @prepend_antispace @append_antispace)
   (method "<" @prepend_antispace @append_antispace)
@@ -327,6 +366,7 @@
 
 [
   (bit_type ">" @prepend_antispace)
+  (call ">" @prepend_antispace)
   (control_definition ">" @prepend_antispace)
   (control_var ">" @prepend_antispace)
   (method ">" @prepend_antispace)

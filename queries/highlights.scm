@@ -1,56 +1,325 @@
 ; Copyright 2026 Oxide Computer Company
 
 ; highlights.scm
+;
+; Capture names follow Helix's theme scopes. Helix and Neovim both let a later
+; pattern override an earlier one for the same node, so general patterns come
+; first and the patterns that refine them follow.
 
-"header" @keyword
-"struct" @keyword
-"typedef" @keyword
-"extern" @keyword
-"parser" @keyword
-"state" @keyword
-"if" @keyword
-"else" @keyword
-"transition" @keyword
-"select" @keyword
-"apply" @keyword
-"control" @keyword
-"package" @keyword
-"action" @keyword
-"table" @keyword
-"key" @keyword
-"size" @keyword
-"range" @keyword
-"lpm" @keyword
-"exact" @keyword
-"ternary" @keyword
-"optional" @keyword
-"actions" @keyword
-"default" @keyword
-"default_action" @keyword
-"return" @keyword
-"NoAction" @keyword
-"const" @keyword
-"meters" @keyword
-"counters" @keyword
-"_" @keyword
-"true" @constant
-"false" @constant
-(direction) @keyword
-(number) @number
-(bit_type) @type
-(varbit_type) @type
-(tuple_type) @type
-"bool" @type
-"error" @type
-"int" @type
-"bit" @type
-"tuple" @type
-"varbit" @type
-"packet_in" @type
-"packet_out" @type
+; Names
+; -----
+
+(identifier) @variable
+
+; By convention, an all-caps name is a constant or a macro.
+((identifier) @constant
+  (#match? @constant "^[A-Z][A-Z0-9_]*$"))
+
+(identifier_preproc) @constant
+
 (type_identifier) @type
-(method_identifier) @function
-(comment) @comment
+
+(type_identifier
+  (identifier) @type)
+
+(method_identifier
+  (identifier) @function)
+
+; Declarations named after a type: controls, parsers, and packages.
+(control_definition
+  (method_identifier
+    (identifier) @type))
+
+(parser_definition
+  (method_identifier
+    (identifier) @type))
+
+(package
+  (method_identifier
+    (identifier) @type))
+
+(method_field
+  (method_identifier
+    (identifier) @type))
+
+; Calls through a member, such as `pkt.extract(...)`, and method declarations.
+(fval
+  "."
+  .
+  (method_identifier
+    (identifier) @function.method))
+
+(method
+  (method_identifier
+    (identifier) @function.method))
+
+(macro_invocation
+  (method_identifier
+    (identifier) @function.macro))
+
+(macro_invocation
+  (fval
+    (method_identifier
+      (identifier) @function.macro)))
+
+; Members of a value, and the fields that declare them.
+(lval
+  "."
+  .
+  (identifier) @variable.other.member)
+
+(fval
+  "."
+  .
+  (identifier) @variable.other.member)
+
+(expr
+  "."
+  .
+  (identifier) @variable.other.member)
+
+(field
+  (identifier) @variable.other.member)
+
+(parameter
+  (identifier) @variable.parameter)
+
+(method_field
+  (identifier) @variable.parameter)
+
+(const_definition
+  (identifier) @constant)
+
+; Parser states, and the transitions that name them.
+(state
+  (method_identifier
+    (identifier) @label))
+
+(transition
+  (identifier) @label)
+
+(select_case
+  (identifier) @label)
+
+; The parser states every parser has.
+((transition
+  (identifier) @constant.builtin)
+  (#any-of? @constant.builtin "accept" "reject"))
+
+((select_case
+  (identifier) @constant.builtin)
+  (#any-of? @constant.builtin "accept" "reject"))
+
+(annotation
+  "@" @attribute
+  (identifier) @attribute)
+
+; Literals
+; --------
+
+(number) @constant.numeric
+
+(bool) @constant.builtin.boolean
+
 (string_literal) @string
-(preproc) @keyword.directive
-(annotation) @attribute
+
+(comment) @comment
+
+; Preprocessor
+; ------------
+
+[
+  "#define"
+  "#elif"
+  "#else"
+  "#endif"
+  "#error"
+  "#if"
+  "#ifdef"
+  "#ifndef"
+  "#include"
+  "#pragma"
+  "#undef"
+  "#warning"
+] @keyword.directive
+
+(include_path) @string.special.path
+
+(preproc
+  (method_not_constant) @function.macro)
+
+; The name of a function-like macro, whose parameter list follows directly.
+(preproc
+  (identifier_preproc) @function.macro
+  .
+  "(")
+
+(preproc
+  "("
+  (identifier) @variable.parameter)
+
+; Types
+; -----
+
+[
+  "bit"
+  "bool"
+  "error"
+  "int"
+  "packet_in"
+  "packet_out"
+  "tuple"
+  "varbit"
+] @type.builtin
+
+; Keywords
+; --------
+
+[
+  "actions"
+  "apply"
+  "counters"
+  "default_action"
+  "key"
+  "meters"
+  "size"
+  "state"
+] @keyword
+
+[
+  "control"
+  "extern"
+  "header"
+  "package"
+  "parser"
+  "struct"
+  "table"
+  "typedef"
+] @keyword.storage.type
+
+[
+  "const"
+  (direction)
+] @keyword.storage.modifier
+
+"action" @keyword.function
+
+[
+  "else"
+  "if"
+  "select"
+  "switch"
+] @keyword.control.conditional
+
+"transition" @keyword.control
+
+"return" @keyword.control.return
+
+"default" @keyword.control
+
+"_" @variable.builtin
+
+; Match kinds.
+[
+  "exact"
+  "lpm"
+  "optional"
+  "range"
+  "ternary"
+] @constant.builtin
+
+"NoAction" @function.builtin
+
+; Operators and punctuation
+; -------------------------
+
+[
+  (binop)
+  (unop)
+  "="
+  ".."
+] @operator
+
+[
+  "("
+  ")"
+  "["
+  "]"
+  "{"
+  "}"
+] @punctuation.bracket
+
+[
+  ","
+  "."
+  ":"
+  ";"
+] @punctuation.delimiter
+
+(expr
+  [
+    "?"
+    ":"
+  ] @operator)
+
+; Angle brackets enclose type arguments. In a comparison they are operators,
+; reached through binop.
+(bit_type
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(varbit_type
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(tuple_type
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(call
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(control_var
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(method
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(control_definition
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(parser_definition
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(package
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(method_field
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)

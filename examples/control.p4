@@ -54,3 +54,50 @@ control ingress(
     }
 
 }
+
+// Constants and variables among a control's declarations.
+control locals(inout Header_t h) {
+    const bit<8> K = 1;
+    bit<16> mask = 16w0xff;
+    apply {
+        h.h.t = mask;
+    }
+}
+
+// Constructor parameters, one with a default value.
+control sized(inout Header_t h)(bit<32> table_size, bit<32> meter_size = 1024) {
+    apply { }
+}
+
+// A switch on the action a table ran, with a label that falls through.
+control dispatch(inout Header_t h) {
+    action a() { }
+    action b() { }
+    table t {
+        actions = { a; b; NoAction; }
+    }
+    apply {
+        switch (t.apply().action_run) {
+            a: { h.h.e = 1; }
+            b:
+            NoAction: {
+                h.h.e = 2;
+            }
+            default: { }
+        }
+    }
+}
+
+// An instance whose initializer defines a method.
+control stateful(inout Header_t h) {
+    Register<bit<32>, bit<32>>(1024) reg;
+    RegisterAction<bit<32>, bit<32>, bit<32>>(reg) count = {
+        void apply(inout bit<32> value, out bit<32> read_value) {
+            read_value = value;
+            value = value + 1;
+        }
+    };
+    apply {
+        count.execute(0);
+    }
+}

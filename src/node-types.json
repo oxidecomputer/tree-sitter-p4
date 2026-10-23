@@ -134,6 +134,10 @@
         {
           "type": "fval",
           "named": true
+        },
+        {
+          "type": "type_argument_list",
+          "named": true
         }
       ]
     }
@@ -144,7 +148,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "expr",
@@ -232,11 +236,23 @@
           "named": true
         },
         {
+          "type": "const_definition",
+          "named": true
+        },
+        {
           "type": "control_var",
           "named": true
         },
         {
+          "type": "macro_invocation",
+          "named": true
+        },
+        {
           "type": "table",
+          "named": true
+        },
+        {
+          "type": "var_decl",
           "named": true
         }
       ]
@@ -294,6 +310,10 @@
           "named": true
         },
         {
+          "type": "obj_initializer",
+          "named": true
+        },
+        {
           "type": "stack_type",
           "named": true
         },
@@ -334,6 +354,10 @@
           "named": true
         },
         {
+          "type": "bit_type",
+          "named": true
+        },
+        {
           "type": "bool",
           "named": true
         },
@@ -343,6 +367,10 @@
         },
         {
           "type": "expr",
+          "named": true
+        },
+        {
+          "type": "identifier",
           "named": true
         },
         {
@@ -367,6 +395,22 @@
         },
         {
           "type": "tuple",
+          "named": true
+        },
+        {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "unop",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
           "named": true
         }
       ]
@@ -497,6 +541,10 @@
       "required": true,
       "types": [
         {
+          "type": "expr",
+          "named": true
+        },
+        {
           "type": "identifier",
           "named": true
         },
@@ -572,6 +620,33 @@
         },
         {
           "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "macro_invocation",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "fval",
+          "named": true
+        },
+        {
+          "type": "method_identifier",
+          "named": true
+        },
+        {
+          "type": "type_argument_list",
           "named": true
         }
       ]
@@ -678,6 +753,25 @@
     }
   },
   {
+    "type": "obj_initializer",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "control_var",
+          "named": true
+        },
+        {
+          "type": "function_declaration",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "package",
     "named": true,
     "fields": {},
@@ -687,6 +781,10 @@
       "types": [
         {
           "type": "annotation",
+          "named": true
+        },
+        {
+          "type": "expr",
           "named": true
         },
         {
@@ -722,6 +820,10 @@
         },
         {
           "type": "direction",
+          "named": true
+        },
+        {
+          "type": "expr",
           "named": true
         },
         {
@@ -768,11 +870,46 @@
           "named": true
         },
         {
+          "type": "parser_local_element",
+          "named": true
+        },
+        {
           "type": "state",
           "named": true
         },
         {
           "type": "type_identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "parser_local_element",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "annotation",
+          "named": true
+        },
+        {
+          "type": "const_definition",
+          "named": true
+        },
+        {
+          "type": "control_var",
+          "named": true
+        },
+        {
+          "type": "macro_invocation",
+          "named": true
+        },
+        {
+          "type": "var_decl",
           "named": true
         }
       ]
@@ -792,10 +929,6 @@
           "named": true
         },
         {
-          "type": "expr",
-          "named": true
-        },
-        {
           "type": "field",
           "named": true
         },
@@ -805,6 +938,10 @@
         },
         {
           "type": "identifier_preproc",
+          "named": true
+        },
+        {
+          "type": "include_path",
           "named": true
         },
         {
@@ -821,6 +958,10 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "preproc_arg",
           "named": true
         },
         {
@@ -919,11 +1060,11 @@
       "required": true,
       "types": [
         {
-          "type": "lval",
+          "type": "expr",
           "named": true
         },
         {
-          "type": "number",
+          "type": "lval",
           "named": true
         }
       ]
@@ -991,10 +1132,6 @@
         {
           "type": "stmt",
           "named": true
-        },
-        {
-          "type": "type_identifier",
-          "named": true
         }
       ]
     }
@@ -1017,6 +1154,14 @@
         },
         {
           "type": "conditional",
+          "named": true
+        },
+        {
+          "type": "macro_invocation",
+          "named": true
+        },
+        {
+          "type": "switch_statement",
           "named": true
         },
         {
@@ -1052,6 +1197,44 @@
         },
         {
           "type": "type_identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "switch_case",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "stmt",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "switch_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "switch_case",
           "named": true
         }
       ]
@@ -1141,6 +1324,10 @@
         },
         {
           "type": "header_definition",
+          "named": true
+        },
+        {
+          "type": "macro_invocation",
           "named": true
         },
         {
@@ -1294,7 +1481,7 @@
     "fields": {},
     "children": {
       "multiple": false,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "identifier",
@@ -1335,7 +1522,12 @@
     }
   },
   {
-    "type": "var_choice",
+    "type": "unop",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "var_decl",
     "named": true,
     "fields": {},
     "children": {
@@ -1351,33 +1543,6 @@
           "named": true
         },
         {
-          "type": "tuple_type",
-          "named": true
-        },
-        {
-          "type": "type_identifier",
-          "named": true
-        },
-        {
-          "type": "varbit_type",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "var_decl",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "bit_type",
-          "named": true
-        },
-        {
           "type": "lval",
           "named": true
         },
@@ -1387,10 +1552,6 @@
         },
         {
           "type": "type_identifier",
-          "named": true
-        },
-        {
-          "type": "var_choice",
           "named": true
         },
         {
@@ -1424,11 +1585,11 @@
     "named": false
   },
   {
-    "type": "\"",
+    "type": "#define",
     "named": false
   },
   {
-    "type": "#define",
+    "type": "#elif",
     "named": false
   },
   {
@@ -1440,11 +1601,35 @@
     "named": false
   },
   {
+    "type": "#error",
+    "named": false
+  },
+  {
     "type": "#if",
     "named": false
   },
   {
+    "type": "#ifdef",
+    "named": false
+  },
+  {
+    "type": "#ifndef",
+    "named": false
+  },
+  {
     "type": "#include",
+    "named": false
+  },
+  {
+    "type": "#pragma",
+    "named": false
+  },
+  {
+    "type": "#undef",
+    "named": false
+  },
+  {
+    "type": "#warning",
     "named": false
   },
   {
@@ -1465,10 +1650,6 @@
   },
   {
     "type": "(",
-    "named": false
-  },
-  {
-    "type": "()",
     "named": false
   },
   {
@@ -1665,6 +1846,10 @@
     "named": false
   },
   {
+    "type": "include_path",
+    "named": true
+  },
+  {
     "type": "inout",
     "named": false
   },
@@ -1717,6 +1902,10 @@
     "named": false
   },
   {
+    "type": "preproc_arg",
+    "named": true
+  },
+  {
     "type": "range",
     "named": false
   },
@@ -1742,6 +1931,10 @@
   },
   {
     "type": "struct",
+    "named": false
+  },
+  {
+    "type": "switch",
     "named": false
   },
   {

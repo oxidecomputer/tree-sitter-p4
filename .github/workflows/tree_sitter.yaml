@@ -34,6 +34,12 @@ jobs:
           tree-sitter generate
           git diff --exit-code src/
 
+      # The examples below are checked only for errors. The corpus pins the
+      # trees of inputs that parse cleanly under more than one reading, such
+      # as a cast against a parenthesized expression.
+      - name: run Tree-sitter corpus tests
+        run: tree-sitter test
+
       - name: run Tree-sitter stats
         run: tree-sitter parse -q -s examples/*.p4 || exit 0
 
@@ -56,6 +62,16 @@ jobs:
           if grep -Eq "ERROR|MISSING" <<<"$output"; then
             exit 1
           fi
+
+      # The bindings declare the language function by name, and nothing else
+      # here links them: a misspelled symbol or a source file missing from a
+      # build script surfaces only in a consumer's build.
+      - name: test Rust binding
+        run: cargo test
+
+      - name: test Go binding
+        working-directory: bindings/go
+        run: GOFLAGS=-mod=mod go test ./...
 
       # A query naming a node type the grammar no longer has fails to compile
       # outright rather than degrading, and `parse` stays green either way.

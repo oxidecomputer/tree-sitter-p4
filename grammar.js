@@ -5,6 +5,9 @@ module.exports = grammar({
 
   extras: ($) => [/\s|\\\r?\n/, $.comment, $.preproc],
 
+  // See src/scanner.c.
+  externals: ($) => [$._define_end, $._error_sentinel],
+
   word: ($) => $.identifier,
 
   precedences: ($) => [
@@ -14,8 +17,22 @@ module.exports = grammar({
   ],
 
   // `a.b.c` is a prefix of both a member reference and a method call; the
-  // parser cannot tell them apart until it reaches the `(` or the end.
-  conflicts: ($) => [[$.fval, $.lval], [$.lval]],
+  // parser cannot tell them apart until it reaches the `(` or the end. The
+  // same holds after `a.b <`, which opens either a comparison or the type
+  // arguments of a call such as `pkt.lookahead<bit<16>>()`.
+  //
+  // `(t)` is a cast when `t` names a type and an expression follows, and a
+  // parenthesized expression otherwise. Without a symbol table the parser keeps
+  // both readings until the next token settles it.
+  conflicts: ($) => [
+    [$.fval, $.lval],
+    [$.lval],
+    [$.lval, $.method_identifier],
+    [$._member_or_index, $.method_identifier],
+    [$._cast_type, $.lval],
+    [$.macro_invocation, $.package],
+    [$._macro_declaration, $.control_var],
+  ],
 
   rules: {
     source_file: ($) => repeat($.top),
@@ -35,6 +52,32 @@ module.exports = grammar({
         $.package,
         $.action,
         $.table,
+        $.macro_invocation,
+      ),
+
+    // A macro expanding to declarations or statements, invoked without a
+    // trailing semicolon, as in `ROTATE_BY_N(1)`. The grammar does not expand
+    // macros, so this is the closest it gets to the expansion. It shares its
+    // prefix with a call, and is told apart only by the missing semicolon.
+    macro_invocation: ($) =>
+      seq(
+        $.method_identifier,
+        "(",
+        optional(seq($.expr, repeat(seq(",", $.expr)), optional(","))),
+        ")",
+      ),
+
+    // The same among declarations, where it shares its prefix with an
+    // instantiation, `T(args) name;`, and is told apart only by the missing
+    // name. The prefix has to be the instantiation's, type and all, because
+    // `type_identifier` would otherwise win statically before the parser
+    // reaches the token that decides.
+    _macro_declaration: ($) =>
+      seq(
+        alias($.type_identifier, $.method_identifier),
+        "(",
+        repeat(seq($.expr, optional(","))),
+        ")",
       ),
 
     package: ($) =>
@@ -51,12 +94,13 @@ module.exports = grammar({
           ")",
           ";",
         ),
+        // An instantiation, as in `V1Switch(p(), c()) main;`. Its arguments
+        // are expressions so that it shares its prefix with a macro
+        // invocation, from which only the instance name tells it apart.
         seq(
           $.method_identifier,
           "(",
-          choice(seq($.method_identifier, "(", ")"), $.identifier),
-          repeat(seq(",", $.method_identifier, "(", ")")),
-          optional(","),
+          optional(seq($.expr, repeat(seq(",", $.expr)), optional(","))),
           ")",
           $.identifier,
           ";",
@@ -152,10 +196,22 @@ module.exports = grammar({
           "(",
           repeat($.parameter),
           ")",
+          // Constructor parameters, as for a control.
+          optional(seq("(", repeat($.parameter), ")")),
           "{",
-          repeat1($.state),
+          repeat1(choice($.parser_local_element, $.state)),
           "}",
         ),
+      ),
+
+    // parserLocalElement in the P4-16 grammar: declarations that precede or
+    // sit between the states.
+    parser_local_element: ($) =>
+      choice(
+        $.const_definition,
+        $.var_decl,
+        seq(repeat($.annotation), $.control_var),
+        alias($._macro_declaration, $.macro_invocation),
       ),
 
     control_definition: ($) =>
@@ -182,20 +238,20 @@ module.exports = grammar({
           "(",
           repeat($.parameter),
           ")",
+          // Constructor parameters, as in `control C(...)(bit<32> size)`.
+          optional(seq("(", repeat($.parameter), ")")),
           "{",
           optional($.control_body),
           "}",
         ),
       ),
 
+    // P4-16 allows exactly one apply block, but the preprocessor directives
+    // are extras, so `#if ... apply {...} #else apply {...} #endif` reaches the
+    // parser as two of them.
     control_body: ($) =>
-      choice(
-        seq(
-          repeat($.control_body_element),
-          seq("apply", "{", repeat($.stmt), "}"),
-          repeat($.control_body_element),
-        ),
-        repeat1($.control_body_element),
+      repeat1(
+        choice($.control_body_element, seq("apply", "{", repeat($.stmt), "}")),
       ),
 
     control_body_element: ($) =>
@@ -203,6 +259,9 @@ module.exports = grammar({
         seq(repeat($.annotation), $.control_var),
         seq(repeat($.annotation), $.table),
         seq(repeat($.annotation), $.action),
+        $.const_definition,
+        $.var_decl,
+        alias($._macro_declaration, $.macro_invocation),
       ),
 
     table: ($) =>
@@ -251,21 +310,35 @@ module.exports = grammar({
 
     key_type: (_) => choice("range", "exact", "ternary", "lpm", "optional"),
 
-    state: ($) =>
-      choice(
-        seq($.method_identifier, "()", $.type_identifier, ";"),
-        seq("state", $.method_identifier, "{", repeat($.stmt), "}"),
-      ),
+    state: ($) => seq("state", $.method_identifier, "{", repeat($.stmt), "}"),
 
     stmt: ($) =>
       choice(
         $.conditional,
+        $.switch_statement,
         $.action,
         $.var_decl,
         $.type_decl,
         $.transition,
         seq($.call, ";"),
+        // A macro invocation: a call without its semicolon.
+        alias($.call, $.macro_invocation),
         seq("return", ";"),
+      ),
+
+    switch_statement: ($) =>
+      seq("switch", "(", $.expr, ")", "{", repeat($.switch_case), "}"),
+
+    // A label with no block falls through to the next one. A `{` after the
+    // colon always opens the block: P4-16 forbids a label that begins with a
+    // brace, so it cannot be the next label's tuple.
+    switch_case: ($) =>
+      prec.right(
+        seq(
+          choice("default", $.expr),
+          ":",
+          optional(seq("{", repeat($.stmt), "}")),
+        ),
       ),
 
     type_decl: ($) =>
@@ -277,21 +350,12 @@ module.exports = grammar({
         ";",
       ),
 
-    var_choice: ($) =>
-      choice(
-        // Cast: the parenthesised type has to be matched as a unit, or the
-        // optional parens swallow the opening paren of a call instead.
-        seq("(", choice($._type, $.type_identifier), ")", $.expr),
-        seq("(", $.expr, ")"),
-        $.expr,
-      ),
-
     var_decl: ($) =>
       seq(
         optional(choice($._type, $.type_identifier)),
         $.lval,
         "=",
-        $.var_choice,
+        $.expr,
         ";",
       ),
 
@@ -335,12 +399,15 @@ module.exports = grammar({
     call: ($) =>
       seq(
         $.fval,
+        optional(seq("<", $.type_argument_list, ">")),
         "(",
         optional(seq($.expr, repeat(seq(",", $.expr)), optional(","))),
         ")",
       ),
 
-    slice: ($) => seq($.lval, "[", $.number, ":", $.number, "]"),
+    // `x[7:0]` and `x[W - 1:0]`. Whether `[` opens an index or a slice is
+    // known only at the `]` or `:`.
+    slice: ($) => seq($.lval, "[", $.expr, ":", $.expr, "]"),
     tuple: ($) =>
       seq("{", $.expr, repeat(seq(",", $.expr)), optional(","), "}"),
 
@@ -363,8 +430,16 @@ module.exports = grammar({
     expr: ($) =>
       choice(
         prec.right(-1, seq($.expr, "?", $.expr, ":", $.expr)),
-        prec.left(2, seq(optional($.expr), $.binop, $.expr)),
+        prec.left(2, seq($.expr, $.binop, $.expr)),
+        prec(4, seq($.unop, $.expr)),
         prec(3, $.call),
+        // Members of a call's result, as in `t.apply().hit`.
+        prec(3, seq($.call, repeat1(seq(".", $.identifier)))),
+        // A cast binds tighter than any binary operator. When the operand
+        // could also begin a binary operation, as in `(x) - y`, the
+        // parenthesized reading wins.
+        prec(4, seq($._cast_type, $.expr)),
+        prec.dynamic(1, prec(-1, seq("(", $.expr, ")"))),
         $.slice,
         $.lval,
         prec(1, $.tuple),
@@ -373,6 +448,13 @@ module.exports = grammar({
         $.number,
         $.bool,
       ),
+
+    // Kept free of precedence so that `(x)` stays ambiguous between a cast
+    // and a parenthesized expression until the next token. For the same
+    // reason the name is an aliased identifier: `type_identifier` carries a
+    // static precedence that would always win over `lval`.
+    _cast_type: ($) =>
+      seq("(", choice($._type, alias($.identifier, $.type_identifier)), ")"),
 
     range: ($) => prec.left(1, seq($.expr, "..", $.expr)),
 
@@ -411,16 +493,16 @@ module.exports = grammar({
         "&&&",
         "<<",
         ">>",
-        "!",
         "^",
-        "~",
       ),
 
-    conditional: ($) => seq($._if, optional($._elseif), optional($._else)),
+    unop: (_) => choice("!", "~", "-", "+"),
 
-    _if: ($) => seq("if", "(", repeat($.expr), ")", "{", repeat($.stmt), "}"),
+    conditional: ($) => seq($._if, repeat($._elseif), optional($._else)),
+
+    _if: ($) => seq("if", "(", $.expr, ")", "{", repeat($.stmt), "}"),
     _elseif: ($) =>
-      seq("else", "if", "(", repeat($.expr), ")", "{", repeat($.stmt), "}"),
+      seq("else", "if", "(", $.expr, ")", "{", repeat($.stmt), "}"),
     _else: ($) => seq("else", "{", repeat($.stmt), "}"),
 
     control_var: ($) =>
@@ -432,6 +514,7 @@ module.exports = grammar({
           repeat(seq($.expr, optional(","))),
           ")",
           $.identifier,
+          optional(seq("=", $.obj_initializer)),
           ";",
         ),
         seq(
@@ -441,22 +524,26 @@ module.exports = grammar({
         ),
       ),
 
-    lval: ($) =>
-      seq(
-        $.identifier,
-        optional(seq("[", $.expr, "]")),
-        repeat(seq(".", $.identifier, optional(seq("[", $.expr, "]")))),
-      ),
+    // The methods an instance defines, as in
+    // `RegisterAction<...>(reg) ra = { void apply(...) { ... } };`.
+    obj_initializer: ($) =>
+      seq("{", repeat(choice($.function_declaration, $.control_var)), "}"),
+
+    // A member and index chain such as `hdr.vlan_tag[0].vid`.
+    lval: ($) => seq($.identifier, repeat($._member_or_index)),
 
     fval: ($) =>
       choice(
         seq(
           $.identifier,
-          repeat(seq(".", $.identifier)),
+          repeat($._member_or_index),
           seq(".", $.method_identifier),
         ),
         $.method_identifier,
       ),
+
+    _member_or_index: ($) =>
+      choice(seq(".", $.identifier), seq("[", $.expr, "]")),
 
     method: ($) =>
       seq(
@@ -478,6 +565,8 @@ module.exports = grammar({
           choice($.stack_type, $._type, $.type_identifier),
           optional(")"),
           $.identifier,
+          // A default value, as for a constructor parameter.
+          optional(seq("=", $.expr)),
           optional(","),
         ),
         seq(
@@ -485,6 +574,7 @@ module.exports = grammar({
           choice($.stack_type, $._type, $.type_identifier),
           optional(")"),
           $.identifier,
+          optional(seq("=", $.expr)),
           optional(","),
         ),
       ),
@@ -583,14 +673,19 @@ module.exports = grammar({
     // whitespace part of the following token rather than an extra, and
     // leaves node boundaries carrying the preceding indentation.
     line_continuation: (_) => /\\\s*/,
-    method_not_constant: (_) => /[a-zA-Z_]*[a-z][a-zA-Z]*/,
+    method_not_constant: (_) => /[a-zA-Z0-9_]*[a-z][a-zA-Z0-9_]*/,
 
     preproc: ($) =>
       choice(
         seq(
           "#define",
           choice(
-            seq($.identifier_preproc, $.number),
+            // An object-like macro with a number, another macro, or nothing
+            // as its value.
+            seq(
+              $._macro_name,
+              choice($.number, $.identifier_preproc, $._define_end),
+            ),
             seq(
               $.identifier_preproc,
               "{",
@@ -598,14 +693,20 @@ module.exports = grammar({
               repeat($.field),
               "}",
             ),
+            // A function-like macro, whose parameter list opens directly
+            // after the name, as in C. The body is an arbitrary token sequence
+            // (statements, annotations, `#` and `##`), so it is kept as text
+            // up to the end of the logical line or the start of a block
+            // comment, which is then lexed as a comment.
             seq(
-              $.method_not_constant,
-              "(",
+              choice($.method_not_constant, $.identifier_preproc),
+              token.immediate("("),
               repeat(seq($.identifier, optional(","))),
               ")",
-              "(",
-              $.expr,
-              ")",
+              alias(
+                token.immediate(/([^\\\n/]|\/[^*\n]|\\(.|\r?\n))*/),
+                $.preproc_arg,
+              ),
             ),
             seq(
               $.identifier_preproc,
@@ -630,10 +731,28 @@ module.exports = grammar({
             ),
           ),
         ),
-        seq("#include", choice("<", '"'), /[^">]*/, choice(">", '"')),
-        seq("#if", /.*/),
-        seq("#else", /.*/),
+        seq("#include", $.include_path),
+        seq(choice("#ifdef", "#ifndef", "#undef"), $._macro_name),
+        // A condition or message, kept as text to the end of the line.
+        seq(
+          choice("#if", "#elif", "#error", "#warning", "#pragma"),
+          alias(/.*/, $.preproc_arg),
+        ),
+        // Only a comment may follow these, and it is lexed as one.
+        "#else",
         "#endif",
+      ),
+
+    include_path: (_) =>
+      token(choice(seq("<", /[^>\n]*/, ">"), seq('"', /[^"\n]*/, '"'))),
+
+    // Include guards such as `_P4_METER_` begin with an underscore, and some
+    // names are lowercase, neither of which `identifier_preproc` allows.
+    _macro_name: ($) =>
+      choice(
+        $.identifier_preproc,
+        alias(/_[A-Za-z0-9_]*/, $.identifier_preproc),
+        alias($.method_not_constant, $.identifier_preproc),
       ),
   },
 });

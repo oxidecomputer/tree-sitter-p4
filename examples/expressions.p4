@@ -1,5 +1,6 @@
 // Expression forms the grammar has to cover: the bitwise and conditional
-// operators, header stack indexing, and calls in value position.
+// operators, header stack indexing, calls in value position, casts and
+// parentheses, and conditionals.
 
 header hdr_t {
     bit<8> f;
@@ -37,5 +38,45 @@ control c(inout hdr_t[4] stack) {
 
         // Bit slices still parse alongside indexing.
         x = a[7:0];
+
+        // A chain of `else if`.
+        if (a == 1) {
+            x = a;
+        } else if (a == 2) {
+            x = b;
+        } else if (a == 3) {
+            x = a;
+        } else {
+            x = b;
+        }
+
+        // Casts and parenthesized expressions. `(a) == b` and `(a) - b` are
+        // parenthesized; `(T)a` and `(bit<8>)a` are casts.
+        x = (bit<128>)a << 8 | (bit<128>)b;
+        x = m | ((bit<48>)a);
+        x = (T)a;
+        x = (a) == b;
+        x = (a) - b;
+        if ((a)) {
+            x = a;
+        }
+
+        // Members of a call's result.
+        if (!t.apply().hit) {
+            x = a;
+        }
+        x = u.apply().miss;
+
+        // Type arguments on a method call, including a closing `>>`.
+        x = pkt.lookahead<bit<16>>();
+        pkt.extract<hdr_t>(_);
+
+        // Indexing within a member chain, in value and call position, and a
+        // slice with expression bounds.
+        x = hdr.stack[0].f;
+        if (hdr.stack[0].isValid()) {
+            x = hdr.stack[0].f[3:0];
+        }
+        x = hdr.f[W - 1:0];
     }
 }

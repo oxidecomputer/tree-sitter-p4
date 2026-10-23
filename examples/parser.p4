@@ -54,3 +54,25 @@ parser Top(packet_in b, out Parsed_headers headers) {
         }
     }
 }
+
+// Declarations among the states (parserLocalElement).
+parser Locals(packet_in pkt, out Parsed_headers hdr) {
+    Checksum() csum;
+    bridge_h bridge_hdr;
+    bit<16> zero = 0;
+    const bit<8> ONE = 1;
+    @name(".udp_port_vxlan")
+    value_set<bit<16>>(1) udp_port_vxlan;
+
+    state start {
+        bit<16> curr = pkt.lookahead<bit<16>>();
+        transition accept;
+    }
+}
+
+// Constructor parameters on a parser.
+parser Sized(packet_in pkt, out Parsed_headers hdr)(bit<8> depth = 4) {
+    state start {
+        transition accept;
+    }
+}
