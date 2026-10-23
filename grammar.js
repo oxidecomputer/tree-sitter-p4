@@ -341,6 +341,7 @@ module.exports = grammar({
         // A macro invocation: a call without its semicolon.
         alias($.call, $.macro_invocation),
         $.return_statement,
+        $.exit_statement,
         $.empty_statement,
       ),
 
@@ -349,7 +350,9 @@ module.exports = grammar({
     // Preferred to a macro invocation followed by an empty statement.
     call_statement: ($) => prec(1, seq($.call, ";")),
 
-    return_statement: (_) => seq("return", ";"),
+    return_statement: ($) => seq("return", optional($.expr), ";"),
+
+    exit_statement: (_) => seq("exit", ";"),
 
     empty_statement: (_) => ";",
 

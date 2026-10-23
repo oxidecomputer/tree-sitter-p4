@@ -250,6 +250,13 @@
   (binop)
 ] @prepend_space @append_space
 
+; A returned value is separated from `return`; `return;` stays tight.
+(return_statement
+  "return" @append_space
+  .
+  (expr)
+)
+
 ; Append spaces
 [
   "bit"

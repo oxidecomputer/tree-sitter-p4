@@ -214,7 +214,10 @@
 
 "transition" @keyword.control
 
-"return" @keyword.control.return
+[
+  "exit"
+  "return"
+] @keyword.control.return
 
 "default" @keyword.control
 

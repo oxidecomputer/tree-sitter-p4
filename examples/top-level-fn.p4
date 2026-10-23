@@ -12,4 +12,9 @@ bool validate_ipv4_mcast_mac(
 	bit<8> mac_validate4 = mac_addr[23:16];
 	// Extract just the lower 7 bits from the second octet
 	bit<7> ipv4_lower7 = ipv4_addr[22:16];
+	return mac_validate1 == 0x01 && mac_validate2 == 0x00;
+}
+
+action stop() {
+	exit;
 }
