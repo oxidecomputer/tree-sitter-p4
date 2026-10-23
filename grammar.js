@@ -475,6 +475,10 @@ module.exports = grammar({
         "=",
         "+",
         "-",
+        // Saturating addition and subtraction, and concatenation.
+        "|+|",
+        "|-|",
+        "++",
         "*",
         "/",
         "%",

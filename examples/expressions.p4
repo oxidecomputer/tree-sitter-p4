@@ -16,6 +16,11 @@ control c(inout hdr_t[4] stack) {
         bit<8> a = 1;
         bit<8> b = 2;
 
+        // Saturating arithmetic and concatenation.
+        x = a |+| b;
+        x = a |-| b;
+        x = a ++ b;
+
         // Bitwise operators.
         x = a ^ b;
         x = ~a;
