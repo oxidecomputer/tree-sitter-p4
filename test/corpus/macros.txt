@@ -38,22 +38,22 @@ V1Switch(c()) main;
           (type_identifier
             (identifier))
           (identifier)))
-      (stmt
+      (block
         (macro_invocation
           (fval
             (method_identifier
               (identifier)))
           (expr
             (number
-              (decimal)))))
-      (stmt
-        (call
-          (fval
-            (method_identifier
-              (identifier)))
-          (expr
-            (number
-              (decimal)))))))
+              (decimal))))
+        (call_statement
+          (call
+            (fval
+              (method_identifier
+                (identifier)))
+            (expr
+              (number
+                (decimal))))))))
   (package
     (method_identifier
       (identifier))

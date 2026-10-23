@@ -17,7 +17,7 @@ control c() {
     (method_identifier
       (identifier))
     (control_body
-      (stmt
+      (block
         (var_decl
           (lval
             (identifier))
@@ -29,8 +29,7 @@ control c() {
             (binop)
             (expr
               (lval
-                (identifier))))))
-      (stmt
+                (identifier)))))
         (var_decl
           (lval
             (identifier))
@@ -42,8 +41,7 @@ control c() {
             (binop)
             (expr
               (lval
-                (identifier))))))
-      (stmt
+                (identifier)))))
         (var_decl
           (lval
             (identifier))
@@ -75,7 +73,7 @@ control c() {
     (method_identifier
       (identifier))
     (control_body
-      (stmt
+      (block
         (var_decl
           (lval
             (identifier))
@@ -113,7 +111,7 @@ control c() {
     (method_identifier
       (identifier))
     (control_body
-      (stmt
+      (block
         (var_decl
           (lval
             (identifier))
@@ -126,8 +124,7 @@ control c() {
             (binop)
             (expr
               (lval
-                (identifier))))))
-      (stmt
+                (identifier)))))
         (var_decl
           (lval
             (identifier))

@@ -55,6 +55,14 @@ control c(inout hdr_t[4] stack) {
             x = b;
         }
 
+        // Branches that are single statements rather than blocks.
+        if (a == 4)
+            x = a;
+        else if (a == 5)
+            t.apply();
+        else
+            x = b;
+
         // Casts and parenthesized expressions. `(a) == b` and `(a) - b` are
         // parenthesized; `(T)a` and `(bit<8>)a` are casts.
         x = (bit<128>)a << 8 | (bit<128>)b;

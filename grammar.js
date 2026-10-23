@@ -11,7 +11,7 @@ module.exports = grammar({
   word: ($) => $.identifier,
 
   // Hidden rules that queries may still name, as in `(_definition)`.
-  supertypes: ($) => [$._definition],
+  supertypes: ($) => [$._definition, $._statement],
 
   precedences: ($) => [
     [$.expr, $.method_identifier],
@@ -127,9 +127,7 @@ module.exports = grammar({
         "(",
         repeat($.parameter),
         ")",
-        "{",
-        repeat($.stmt),
-        "}",
+        $.block,
       ),
 
     header_definition: ($) =>
@@ -256,9 +254,7 @@ module.exports = grammar({
     // are extras, so `#if ... apply {...} #else apply {...} #endif` reaches the
     // parser as two of them.
     control_body: ($) =>
-      repeat1(
-        choice($.control_body_element, seq("apply", "{", repeat($.stmt), "}")),
-      ),
+      repeat1(choice($.control_body_element, seq("apply", $.block))),
 
     control_body_element: ($) =>
       choice(
@@ -329,21 +325,28 @@ module.exports = grammar({
     key_type: ($) =>
       choice("range", "exact", "ternary", "lpm", "optional", $.identifier),
 
-    state: ($) => seq("state", $.method_identifier, "{", repeat($.stmt), "}"),
+    state: ($) => seq("state", $.method_identifier, $.block),
 
-    stmt: ($) =>
+    _statement: ($) =>
       choice(
+        $.block,
         $.conditional,
         $.switch_statement,
         $.action,
         $.var_decl,
         $.type_decl,
         $.transition,
-        seq($.call, ";"),
+        $.call_statement,
         // A macro invocation: a call without its semicolon.
         alias($.call, $.macro_invocation),
-        seq("return", ";"),
+        $.return_statement,
       ),
+
+    block: ($) => seq("{", repeat($._statement), "}"),
+
+    call_statement: ($) => seq($.call, ";"),
+
+    return_statement: (_) => seq("return", ";"),
 
     switch_statement: ($) =>
       seq("switch", "(", $.expr, ")", "{", repeat($.switch_case), "}"),
@@ -352,13 +355,7 @@ module.exports = grammar({
     // colon always opens the block: P4-16 forbids a label that begins with a
     // brace, so it cannot be the next label's tuple.
     switch_case: ($) =>
-      prec.right(
-        seq(
-          choice("default", $.expr),
-          ":",
-          optional(seq("{", repeat($.stmt), "}")),
-        ),
-      ),
+      prec.right(seq(choice("default", $.expr), ":", optional($.block))),
 
     type_decl: ($) =>
       seq(
@@ -386,9 +383,7 @@ module.exports = grammar({
         "(",
         repeat($.parameter),
         ")",
-        "{",
-        repeat($.stmt),
-        "}",
+        $.block,
       ),
 
     // The select form takes no trailing semicolon in the P4-16 grammar,
@@ -522,12 +517,20 @@ module.exports = grammar({
 
     unop: (_) => choice("!", "~", "-", "+"),
 
-    conditional: ($) => seq($._if, repeat($._elseif), optional($._else)),
-
-    _if: ($) => seq("if", "(", $.expr, ")", "{", repeat($.stmt), "}"),
-    _elseif: ($) =>
-      seq("else", "if", "(", $.expr, ")", "{", repeat($.stmt), "}"),
-    _else: ($) => seq("else", "{", repeat($.stmt), "}"),
+    // As in P4-16, each branch is any statement, so `else if` is a
+    // conditional nested in the else branch, and a branch need not be a
+    // block. An `else` belongs to the nearest `if`.
+    conditional: ($) =>
+      prec.right(
+        seq(
+          "if",
+          "(",
+          $.expr,
+          ")",
+          $._statement,
+          optional(seq("else", $._statement)),
+        ),
+      ),
 
     control_var: ($) =>
       choice(

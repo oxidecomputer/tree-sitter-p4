@@ -26,7 +26,6 @@
   (preproc)
   (select_case)
   (state)
-  (stmt)
   (switch_case)
   (table_element)
   (_definition)
@@ -56,13 +55,29 @@
     (preproc)
     (select_case)
     (state)
-    (stmt)
     (switch_case)
     (table_element)
     (_definition)
   ] @append_spaced_softline
   .
   (comment)* @do_nothing
+)
+
+; Statements of a block, each on a line of its own. A branch of a conditional
+; is a statement too, but is not matched here, which keeps `} else {` together.
+(block
+  (_statement) @allow_blank_line_before
+)
+
+(block
+  (_statement) @append_spaced_softline
+  .
+  (comment)* @do_nothing
+)
+
+; A branch that is not a block follows its condition on the same line.
+(conditional
+  ")" @append_space
 )
 
 ; Braces. A softline breaks only where the construct holding it already spans
@@ -73,40 +88,30 @@
 ; matches every pairing of them, and a conditional with an else branch would
 ; then collect the indentation markers four times over.
 [
-  (action "{" @prepend_space)
-  (conditional "{" @prepend_space)
-  (control_body "{" @prepend_space)
+  (block "{" @prepend_space)
   (control_definition "{" @prepend_space)
   (extern_definition "{" @prepend_space)
-  (function_declaration "{" @prepend_space)
   (header_definition "{" @prepend_space)
   (match_kind_declaration "{" @prepend_space)
   (obj_initializer "{" @prepend_space)
   (parser_definition "{" @prepend_space)
   (select_expr "{" @prepend_space)
-  (state "{" @prepend_space)
   (struct_definition "{" @prepend_space)
-  (switch_case "{" @prepend_space)
   (switch_statement "{" @prepend_space)
   (table "{" @prepend_space)
   (table_element "{" @prepend_space)
 ]
 
 [
-  (action "{" @append_spaced_softline @append_indent_start)
-  (conditional "{" @append_spaced_softline @append_indent_start)
-  (control_body "{" @append_spaced_softline @append_indent_start)
+  (block "{" @append_spaced_softline @append_indent_start)
   (control_definition "{" @append_spaced_softline @append_indent_start)
   (extern_definition "{" @append_spaced_softline @append_indent_start)
-  (function_declaration "{" @append_spaced_softline @append_indent_start)
   (header_definition "{" @append_spaced_softline @append_indent_start)
   (match_kind_declaration "{" @append_spaced_softline @append_indent_start)
   (obj_initializer "{" @append_spaced_softline @append_indent_start)
   (parser_definition "{" @append_spaced_softline @append_indent_start)
   (select_expr "{" @append_spaced_softline @append_indent_start)
-  (state "{" @append_spaced_softline @append_indent_start)
   (struct_definition "{" @append_spaced_softline @append_indent_start)
-  (switch_case "{" @append_spaced_softline @append_indent_start)
   (switch_statement "{" @append_spaced_softline @append_indent_start)
   (table "{" @append_spaced_softline @append_indent_start)
   (table_element "{" @append_spaced_softline @append_indent_start)
@@ -114,20 +119,15 @@
 ]
 
 [
-  (action "}" @prepend_spaced_softline @prepend_indent_end)
-  (conditional "}" @prepend_spaced_softline @prepend_indent_end)
-  (control_body "}" @prepend_spaced_softline @prepend_indent_end)
+  (block "}" @prepend_spaced_softline @prepend_indent_end)
   (control_definition "}" @prepend_spaced_softline @prepend_indent_end)
   (extern_definition "}" @prepend_spaced_softline @prepend_indent_end)
-  (function_declaration "}" @prepend_spaced_softline @prepend_indent_end)
   (header_definition "}" @prepend_spaced_softline @prepend_indent_end)
   (match_kind_declaration "}" @prepend_spaced_softline @prepend_indent_end)
   (obj_initializer "}" @prepend_spaced_softline @prepend_indent_end)
   (parser_definition "}" @prepend_spaced_softline @prepend_indent_end)
   (select_expr "}" @prepend_spaced_softline @prepend_indent_end)
-  (state "}" @prepend_spaced_softline @prepend_indent_end)
   (struct_definition "}" @prepend_spaced_softline @prepend_indent_end)
-  (switch_case "}" @prepend_spaced_softline @prepend_indent_end)
   (switch_statement "}" @prepend_spaced_softline @prepend_indent_end)
   (table "}" @prepend_spaced_softline @prepend_indent_end)
   (table_element "}" @prepend_spaced_softline @prepend_indent_end)
