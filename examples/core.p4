@@ -13,6 +13,9 @@ extern packet_out {
     void emit<T>(in T hdr);
 }
 
+// A stray semicolon after a declaration.
+struct empty_t { };
+
 // Match kinds an architecture adds, and a table that uses one.
 match_kind {
     selector,

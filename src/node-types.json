@@ -78,6 +78,10 @@
         "named": true
       },
       {
+        "type": "empty_statement",
+        "named": true
+      },
+      {
         "type": "macro_invocation",
         "named": true
       },
@@ -488,6 +492,11 @@
   },
   {
     "type": "direction",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "empty_statement",
     "named": true,
     "fields": {}
   },

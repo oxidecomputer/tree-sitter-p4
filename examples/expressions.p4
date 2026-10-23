@@ -16,6 +16,9 @@ control c(inout hdr_t[4] stack) {
         bit<8> a = 1;
         bit<8> b = 2;
 
+        // An empty statement, as in a doubled semicolon.
+        x = a;;
+
         // Saturating arithmetic and concatenation.
         x = a |+| b;
         x = a |-| b;

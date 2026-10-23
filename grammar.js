@@ -39,7 +39,8 @@ module.exports = grammar({
   ],
 
   rules: {
-    source_file: ($) => repeat($._definition),
+    // A stray semicolon is an empty declaration, as after `struct S { };`.
+    source_file: ($) => repeat(choice($._definition, ";")),
 
     _definition: ($) =>
       choice(
@@ -340,13 +341,17 @@ module.exports = grammar({
         // A macro invocation: a call without its semicolon.
         alias($.call, $.macro_invocation),
         $.return_statement,
+        $.empty_statement,
       ),
 
     block: ($) => seq("{", repeat($._statement), "}"),
 
-    call_statement: ($) => seq($.call, ";"),
+    // Preferred to a macro invocation followed by an empty statement.
+    call_statement: ($) => prec(1, seq($.call, ";")),
 
     return_statement: (_) => seq("return", ";"),
+
+    empty_statement: (_) => ";",
 
     switch_statement: ($) =>
       seq("switch", "(", $.expr, ")", "{", repeat($.switch_case), "}"),
@@ -392,7 +397,7 @@ module.exports = grammar({
     transition: ($) =>
       choice(
         seq("transition", $.identifier, ";"),
-        seq("transition", $.select_expr, optional(";")),
+        prec.right(seq("transition", $.select_expr, optional(";"))),
       ),
 
     select_expr: ($) =>
