@@ -13,6 +13,21 @@ extern packet_out {
     void emit<T>(in T hdr);
 }
 
+// Match kinds an architecture adds, and a table that uses one.
+match_kind {
+    selector,
+    dleft_hash,
+}
+
+control Selected(inout headers hdr) {
+    action a() { }
+    table t {
+        key = { hdr.ethernet.etherType: selector; }
+        actions = { a; }
+    }
+    apply { t.apply(); }
+}
+
 // Generic declarations with several type parameters.
 parser GenericParser<H, M>(packet_in b, out H hdr, inout M meta);
 control GenericControl<H, M>(inout H hdr, inout M meta);

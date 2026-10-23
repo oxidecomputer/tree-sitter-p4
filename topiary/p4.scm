@@ -80,6 +80,7 @@
   (extern_definition "{" @prepend_space)
   (function_declaration "{" @prepend_space)
   (header_definition "{" @prepend_space)
+  (match_kind_declaration "{" @prepend_space)
   (obj_initializer "{" @prepend_space)
   (parser_definition "{" @prepend_space)
   (select_expr "{" @prepend_space)
@@ -99,6 +100,7 @@
   (extern_definition "{" @append_spaced_softline @append_indent_start)
   (function_declaration "{" @append_spaced_softline @append_indent_start)
   (header_definition "{" @append_spaced_softline @append_indent_start)
+  (match_kind_declaration "{" @append_spaced_softline @append_indent_start)
   (obj_initializer "{" @append_spaced_softline @append_indent_start)
   (parser_definition "{" @append_spaced_softline @append_indent_start)
   (select_expr "{" @append_spaced_softline @append_indent_start)
@@ -119,6 +121,7 @@
   (extern_definition "}" @prepend_spaced_softline @prepend_indent_end)
   (function_declaration "}" @prepend_spaced_softline @prepend_indent_end)
   (header_definition "}" @prepend_spaced_softline @prepend_indent_end)
+  (match_kind_declaration "}" @prepend_spaced_softline @prepend_indent_end)
   (obj_initializer "}" @prepend_spaced_softline @prepend_indent_end)
   (parser_definition "}" @prepend_spaced_softline @prepend_indent_end)
   (select_expr "}" @prepend_spaced_softline @prepend_indent_end)
@@ -235,6 +238,7 @@
   "extern"
   "header"
   "if"
+  "match_kind"
   "package"
   "parser"
   "state"

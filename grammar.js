@@ -43,6 +43,7 @@ module.exports = grammar({
     _definition: ($) =>
       choice(
         $.function_declaration,
+        $.match_kind_declaration,
         $.header_definition,
         $.struct_definition,
         $.typedef_definition,
@@ -104,6 +105,18 @@ module.exports = grammar({
           $.identifier,
           ";",
         ),
+      ),
+
+    // The match kinds an architecture adds, as in
+    // `match_kind { selector, dleft_hash }`.
+    match_kind_declaration: ($) =>
+      seq(
+        "match_kind",
+        "{",
+        $.identifier,
+        repeat(seq(",", $.identifier)),
+        optional(","),
+        "}",
       ),
 
     function_declaration: ($) =>
@@ -300,7 +313,10 @@ module.exports = grammar({
 
     action_item: ($) => choice($.method_identifier, $.call, "NoAction"),
 
-    key_type: (_) => choice("range", "exact", "ternary", "lpm", "optional"),
+    // The standard match kinds, or one an architecture declares with
+    // `match_kind`, such as `selector` or `atcam_partition_index`.
+    key_type: ($) =>
+      choice("range", "exact", "ternary", "lpm", "optional", $.identifier),
 
     state: ($) => seq("state", $.method_identifier, "{", repeat($.stmt), "}"),
 

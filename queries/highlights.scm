@@ -189,6 +189,7 @@
 [
   "control"
   "extern"
+  "match_kind"
   "header"
   "package"
   "parser"
@@ -220,6 +221,12 @@
 "_" @variable.builtin
 
 ; Match kinds.
+(key_type
+  (identifier) @constant.builtin)
+
+(match_kind_declaration
+  (identifier) @constant.builtin)
+
 [
   "exact"
   "lpm"
