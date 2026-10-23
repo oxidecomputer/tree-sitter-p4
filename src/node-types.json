@@ -108,6 +108,14 @@
       "required": true,
       "types": [
         {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
           "type": "number",
           "named": true
         }
@@ -183,6 +191,10 @@
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "int_type",
           "named": true
         },
         {
@@ -310,6 +322,10 @@
           "named": true
         },
         {
+          "type": "int_type",
+          "named": true
+        },
+        {
           "type": "obj_initializer",
           "named": true
         },
@@ -375,6 +391,10 @@
         },
         {
           "type": "identifier_preproc",
+          "named": true
+        },
+        {
+          "type": "int_type",
           "named": true
         },
         {
@@ -471,6 +491,10 @@
           "named": true
         },
         {
+          "type": "int_type",
+          "named": true
+        },
+        {
           "type": "line_continuation",
           "named": true
         },
@@ -503,6 +527,10 @@
       "types": [
         {
           "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "int_type",
           "named": true
         },
         {
@@ -577,6 +605,29 @@
         },
         {
           "type": "type_identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "int_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "number",
           "named": true
         }
       ]
@@ -662,6 +713,10 @@
       "types": [
         {
           "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "int_type",
           "named": true
         },
         {
@@ -831,6 +886,10 @@
           "named": true
         },
         {
+          "type": "int_type",
+          "named": true
+        },
+        {
           "type": "stack_type",
           "named": true
         },
@@ -942,6 +1001,10 @@
         },
         {
           "type": "include_path",
+          "named": true
+        },
+        {
+          "type": "int_type",
           "named": true
         },
         {
@@ -1100,6 +1163,10 @@
         },
         {
           "type": "expr",
+          "named": true
+        },
+        {
+          "type": "int_type",
           "named": true
         },
         {
@@ -1430,6 +1497,10 @@
           "named": true
         },
         {
+          "type": "int_type",
+          "named": true
+        },
+        {
           "type": "tuple_type",
           "named": true
         },
@@ -1458,6 +1529,10 @@
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "int_type",
           "named": true
         },
         {
@@ -1507,6 +1582,10 @@
           "named": true
         },
         {
+          "type": "int_type",
+          "named": true
+        },
+        {
           "type": "tuple_type",
           "named": true
         },
@@ -1543,6 +1622,10 @@
           "named": true
         },
         {
+          "type": "int_type",
+          "named": true
+        },
+        {
           "type": "lval",
           "named": true
         },
@@ -1569,6 +1652,14 @@
       "multiple": false,
       "required": true,
       "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
         {
           "type": "number",
           "named": true

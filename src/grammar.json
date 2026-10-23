@@ -3307,6 +3307,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "int_type"
+        },
+        {
+          "type": "SYMBOL",
           "name": "varbit_type"
         },
         {
@@ -3328,7 +3332,28 @@
         },
         {
           "type": "SYMBOL",
-          "name": "number"
+          "name": "_width"
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        }
+      ]
+    },
+    "int_type": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "int"
+        },
+        {
+          "type": "STRING",
+          "value": "<"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_width"
         },
         {
           "type": "STRING",
@@ -3349,11 +3374,41 @@
         },
         {
           "type": "SYMBOL",
-          "name": "number"
+          "name": "_width"
         },
         {
           "type": "STRING",
           "value": ">"
+        }
+      ]
+    },
+    "_width": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "number"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "("
+            },
+            {
+              "type": "SYMBOL",
+              "name": "expr"
+            },
+            {
+              "type": "STRING",
+              "value": ")"
+            }
+          ]
         }
       ]
     },
@@ -4150,6 +4205,16 @@
       {
         "type": "SYMBOL",
         "name": "bit_type"
+      },
+      {
+        "type": "SYMBOL",
+        "name": "_type"
+      }
+    ],
+    [
+      {
+        "type": "SYMBOL",
+        "name": "int_type"
       },
       {
         "type": "SYMBOL",

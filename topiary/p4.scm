@@ -257,6 +257,7 @@
   "varbit"
   (bit_type)
   (direction)
+  (int_type)
   (tuple_type)
   (type_identifier)
   (varbit_type)
@@ -354,6 +355,7 @@
 ; operators are reached through (binop).
 [
   (bit_type "<" @prepend_antispace @append_antispace)
+  (int_type "<" @prepend_antispace @append_antispace)
   (call "<" @prepend_antispace @append_antispace)
   (control_definition "<" @prepend_antispace @append_antispace)
   (control_var "<" @prepend_antispace @append_antispace)
@@ -366,6 +368,7 @@
 
 [
   (bit_type ">" @prepend_antispace)
+  (int_type ">" @prepend_antispace)
   (call ">" @prepend_antispace)
   (control_definition ">" @prepend_antispace)
   (control_var ">" @prepend_antispace)

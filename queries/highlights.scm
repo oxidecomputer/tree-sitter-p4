@@ -270,6 +270,12 @@
     ">"
   ] @punctuation.bracket)
 
+(int_type
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
 (varbit_type
   [
     "<"

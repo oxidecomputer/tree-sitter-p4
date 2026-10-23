@@ -13,6 +13,7 @@ module.exports = grammar({
   precedences: ($) => [
     [$.expr, $.method_identifier],
     [$.bit_type, $._type],
+    [$.int_type, $._type],
     [$.varbit_type, $._type],
   ],
 
@@ -609,12 +610,18 @@ module.exports = grammar({
         "packet_in",
         "packet_out",
         $.bit_type,
+        $.int_type,
         $.varbit_type,
         $.tuple_type,
       ),
 
-    bit_type: ($) => seq("bit", "<", $.number, ">"),
-    varbit_type: ($) => seq("varbit", "<", $.number, ">"),
+    bit_type: ($) => seq("bit", "<", $._width, ">"),
+    int_type: ($) => seq("int", "<", $._width, ">"),
+    varbit_type: ($) => seq("varbit", "<", $._width, ">"),
+
+    // A width is a number, a name such as a macro, or, per P4-16, any
+    // expression in parentheses, as in `bit<(4 * 8)>`.
+    _width: ($) => choice($.number, $.identifier, seq("(", $.expr, ")")),
     tuple_type: ($) => seq("tuple", "<", $.type_argument_list, ">"),
 
     type_argument_list: ($) =>
