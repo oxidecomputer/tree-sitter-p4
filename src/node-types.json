@@ -941,6 +941,10 @@
           "named": true
         },
         {
+          "type": "include_path",
+          "named": true
+        },
+        {
           "type": "line_continuation",
           "named": true
         },
@@ -954,6 +958,10 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "preproc_arg",
           "named": true
         },
         {
@@ -1577,10 +1585,6 @@
     "named": false
   },
   {
-    "type": "\"",
-    "named": false
-  },
-  {
     "type": "#define",
     "named": false
   },
@@ -1602,6 +1606,14 @@
   },
   {
     "type": "#if",
+    "named": false
+  },
+  {
+    "type": "#ifdef",
+    "named": false
+  },
+  {
+    "type": "#ifndef",
     "named": false
   },
   {
@@ -1834,6 +1846,10 @@
     "named": false
   },
   {
+    "type": "include_path",
+    "named": true
+  },
+  {
     "type": "inout",
     "named": false
   },
@@ -1884,6 +1900,10 @@
   {
     "type": "parser",
     "named": false
+  },
+  {
+    "type": "preproc_arg",
+    "named": true
   },
   {
     "type": "range",

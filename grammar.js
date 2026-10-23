@@ -681,15 +681,9 @@ module.exports = grammar({
           "#define",
           choice(
             // An object-like macro with a number, another macro, or nothing
-            // as its value. Include guards such as `_P4_METER_` begin with
-            // an underscore, and some names are lowercase, neither of which
-            // `identifier_preproc` allows.
+            // as its value.
             seq(
-              choice(
-                $.identifier_preproc,
-                alias(/_[A-Za-z0-9_]*/, $.identifier_preproc),
-                alias($.method_not_constant, $.identifier_preproc),
-              ),
+              $._macro_name,
               choice($.number, $.identifier_preproc, $._define_end),
             ),
             seq(
@@ -709,7 +703,10 @@ module.exports = grammar({
               token.immediate("("),
               repeat(seq($.identifier, optional(","))),
               ")",
-              token.immediate(/([^\\\n/]|\/[^*\n]|\\(.|\r?\n))*/),
+              alias(
+                token.immediate(/([^\\\n/]|\/[^*\n]|\\(.|\r?\n))*/),
+                $.preproc_arg,
+              ),
             ),
             seq(
               $.identifier_preproc,
@@ -734,11 +731,28 @@ module.exports = grammar({
             ),
           ),
         ),
-        seq("#include", choice("<", '"'), /[^">]*/, choice(">", '"')),
-        seq("#if", /.*/),
-        seq("#else", /.*/),
-        seq(choice("#elif", "#undef", "#error", "#warning", "#pragma"), /.*/),
+        seq("#include", $.include_path),
+        seq(choice("#ifdef", "#ifndef", "#undef"), $._macro_name),
+        // A condition or message, kept as text to the end of the line.
+        seq(
+          choice("#if", "#elif", "#error", "#warning", "#pragma"),
+          alias(/.*/, $.preproc_arg),
+        ),
+        // Only a comment may follow these, and it is lexed as one.
+        "#else",
         "#endif",
+      ),
+
+    include_path: (_) =>
+      token(choice(seq("<", /[^>\n]*/, ">"), seq('"', /[^"\n]*/, '"'))),
+
+    // Include guards such as `_P4_METER_` begin with an underscore, and some
+    // names are lowercase, neither of which `identifier_preproc` allows.
+    _macro_name: ($) =>
+      choice(
+        $.identifier_preproc,
+        alias(/_[A-Za-z0-9_]*/, $.identifier_preproc),
+        alias($.method_not_constant, $.identifier_preproc),
       ),
   },
 });

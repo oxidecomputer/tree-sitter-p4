@@ -11,7 +11,8 @@ const bit<8> A = 1;
 --------------------------------------------------------------------------------
 
 (source_file
-  (preproc)
+  (preproc
+    (identifier_preproc))
   (preproc
     (identifier_preproc))
   (preproc
