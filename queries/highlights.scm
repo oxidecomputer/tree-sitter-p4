@@ -6,63 +6,28 @@
 ; pattern override an earlier one for the same node, so general patterns come
 ; first and the patterns that refine them follow.
 
-"header" @keyword
-"struct" @keyword
-"typedef" @keyword
-"extern" @keyword
-"parser" @keyword
-"state" @keyword
-"if" @keyword
-"else" @keyword
-"switch" @keyword
-"transition" @keyword
-"select" @keyword
-"apply" @keyword
-"control" @keyword
-"package" @keyword
-"action" @keyword
-"table" @keyword
-"key" @keyword
-"size" @keyword
-"range" @keyword
-"lpm" @keyword
-"exact" @keyword
-"ternary" @keyword
-"optional" @keyword
-"actions" @keyword
-"default" @keyword
-"default_action" @keyword
-"return" @keyword
-"NoAction" @keyword
-"const" @keyword
-"meters" @keyword
-"counters" @keyword
-"_" @keyword
-"true" @constant
-"false" @constant
-(direction) @keyword
-(number) @number
-(bit_type) @type
-(varbit_type) @type
-(tuple_type) @type
-"bool" @type
-"error" @type
-"int" @type
-"bit" @type
-"tuple" @type
-"varbit" @type
-"packet_in" @type
-"packet_out" @type
+; Names
+; -----
+
+(identifier_preproc) @constant
+
 (type_identifier) @type
 (method_identifier) @function
-(comment) @comment
-(string_literal) @string
 (annotation) @attribute
+
+; Literals
+; --------
+
+(number) @constant.numeric
+
+(bool) @constant.builtin.boolean
+
+(string_literal) @string
+
+(comment) @comment
 
 ; Preprocessor
 ; ------------
-
-(identifier_preproc) @constant
 
 [
   "#define"
@@ -93,3 +58,75 @@
 (preproc
   "("
   (identifier) @variable.parameter)
+
+; Types
+; -----
+
+[
+  "bit"
+  "bool"
+  "error"
+  "int"
+  "packet_in"
+  "packet_out"
+  "tuple"
+  "varbit"
+] @type.builtin
+
+; Keywords
+; --------
+
+[
+  "actions"
+  "apply"
+  "counters"
+  "default_action"
+  "key"
+  "meters"
+  "size"
+  "state"
+] @keyword
+
+[
+  "control"
+  "extern"
+  "header"
+  "package"
+  "parser"
+  "struct"
+  "table"
+  "typedef"
+] @keyword.storage.type
+
+[
+  "const"
+  (direction)
+] @keyword.storage.modifier
+
+"action" @keyword.function
+
+[
+  "else"
+  "if"
+  "select"
+  "switch"
+] @keyword.control.conditional
+
+"transition" @keyword.control
+
+"return" @keyword.control.return
+
+"default" @keyword.control
+
+"_" @variable.builtin
+
+; Match kinds.
+[
+  "exact"
+  "lpm"
+  "optional"
+  "range"
+  "ternary"
+] @constant.builtin
+
+"NoAction" @function.builtin
