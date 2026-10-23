@@ -300,31 +300,13 @@
     ">"
   ] @punctuation.bracket)
 
-(method
-  [
-    "<"
-    ">"
-  ] @punctuation.bracket)
-
-(control_definition
-  [
-    "<"
-    ">"
-  ] @punctuation.bracket)
-
-(parser_definition
-  [
-    "<"
-    ">"
-  ] @punctuation.bracket)
-
-(package
-  [
-    "<"
-    ">"
-  ] @punctuation.bracket)
-
 (method_field
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(type_parameters
   [
     "<"
     ">"

@@ -357,12 +357,9 @@
   (bit_type "<" @prepend_antispace @append_antispace)
   (int_type "<" @prepend_antispace @append_antispace)
   (call "<" @prepend_antispace @append_antispace)
-  (control_definition "<" @prepend_antispace @append_antispace)
   (control_var "<" @prepend_antispace @append_antispace)
-  (method "<" @prepend_antispace @append_antispace)
-  (package "<" @prepend_antispace @append_antispace)
-  (parser_definition "<" @prepend_antispace @append_antispace)
   (tuple_type "<" @prepend_antispace @append_antispace)
+  (type_parameters "<" @prepend_antispace @append_antispace)
   (varbit_type "<" @prepend_antispace @append_antispace)
 ]
 
@@ -370,12 +367,9 @@
   (bit_type ">" @prepend_antispace)
   (int_type ">" @prepend_antispace)
   (call ">" @prepend_antispace)
-  (control_definition ">" @prepend_antispace)
   (control_var ">" @prepend_antispace)
-  (method ">" @prepend_antispace)
-  (package ">" @prepend_antispace)
-  (parser_definition ">" @prepend_antispace)
   (tuple_type ">" @prepend_antispace)
+  (type_parameters ">" @prepend_antispace)
   (varbit_type ">" @prepend_antispace)
 ]
 

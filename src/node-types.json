@@ -295,7 +295,7 @@
           "named": true
         },
         {
-          "type": "type_identifier",
+          "type": "type_parameters",
           "named": true
         }
       ]
@@ -469,6 +469,10 @@
         },
         {
           "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "type_parameters",
           "named": true
         }
       ]
@@ -736,6 +740,10 @@
           "named": true
         },
         {
+          "type": "type_parameters",
+          "named": true
+        },
+        {
           "type": "varbit_type",
           "named": true
         }
@@ -759,7 +767,7 @@
           "named": true
         },
         {
-          "type": "type_identifier",
+          "type": "type_argument_list",
           "named": true
         }
       ]
@@ -855,7 +863,7 @@
           "named": true
         },
         {
-          "type": "type_identifier",
+          "type": "type_parameters",
           "named": true
         }
       ]
@@ -937,7 +945,7 @@
           "named": true
         },
         {
-          "type": "type_identifier",
+          "type": "type_parameters",
           "named": true
         }
       ]
@@ -1560,6 +1568,21 @@
       "types": [
         {
           "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_parameters",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "type_identifier",
           "named": true
         }
       ]

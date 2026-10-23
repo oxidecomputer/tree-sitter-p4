@@ -12,3 +12,12 @@ extern packet_in {
 extern packet_out {
     void emit<T>(in T hdr);
 }
+
+// Generic declarations with several type parameters.
+parser GenericParser<H, M>(packet_in b, out H hdr, inout M meta);
+control GenericControl<H, M>(inout H hdr, inout M meta);
+package GenericSwitch<IH, IM>(GenericParser<IH, IM> p, GenericControl<IH, IM> c,);
+extern GenericRegister<T, I> {
+    T read(in I index);
+    void write<V>(in I index, in V value);
+}

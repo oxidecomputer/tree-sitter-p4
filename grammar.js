@@ -86,10 +86,8 @@ module.exports = grammar({
         seq(
           repeat($.annotation),
           "package",
-          choice(
-            $.method_identifier,
-            seq($.method_identifier, "<", $.type_identifier, ">"),
-          ),
+          $.method_identifier,
+          optional($.type_parameters),
           "(",
           repeat($.method_field),
           ")",
@@ -168,6 +166,7 @@ module.exports = grammar({
         repeat($.annotation),
         "extern",
         $.type_identifier,
+        optional($.type_parameters),
         "{",
         repeat($.method),
         "}",
@@ -178,10 +177,8 @@ module.exports = grammar({
         seq(
           repeat($.annotation),
           "parser",
-          choice(
-            seq($.method_identifier, "<", $.type_identifier, ">"),
-            $.method_identifier,
-          ),
+          $.method_identifier,
+          optional($.type_parameters),
           "(",
           repeat($.parameter),
           ")",
@@ -190,10 +187,8 @@ module.exports = grammar({
         seq(
           repeat($.annotation),
           "parser",
-          choice(
-            seq($.method_identifier, "<", $.type_identifier, ">"),
-            $.method_identifier,
-          ),
+          $.method_identifier,
+          optional($.type_parameters),
           "(",
           repeat($.parameter),
           ")",
@@ -220,10 +215,8 @@ module.exports = grammar({
         seq(
           repeat($.annotation),
           "control",
-          choice(
-            seq($.method_identifier, "<", $.type_identifier, ">"),
-            $.method_identifier,
-          ),
+          $.method_identifier,
+          optional($.type_parameters),
           "(",
           repeat($.parameter),
           ")",
@@ -232,10 +225,8 @@ module.exports = grammar({
         seq(
           repeat($.annotation),
           "control",
-          choice(
-            seq($.method_identifier, "<", $.type_identifier, ">"),
-            $.method_identifier,
-          ),
+          $.method_identifier,
+          optional($.type_parameters),
           "(",
           repeat($.parameter),
           ")",
@@ -550,7 +541,7 @@ module.exports = grammar({
       seq(
         choice($._type, $.type_identifier),
         $.method_identifier,
-        optional(seq("<", $.type_identifier, ">")),
+        optional($.type_parameters),
         "(",
         repeat($.parameter),
         ")",
@@ -592,10 +583,8 @@ module.exports = grammar({
 
     method_field: ($) =>
       seq(
-        choice(
-          $.method_identifier,
-          seq($.method_identifier, "<", $.type_identifier, ">"),
-        ),
+        $.method_identifier,
+        optional(seq("<", $.type_argument_list, ">")),
         $.identifier,
         ",",
       ),
@@ -623,6 +612,11 @@ module.exports = grammar({
     // expression in parentheses, as in `bit<(4 * 8)>`.
     _width: ($) => choice($.number, $.identifier, seq("(", $.expr, ")")),
     tuple_type: ($) => seq("tuple", "<", $.type_argument_list, ">"),
+
+    // The type parameters of a generic declaration, as in
+    // `control C<H, M>(...)` or `extern Register<T, I> { ... }`.
+    type_parameters: ($) =>
+      seq("<", $.type_identifier, repeat(seq(",", $.type_identifier)), ">"),
 
     type_argument_list: ($) =>
       seq(
