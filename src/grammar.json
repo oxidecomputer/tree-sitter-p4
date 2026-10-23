@@ -3614,7 +3614,19 @@
         },
         {
           "type": "SYMBOL",
+          "name": "binary"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "octal"
+        },
+        {
+          "type": "SYMBOL",
           "name": "whex"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "wbinary"
         },
         {
           "type": "SYMBOL",
@@ -3624,19 +3636,31 @@
     },
     "decimal": {
       "type": "PATTERN",
-      "value": "\\d+"
+      "value": "\\d[\\d_]*"
     },
     "hex": {
       "type": "PATTERN",
-      "value": "0x(\\d|[a-fA-F])+"
+      "value": "0[xX][0-9a-fA-F][0-9a-fA-F_]*"
+    },
+    "binary": {
+      "type": "PATTERN",
+      "value": "0[bB][01][01_]*"
+    },
+    "octal": {
+      "type": "PATTERN",
+      "value": "0[oO][0-7][0-7_]*"
     },
     "whex": {
       "type": "PATTERN",
-      "value": "\\d+w0x(\\d|[a-fA-F])+"
+      "value": "\\d+[ws]0[xX][0-9a-fA-F][0-9a-fA-F_]*"
+    },
+    "wbinary": {
+      "type": "PATTERN",
+      "value": "\\d+[ws]0[bB][01][01_]*"
     },
     "wdecimal": {
       "type": "PATTERN",
-      "value": "\\d+w\\d+"
+      "value": "\\d+[ws]\\d[\\d_]*"
     },
     "annotation": {
       "type": "SEQ",

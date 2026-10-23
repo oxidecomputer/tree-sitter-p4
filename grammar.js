@@ -671,15 +671,32 @@ module.exports = grammar({
 
     bool: (_) => choice("true", "false"),
 
-    number: ($) => choice($.decimal, $.hex, $.whex, $.wdecimal),
+    number: ($) =>
+      choice(
+        $.decimal,
+        $.hex,
+        $.binary,
+        $.octal,
+        $.whex,
+        $.wbinary,
+        $.wdecimal,
+      ),
 
-    decimal: (_) => /\d+/,
+    // P4-16 integer literals: a base prefix, digits that may be separated by
+    // underscores, and optionally a width with `w` (unsigned) or `s` (signed).
+    decimal: (_) => /\d[\d_]*/,
 
-    hex: (_) => /0x(\d|[a-fA-F])+/,
+    hex: (_) => /0[xX][0-9a-fA-F][0-9a-fA-F_]*/,
 
-    whex: (_) => /\d+w0x(\d|[a-fA-F])+/,
+    binary: (_) => /0[bB][01][01_]*/,
 
-    wdecimal: (_) => /\d+w\d+/,
+    octal: (_) => /0[oO][0-7][0-7_]*/,
+
+    whex: (_) => /\d+[ws]0[xX][0-9a-fA-F][0-9a-fA-F_]*/,
+
+    wbinary: (_) => /\d+[ws]0[bB][01][01_]*/,
+
+    wdecimal: (_) => /\d+[ws]\d[\d_]*/,
 
     annotation: ($) => seq("@", $.identifier, optional($.annotation_body)),
 

@@ -822,11 +822,23 @@
       "required": true,
       "types": [
         {
+          "type": "binary",
+          "named": true
+        },
+        {
           "type": "decimal",
           "named": true
         },
         {
           "type": "hex",
+          "named": true
+        },
+        {
+          "type": "octal",
+          "named": true
+        },
+        {
+          "type": "wbinary",
           "named": true
         },
         {
@@ -1916,6 +1928,10 @@
     "named": false
   },
   {
+    "type": "binary",
+    "named": true
+  },
+  {
     "type": "bit",
     "named": false
   },
@@ -2033,6 +2049,10 @@
     "named": true
   },
   {
+    "type": "octal",
+    "named": true
+  },
+  {
     "type": "optional",
     "named": false
   },
@@ -2119,6 +2139,10 @@
   {
     "type": "varbit",
     "named": false
+  },
+  {
+    "type": "wbinary",
+    "named": true
   },
   {
     "type": "wdecimal",
