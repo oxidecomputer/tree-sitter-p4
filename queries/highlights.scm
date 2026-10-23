@@ -229,3 +229,97 @@
 ] @constant.builtin
 
 "NoAction" @function.builtin
+
+; Operators and punctuation
+; -------------------------
+
+[
+  (binop)
+  (unop)
+  "="
+  ".."
+] @operator
+
+[
+  "("
+  ")"
+  "["
+  "]"
+  "{"
+  "}"
+] @punctuation.bracket
+
+[
+  ","
+  "."
+  ":"
+  ";"
+] @punctuation.delimiter
+
+(expr
+  [
+    "?"
+    ":"
+  ] @operator)
+
+; Angle brackets enclose type arguments. In a comparison they are operators,
+; reached through binop.
+(bit_type
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(varbit_type
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(tuple_type
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(call
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(control_var
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(method
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(control_definition
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(parser_definition
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(package
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(method_field
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
