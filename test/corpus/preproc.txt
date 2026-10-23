@@ -17,13 +17,12 @@ const bit<8> A = 1;
     (identifier_preproc))
   (preproc
     (identifier_preproc))
-  (top
-    (const_definition
-      (bit_type
-        (number
-          (decimal)))
-      (identifier)
-      (expr
-        (number
-          (decimal)))))
+  (const_definition
+    (bit_type
+      (number
+        (decimal)))
+    (identifier)
+    (expr
+      (number
+        (decimal))))
   (preproc))

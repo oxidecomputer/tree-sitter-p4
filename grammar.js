@@ -10,6 +10,9 @@ module.exports = grammar({
 
   word: ($) => $.identifier,
 
+  // Hidden rules that queries may still name, as in `(_definition)`.
+  supertypes: ($) => [$._definition],
+
   precedences: ($) => [
     [$.expr, $.method_identifier],
     [$.bit_type, $._type],
@@ -36,9 +39,7 @@ module.exports = grammar({
   ],
 
   rules: {
-    source_file: ($) => repeat($.top),
-
-    top: ($) => $._definition,
+    source_file: ($) => repeat($._definition),
 
     _definition: ($) =>
       choice(

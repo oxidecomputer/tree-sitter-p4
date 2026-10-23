@@ -7,12 +7,8 @@
       "type": "REPEAT",
       "content": {
         "type": "SYMBOL",
-        "name": "top"
+        "name": "_definition"
       }
-    },
-    "top": {
-      "type": "SYMBOL",
-      "name": "_definition"
     },
     "_definition": {
       "type": "CHOICE",
@@ -4329,6 +4325,8 @@
     }
   ],
   "inline": [],
-  "supertypes": [],
+  "supertypes": [
+    "_definition"
+  ],
   "reserved": {}
 }

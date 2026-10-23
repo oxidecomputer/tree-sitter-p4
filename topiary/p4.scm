@@ -29,7 +29,7 @@
   (stmt)
   (switch_case)
   (table_element)
-  (top)
+  (_definition)
 ] @allow_blank_line_before
 
 ; Input softlines before comments, so that the input decides whether a comment
@@ -59,7 +59,7 @@
     (stmt)
     (switch_case)
     (table_element)
-    (top)
+    (_definition)
   ] @append_spaced_softline
   .
   (comment)* @do_nothing
