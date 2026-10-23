@@ -2851,12 +2851,20 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "SYMBOL",
-              "name": "_type"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_type"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "type_identifier"
+                }
+              ]
             },
             {
-              "type": "SYMBOL",
-              "name": "type_identifier"
+              "type": "BLANK"
             }
           ]
         },

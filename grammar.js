@@ -537,9 +537,11 @@ module.exports = grammar({
     _member_or_index: ($) =>
       choice(seq(".", $.identifier), seq("[", $.expr, "]")),
 
+    // A method of an extern. A constructor has no return type, as in
+    // `Register(bit<32> size);`.
     method: ($) =>
       seq(
-        choice($._type, $.type_identifier),
+        optional(choice($._type, $.type_identifier)),
         $.method_identifier,
         optional($.type_parameters),
         "(",
