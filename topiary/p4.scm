@@ -16,6 +16,10 @@
   (string_literal)
 ] @leaf
 
+; A directive has to begin a line. As an extra it may follow any token, such as
+; the brace before `#endif` that closes an apply block inside `#if`.
+(preproc) @prepend_hardline
+
 ; Allow blank line before
 [
   (comment)
