@@ -101,11 +101,13 @@ module.exports = grammar({
           ")",
           ";",
         ),
-        // An instantiation, as in `V1Switch(p(), c()) main;`. Its arguments
-        // are expressions so that it shares its prefix with a macro
-        // invocation, from which only the instance name tells it apart.
+        // An instantiation, as in `V1Switch(p(), c()) main;`, with type
+        // arguments for a generic package, as in `Pipeline<H, M>(...) pipe;`.
+        // Its arguments are expressions so that it shares its prefix with a
+        // macro invocation, from which only the instance name tells it apart.
         seq(
           $.method_identifier,
+          optional(seq("<", $.type_argument_list, ">")),
           "(",
           optional(
             seq($._expression, repeat(seq(",", $._expression)), optional(",")),
