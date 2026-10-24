@@ -69,7 +69,7 @@ module.exports = grammar({
     // prefix with a call, and is told apart only by the missing semicolon.
     macro_invocation: ($) =>
       seq(
-        $.method_identifier,
+        field("name", $.method_identifier),
         "(",
         optional(
           seq($._expression, repeat(seq(",", $._expression)), optional(",")),
@@ -95,7 +95,7 @@ module.exports = grammar({
         seq(
           repeat($.annotation),
           "package",
-          $.method_identifier,
+          field("name", $.method_identifier),
           optional($.type_parameters),
           "(",
           repeat($.method_field),
@@ -107,14 +107,14 @@ module.exports = grammar({
         // Its arguments are expressions so that it shares its prefix with a
         // macro invocation, from which only the instance name tells it apart.
         seq(
-          $.method_identifier,
+          field("name", $.method_identifier),
           optional(seq("<", $.type_argument_list, ">")),
           "(",
           optional(
             seq($._expression, repeat(seq(",", $._expression)), optional(",")),
           ),
           ")",
-          $.identifier,
+          field("instance", $.identifier),
           ";",
         ),
       ),
@@ -144,21 +144,21 @@ module.exports = grammar({
 
     function_declaration: ($) =>
       seq(
-        choice($._type, $.type_identifier),
-        $.method_identifier,
+        field("type", choice($._type, $.type_identifier)),
+        field("name", $.method_identifier),
         "(",
         repeat($.parameter),
         ")",
-        $.block,
+        field("body", $.block),
       ),
 
     header_definition: ($) =>
       choice(
-        seq("header", $.type_identifier, $.identifier_preproc),
+        seq("header", field("name", $.type_identifier), $.identifier_preproc),
         seq(
           repeat($.annotation),
           "header",
-          $.type_identifier,
+          field("name", $.type_identifier),
           "{",
           repeat($.field),
           "}",
@@ -170,7 +170,7 @@ module.exports = grammar({
       seq(
         repeat($.annotation),
         "header_union",
-        $.type_identifier,
+        field("name", $.type_identifier),
         "{",
         repeat($.field),
         "}",
@@ -180,7 +180,7 @@ module.exports = grammar({
       seq(
         repeat($.annotation),
         "struct",
-        $.type_identifier,
+        field("name", $.type_identifier),
         "{",
         repeat($.field),
         "}",
@@ -190,8 +190,8 @@ module.exports = grammar({
       seq(
         repeat($.annotation),
         "typedef",
-        choice($._type, $.type_identifier),
-        $.type_identifier,
+        field("type", choice($._type, $.type_identifier)),
+        field("name", $.type_identifier),
         ";",
       ),
 
@@ -199,10 +199,10 @@ module.exports = grammar({
       seq(
         repeat($.annotation),
         "const",
-        choice($._type, $.type_identifier),
-        $.identifier,
+        field("type", choice($._type, $.type_identifier)),
+        field("name", $.identifier),
         "=",
-        $._expression,
+        field("value", $._expression),
         ";",
       ),
 
@@ -210,7 +210,7 @@ module.exports = grammar({
       seq(
         repeat($.annotation),
         "extern",
-        $.type_identifier,
+        field("name", $.type_identifier),
         optional($.type_parameters),
         "{",
         repeat($.method),
@@ -224,16 +224,19 @@ module.exports = grammar({
         "extern",
         // Any type but the packet types, which are lexed as keywords here
         // and would then claim `extern packet_in { ... }`.
-        choice(
-          "bool",
-          "error",
-          $.bit_type,
-          $.int_type,
-          $.varbit_type,
-          $.tuple_type,
-          $.type_identifier,
+        field(
+          "type",
+          choice(
+            "bool",
+            "error",
+            $.bit_type,
+            $.int_type,
+            $.varbit_type,
+            $.tuple_type,
+            $.type_identifier,
+          ),
         ),
-        $.method_identifier,
+        field("name", $.method_identifier),
         optional($.type_parameters),
         "(",
         repeat($.parameter),
@@ -246,7 +249,7 @@ module.exports = grammar({
         seq(
           repeat($.annotation),
           "parser",
-          $.method_identifier,
+          field("name", $.method_identifier),
           optional($.type_parameters),
           "(",
           repeat($.parameter),
@@ -256,7 +259,7 @@ module.exports = grammar({
         seq(
           repeat($.annotation),
           "parser",
-          $.method_identifier,
+          field("name", $.method_identifier),
           optional($.type_parameters),
           "(",
           repeat($.parameter),
@@ -284,7 +287,7 @@ module.exports = grammar({
         seq(
           repeat($.annotation),
           "control",
-          $.method_identifier,
+          field("name", $.method_identifier),
           optional($.type_parameters),
           "(",
           repeat($.parameter),
@@ -294,7 +297,7 @@ module.exports = grammar({
         seq(
           repeat($.annotation),
           "control",
-          $.method_identifier,
+          field("name", $.method_identifier),
           optional($.type_parameters),
           "(",
           repeat($.parameter),
@@ -302,7 +305,7 @@ module.exports = grammar({
           // Constructor parameters, as in `control C(...)(bit<32> size)`.
           optional(seq("(", repeat($.parameter), ")")),
           "{",
-          optional($.control_body),
+          optional(field("body", $.control_body)),
           "}",
         ),
       ),
@@ -324,7 +327,13 @@ module.exports = grammar({
       ),
 
     table: ($) =>
-      seq("table", $.type_identifier, "{", repeat($.table_element), "}"),
+      seq(
+        "table",
+        field("name", $.type_identifier),
+        "{",
+        repeat($.table_element),
+        "}",
+      ),
 
     table_element: ($) =>
       choice(
@@ -386,7 +395,12 @@ module.exports = grammar({
       choice("range", "exact", "ternary", "lpm", "optional", $.identifier),
 
     state: ($) =>
-      seq(repeat($.annotation), "state", $.method_identifier, $.block),
+      seq(
+        repeat($.annotation),
+        "state",
+        field("name", $.method_identifier),
+        field("body", $.block),
+      ),
 
     _statement: ($) =>
       choice(
@@ -411,14 +425,23 @@ module.exports = grammar({
     // Preferred to a macro invocation followed by an empty statement.
     call_statement: ($) => prec(1, seq($.call, ";")),
 
-    return_statement: ($) => seq("return", optional($._expression), ";"),
+    return_statement: ($) =>
+      seq("return", optional(field("value", $._expression)), ";"),
 
     exit_statement: (_) => seq("exit", ";"),
 
     empty_statement: (_) => ";",
 
     switch_statement: ($) =>
-      seq("switch", "(", $._expression, ")", "{", repeat($.switch_case), "}"),
+      seq(
+        "switch",
+        "(",
+        field("value", $._expression),
+        ")",
+        "{",
+        repeat($.switch_case),
+        "}",
+      ),
 
     // A label with no block falls through to the next one. A `{` after the
     // colon always opens the block: P4-16 forbids a label that begins with a
@@ -429,30 +452,30 @@ module.exports = grammar({
     type_decl: ($) =>
       seq(
         optional("("),
-        choice($._type, $.type_identifier),
+        field("type", choice($._type, $.type_identifier)),
         optional(")"),
-        $.identifier,
+        field("name", $.identifier),
         ";",
       ),
 
     var_decl: ($) =>
       seq(
-        optional(choice($._type, $.type_identifier)),
+        optional(field("type", choice($._type, $.type_identifier))),
         // A slice may be assigned to, as in `x[15:8] = y;`.
-        choice($.lval, alias($._field_slice, $.slice)),
+        field("left", choice($.lval, alias($._field_slice, $.slice))),
         "=",
-        $._expression,
+        field("right", $._expression),
         ";",
       ),
 
     action: ($) =>
       seq(
         "action",
-        $.method_identifier,
+        field("name", $.method_identifier),
         "(",
         repeat($.parameter),
         ")",
-        $.block,
+        field("body", $.block),
       ),
 
     // The select form takes no trailing semicolon in the P4-16 grammar,
@@ -482,7 +505,7 @@ module.exports = grammar({
 
     call: ($) =>
       seq(
-        $.fval,
+        field("function", $.fval),
         optional(seq("<", $.type_argument_list, ">")),
         "(",
         optional(
@@ -559,13 +582,27 @@ module.exports = grammar({
     conditional_expression: ($) =>
       prec.right(
         -1,
-        seq($._expression, "?", $._expression, ":", $._expression),
+        seq(
+          field("condition", $._expression),
+          "?",
+          field("consequence", $._expression),
+          ":",
+          field("alternative", $._expression),
+        ),
       ),
 
     binary_expression: ($) =>
-      prec.left(2, seq($._expression, $.binop, $._expression)),
+      prec.left(
+        2,
+        seq(
+          field("left", $._expression),
+          field("operator", $.binop),
+          field("right", $._expression),
+        ),
+      ),
 
-    unary_expression: ($) => prec(4, seq($.unop, $._expression)),
+    unary_expression: ($) =>
+      prec(4, seq(field("operator", $.unop), field("argument", $._expression))),
 
     // Members of a call's result, as in `t.apply().hit`.
     member_expression: ($) =>
@@ -574,7 +611,8 @@ module.exports = grammar({
     // A cast binds tighter than any binary operator. When the operand could
     // also begin a binary operation, as in `(x) - y`, the parenthesized
     // reading wins.
-    cast_expression: ($) => prec(4, seq($._cast_type, $._expression)),
+    cast_expression: ($) =>
+      prec(4, seq($._cast_type, field("value", $._expression))),
 
     parenthesized_expression: ($) =>
       prec.dynamic(1, prec(-1, seq("(", $._expression, ")"))),
@@ -644,28 +682,28 @@ module.exports = grammar({
         seq(
           "if",
           "(",
-          $._expression,
+          field("condition", $._expression),
           ")",
-          $._statement,
-          optional(seq("else", $._statement)),
+          field("consequence", $._statement),
+          optional(seq("else", field("alternative", $._statement))),
         ),
       ),
 
     control_var: ($) =>
       choice(
         seq(
-          $.type_identifier,
+          field("type", $.type_identifier),
           optional(seq("<", $.type_argument_list, ">")),
           "(",
           repeat(seq($._expression, optional(","))),
           ")",
-          $.identifier,
+          field("name", $.identifier),
           optional(seq("=", $.obj_initializer)),
           ";",
         ),
         seq(
-          choice($.stack_type, $._type, $.type_identifier),
-          $.identifier,
+          field("type", choice($.stack_type, $._type, $.type_identifier)),
+          field("name", $.identifier),
           ";",
         ),
       ),
@@ -695,8 +733,8 @@ module.exports = grammar({
     // `Register(bit<32> size);`.
     method: ($) =>
       seq(
-        optional(choice($._type, $.type_identifier)),
-        $.method_identifier,
+        optional(field("type", choice($._type, $.type_identifier))),
+        field("name", $.method_identifier),
         optional($.type_parameters),
         "(",
         repeat($.parameter),
@@ -706,23 +744,23 @@ module.exports = grammar({
 
     parameter: ($) =>
       choice(
-        seq($.direction, $.identifier, optional(",")),
+        seq($.direction, field("name", $.identifier), optional(",")),
         seq(
           $.direction,
           optional("("),
-          choice($.stack_type, $._type, $.type_identifier),
+          field("type", choice($.stack_type, $._type, $.type_identifier)),
           optional(")"),
-          $.identifier,
+          field("name", $.identifier),
           // A default value, as for a constructor parameter.
-          optional(seq("=", $._expression)),
+          optional(seq("=", field("value", $._expression))),
           optional(","),
         ),
         seq(
           optional("("),
-          choice($.stack_type, $._type, $.type_identifier),
+          field("type", choice($.stack_type, $._type, $.type_identifier)),
           optional(")"),
-          $.identifier,
-          optional(seq("=", $._expression)),
+          field("name", $.identifier),
+          optional(seq("=", field("value", $._expression))),
           optional(","),
         ),
       ),
@@ -732,8 +770,8 @@ module.exports = grammar({
     field: ($) =>
       seq(
         repeat($.annotation),
-        choice($.stack_type, $._type, $.type_identifier),
-        $.identifier,
+        field("type", choice($.stack_type, $._type, $.type_identifier)),
+        field("name", $.identifier),
         ";",
         optional($.line_continuation),
       ),
