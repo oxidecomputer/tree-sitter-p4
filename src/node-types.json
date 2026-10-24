@@ -1383,6 +1383,10 @@
       "required": false,
       "types": [
         {
+          "type": "_expression",
+          "named": true
+        },
+        {
           "type": "bit_type",
           "named": true
         },
@@ -1392,10 +1396,6 @@
         },
         {
           "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "identifier_preproc",
           "named": true
         },
         {
@@ -1411,15 +1411,7 @@
           "named": true
         },
         {
-          "type": "lval",
-          "named": true
-        },
-        {
           "type": "method_not_constant",
-          "named": true
-        },
-        {
-          "type": "number",
           "named": true
         },
         {

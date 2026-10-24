@@ -25,3 +25,37 @@ const bit<8> A = 1;
     (number
       (decimal)))
   (preproc))
+
+================================================================================
+A define's value is an expression on the rest of its line
+================================================================================
+
+#define SIZE (1 << WIDTH)
+#define ALGO HashAlgorithm_t.CRC16 // a member
+const bit<8> A = 1;
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (identifier_preproc)
+    (parenthesized_expression
+      (binary_expression
+        (number
+          (decimal))
+        (binop)
+        (lval
+          (identifier)))))
+  (preproc
+    (identifier_preproc)
+    (lval
+      (identifier)
+      (identifier)))
+  (comment)
+  (const_definition
+    (bit_type
+      (number
+        (decimal)))
+    (identifier)
+    (number
+      (decimal))))

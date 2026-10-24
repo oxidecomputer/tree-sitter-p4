@@ -4056,17 +4056,16 @@
                       "members": [
                         {
                           "type": "SYMBOL",
-                          "name": "number"
+                          "name": "_expression"
                         },
                         {
-                          "type": "SYMBOL",
-                          "name": "identifier_preproc"
-                        },
-                        {
-                          "type": "SYMBOL",
-                          "name": "_define_end"
+                          "type": "BLANK"
                         }
                       ]
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_define_end"
                     }
                   ]
                 },
@@ -4502,6 +4501,10 @@
     [
       "_macro_declaration",
       "control_var"
+    ],
+    [
+      "preproc",
+      "_macro_name"
     ]
   ],
   "precedences": [

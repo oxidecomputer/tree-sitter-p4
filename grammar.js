@@ -36,6 +36,7 @@ module.exports = grammar({
     [$._cast_type, $.lval],
     [$.macro_invocation, $.package],
     [$._macro_declaration, $.control_var],
+    [$.preproc, $._macro_name],
   ],
 
   rules: {
@@ -839,12 +840,9 @@ module.exports = grammar({
         seq(
           "#define",
           choice(
-            // An object-like macro with a number, another macro, or nothing
-            // as its value.
-            seq(
-              $._macro_name,
-              choice($.number, $.identifier_preproc, $._define_end),
-            ),
+            // An object-like macro whose value, if any, is an expression on
+            // the rest of the line, as in `#define SIZE (1 << WIDTH)`.
+            seq($._macro_name, optional($._expression), $._define_end),
             seq(
               $.identifier_preproc,
               "{",
