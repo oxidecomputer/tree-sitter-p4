@@ -191,6 +191,7 @@
   "extern"
   "match_kind"
   "header"
+  "header_union"
   "package"
   "parser"
   "struct"

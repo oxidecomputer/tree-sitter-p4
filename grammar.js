@@ -47,6 +47,7 @@ module.exports = grammar({
         $.function_declaration,
         $.match_kind_declaration,
         $.header_definition,
+        $.header_union_definition,
         $.struct_definition,
         $.typedef_definition,
         $.const_definition,
@@ -146,6 +147,17 @@ module.exports = grammar({
           repeat($.field),
           "}",
         ),
+      ),
+
+    // A header union holds at most one valid header of its members.
+    header_union_definition: ($) =>
+      seq(
+        repeat($.annotation),
+        "header_union",
+        $.type_identifier,
+        "{",
+        repeat($.field),
+        "}",
       ),
 
     struct_definition: ($) =>

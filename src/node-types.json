@@ -28,6 +28,10 @@
         "named": true
       },
       {
+        "type": "header_union_definition",
+        "named": true
+      },
+      {
         "type": "macro_invocation",
         "named": true
       },
@@ -809,6 +813,29 @@
         },
         {
           "type": "identifier_preproc",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "header_union_definition",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "annotation",
+          "named": true
+        },
+        {
+          "type": "field",
           "named": true
         },
         {
@@ -2144,6 +2171,10 @@
   },
   {
     "type": "header",
+    "named": false
+  },
+  {
+    "type": "header_union",
     "named": false
   },
   {
