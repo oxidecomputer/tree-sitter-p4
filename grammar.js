@@ -46,6 +46,7 @@ module.exports = grammar({
       choice(
         $.function_declaration,
         $.match_kind_declaration,
+        $.error_declaration,
         $.header_definition,
         $.header_union_definition,
         $.struct_definition,
@@ -120,6 +121,17 @@ module.exports = grammar({
     match_kind_declaration: ($) =>
       seq(
         "match_kind",
+        "{",
+        $.identifier,
+        repeat(seq(",", $.identifier)),
+        optional(","),
+        "}",
+      ),
+
+    // The errors a program adds, as in `error { InvalidIPv4Header }`.
+    error_declaration: ($) =>
+      seq(
+        "error",
         "{",
         $.identifier,
         repeat(seq(",", $.identifier)),

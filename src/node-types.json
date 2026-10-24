@@ -16,6 +16,10 @@
         "named": true
       },
       {
+        "type": "error_declaration",
+        "named": true
+      },
+      {
         "type": "extern_definition",
         "named": true
       },
@@ -638,6 +642,21 @@
     "type": "empty_statement",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "error_declaration",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "exit_statement",

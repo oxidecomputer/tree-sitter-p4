@@ -231,6 +231,10 @@
 (match_kind_declaration
   (identifier) @constant.builtin)
 
+; Errors, which are referred to as `error.Name`.
+(error_declaration
+  (identifier) @constant)
+
 [
   "exact"
   "lpm"
