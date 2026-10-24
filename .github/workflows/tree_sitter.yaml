@@ -77,8 +77,10 @@ jobs:
       # outright rather than degrading, and `parse` stays green either way.
       - name: check queries compile
         run: |
-          tree-sitter query queries/highlights.scm examples/parser.p4 >/dev/null
-          tree-sitter query topiary/p4.scm examples/parser.p4 >/dev/null
+          for query in queries/*.scm queries/*/*.scm topiary/p4.scm; do
+            [ -f "$query" ] || continue
+            tree-sitter query "$query" examples/parser.p4 >/dev/null
+          done
 
       # The formatting queries name a couple of dozen node types, so a change
       # to the grammar can degrade the formatter without breaking a parse.
