@@ -56,6 +56,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "extern_function_declaration"
+        },
+        {
+          "type": "SYMBOL",
           "name": "parser_definition"
         },
         {
@@ -657,6 +661,90 @@
         {
           "type": "STRING",
           "value": "}"
+        }
+      ]
+    },
+    "extern_function_declaration": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "annotation"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "extern"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "bool"
+            },
+            {
+              "type": "STRING",
+              "value": "error"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "bit_type"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "int_type"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "varbit_type"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "tuple_type"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "type_identifier"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "method_identifier"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "type_parameters"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": "("
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "parameter"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ")"
+        },
+        {
+          "type": "STRING",
+          "value": ";"
         }
       ]
     },

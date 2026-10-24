@@ -52,6 +52,7 @@ module.exports = grammar({
         $.typedef_definition,
         $.const_definition,
         $.extern_definition,
+        $.extern_function_declaration,
         $.parser_definition,
         $.control_definition,
         $.package,
@@ -199,6 +200,30 @@ module.exports = grammar({
         "{",
         repeat($.method),
         "}",
+      ),
+
+    // A function the target provides, as in `extern void drop();`.
+    extern_function_declaration: ($) =>
+      seq(
+        repeat($.annotation),
+        "extern",
+        // Any type but the packet types, which are lexed as keywords here
+        // and would then claim `extern packet_in { ... }`.
+        choice(
+          "bool",
+          "error",
+          $.bit_type,
+          $.int_type,
+          $.varbit_type,
+          $.tuple_type,
+          $.type_identifier,
+        ),
+        $.method_identifier,
+        optional($.type_parameters),
+        "(",
+        repeat($.parameter),
+        ")",
+        ";",
       ),
 
     parser_definition: ($) =>

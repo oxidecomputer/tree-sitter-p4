@@ -190,6 +190,7 @@
   [
     (action "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
     (control_definition "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
+    (extern_function_declaration "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
     (function_declaration "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
     (method "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
     (package "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
@@ -202,6 +203,7 @@
   [
     (action ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
     (control_definition ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
+    (extern_function_declaration ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
     (function_declaration ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
     (method ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
     (package ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
@@ -355,6 +357,7 @@
   (macro_invocation "(" @prepend_antispace)
   (control_definition "(" @prepend_antispace)
   (control_var "(" @prepend_antispace)
+  (extern_function_declaration "(" @prepend_antispace)
   (function_declaration "(" @prepend_antispace)
   (method "(" @prepend_antispace)
   (package "(" @prepend_antispace)

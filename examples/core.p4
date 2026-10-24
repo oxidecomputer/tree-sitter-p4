@@ -40,3 +40,8 @@ extern GenericRegister<T, I> {
     T read(in I index);
     void write<V>(in I index, in V value);
 }
+
+// Functions the target provides.
+@name("drop")
+extern void mark_to_drop();
+extern bit<16> fold<T>(in T data);
