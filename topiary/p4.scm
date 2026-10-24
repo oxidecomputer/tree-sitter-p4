@@ -397,6 +397,7 @@
 [
   (bit_type "<" @prepend_antispace @append_antispace)
   (int_type "<" @prepend_antispace @append_antispace)
+  (method_field "<" @prepend_antispace @append_antispace)
   (package "<" @prepend_antispace @append_antispace)
   (call "<" @prepend_antispace @append_antispace)
   (control_var "<" @prepend_antispace @append_antispace)
@@ -408,6 +409,7 @@
 [
   (bit_type ">" @prepend_antispace)
   (int_type ">" @prepend_antispace)
+  (method_field ">" @prepend_antispace)
   (package ">" @prepend_antispace)
   (call ">" @prepend_antispace)
   (control_var ">" @prepend_antispace)

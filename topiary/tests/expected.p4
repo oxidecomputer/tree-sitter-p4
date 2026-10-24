@@ -123,6 +123,7 @@ control MyIngress(inout headers hdr, inout metadata meta) {
 
 package MySwitch(
     MyParser p,
+    Generic<H, M> g,
     MyIngress ig,
 );
 
