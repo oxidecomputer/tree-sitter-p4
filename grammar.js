@@ -341,7 +341,8 @@ module.exports = grammar({
           "key",
           "=",
           "{",
-          repeat1(
+          // Either list may be empty in P4-16.
+          repeat(
             seq($._expression, ":", $.key_type, repeat($.annotation), ";"),
           ),
           "}",
@@ -350,7 +351,7 @@ module.exports = grammar({
           "actions",
           "=",
           "{",
-          repeat1(seq(repeat($.annotation), $.action_item, ";")),
+          repeat(seq(repeat($.annotation), $.action_item, ";")),
           "}",
         ),
         seq(

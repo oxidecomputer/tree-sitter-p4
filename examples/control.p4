@@ -135,3 +135,12 @@ control annotated_blocks(inout Header_t h) {
     }
     apply { }
 }
+
+// Empty key and action lists.
+control keyless(inout Header_t h) {
+    table t {
+        key = { }
+        actions = { }
+    }
+    apply { t.apply(); }
+}
