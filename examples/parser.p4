@@ -38,6 +38,7 @@ parser Top(packet_in b, out Parsed_headers headers) {
        }
    }
 
+   @critical
    state parse_ipv4_options {
        // use information in the ipv4 header to compute the number
        // of bits to extract

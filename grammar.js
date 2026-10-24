@@ -333,7 +333,8 @@ module.exports = grammar({
     key_type: ($) =>
       choice("range", "exact", "ternary", "lpm", "optional", $.identifier),
 
-    state: ($) => seq("state", $.method_identifier, $.block),
+    state: ($) =>
+      seq(repeat($.annotation), "state", $.method_identifier, $.block),
 
     _statement: ($) =>
       choice(
@@ -655,6 +656,7 @@ module.exports = grammar({
 
     field: ($) =>
       seq(
+        repeat($.annotation),
         choice($.stack_type, $._type, $.type_identifier),
         $.identifier,
         ";",

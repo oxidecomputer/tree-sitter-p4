@@ -6,3 +6,9 @@ struct Parsed_headers {
     Tcp_h      tcp;
     Udp_h      udp;
 }
+
+// Annotated fields.
+struct annotated_t {
+    @name(".ingress_metadata") ingress_metadata_t ingress_metadata;
+    @flexible bit<1> do_egr_mirroring;
+}
