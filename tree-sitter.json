@@ -6,7 +6,9 @@
       "scope": "source.p4",
       "path": ".",
       "file-types": ["p4"],
-      "injection-regex": "^p4$"
+      "injection-regex": "^p4$",
+      "highlights": "queries/highlights.scm",
+      "tags": "queries/tags.scm"
     }
   ],
   "metadata": {
