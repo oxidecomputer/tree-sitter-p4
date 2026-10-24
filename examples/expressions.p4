@@ -98,11 +98,12 @@ control c(inout hdr_t[4] stack) {
     }
 }
 
-// Slices of a call's result.
+// Slices of a call's result and of a parenthesized expression.
 control call_slices(inout H h) {
     action a() {
         h.x = pkt.lookahead<bit<8>>()[7:0];
         h.y = c_hash.get({h.a, h.b})[31:0];
+        h.z = (h.count >> 20)[4:0];
     }
     apply { }
 }

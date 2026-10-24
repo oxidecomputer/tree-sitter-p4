@@ -439,7 +439,7 @@ module.exports = grammar({
       seq(
         optional(choice($._type, $.type_identifier)),
         // A slice may be assigned to, as in `x[15:8] = y;`.
-        choice($.lval, $.slice),
+        choice($.lval, alias($._field_slice, $.slice)),
         "=",
         $._expression,
         ";",
@@ -492,10 +492,26 @@ module.exports = grammar({
       ),
 
     // `x[7:0]` and `x[W - 1:0]`. Whether `[` opens an index or a slice is
-    // known only at the `]` or `:`. A call's result may be sliced too, as in
-    // `pkt.lookahead<bit<8>>()[7:0]`.
+    // known only at the `]` or `:`. A call's result or a parenthesized
+    // expression may be sliced too, as in `pkt.lookahead<bit<8>>()[7:0]` or
+    // `(count >> 20)[4:0]`.
     slice: ($) =>
-      seq(choice($.lval, $.call), "[", $._expression, ":", $._expression, "]"),
+      choice(
+        $._field_slice,
+        seq(
+          choice($.call, $.parenthesized_expression),
+          "[",
+          $._expression,
+          ":",
+          $._expression,
+          "]",
+        ),
+      ),
+
+    // The slices that may be assigned to.
+    _field_slice: ($) =>
+      seq($.lval, "[", $._expression, ":", $._expression, "]"),
+
     tuple: ($) =>
       seq(
         "{",

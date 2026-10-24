@@ -1964,8 +1964,13 @@
               "name": "lval"
             },
             {
-              "type": "SYMBOL",
-              "name": "slice"
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_field_slice"
+              },
+              "named": true,
+              "value": "slice"
             }
           ]
         },
@@ -2248,20 +2253,58 @@
       ]
     },
     "slice": {
-      "type": "SEQ",
+      "type": "CHOICE",
       "members": [
         {
-          "type": "CHOICE",
+          "type": "SYMBOL",
+          "name": "_field_slice"
+        },
+        {
+          "type": "SEQ",
           "members": [
             {
-              "type": "SYMBOL",
-              "name": "lval"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "call"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "parenthesized_expression"
+                }
+              ]
+            },
+            {
+              "type": "STRING",
+              "value": "["
             },
             {
               "type": "SYMBOL",
-              "name": "call"
+              "name": "_expression"
+            },
+            {
+              "type": "STRING",
+              "value": ":"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_expression"
+            },
+            {
+              "type": "STRING",
+              "value": "]"
             }
           ]
+        }
+      ]
+    },
+    "_field_slice": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "lval"
         },
         {
           "type": "STRING",
