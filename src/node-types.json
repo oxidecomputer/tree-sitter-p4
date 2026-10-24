@@ -1015,6 +1015,21 @@
     }
   },
   {
+    "type": "mask",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "match_kind_declaration",
     "named": true,
     "fields": {},
@@ -1500,6 +1515,10 @@
       "types": [
         {
           "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "mask",
           "named": true
         },
         {
@@ -2293,6 +2312,10 @@
   },
   {
     "type": "lpm",
+    "named": false
+  },
+  {
+    "type": "mask",
     "named": false
   },
   {

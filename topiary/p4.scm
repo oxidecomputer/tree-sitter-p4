@@ -267,6 +267,7 @@
   "header"
   "header_union"
   "if"
+  "mask"
   "match_kind"
   "package"
   "parser"

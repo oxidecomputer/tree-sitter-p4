@@ -516,7 +516,7 @@ module.exports = grammar({
       choice($.tuple_keyset, $.simple_keyset_expression),
 
     simple_keyset_expression: ($) =>
-      choice($.range, "default", "_", $._expression),
+      choice($.range, $.mask, "default", "_", $._expression),
 
     _expression: ($) =>
       choice(
@@ -567,6 +567,10 @@ module.exports = grammar({
       seq("(", choice($._type, alias($.identifier, $.type_identifier)), ")"),
 
     range: ($) => prec.left(1, seq($._expression, "..", $._expression)),
+
+    // A value and the bits of it that matter, as in `0x0800 &&& 0x0f00`
+    // or, equivalently, `0x0800 mask 0x0f00`.
+    mask: ($) => prec.left(1, seq($._expression, "mask", $._expression)),
 
     string_literal: (_) =>
       token(

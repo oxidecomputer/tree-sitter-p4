@@ -2380,6 +2380,10 @@
           "name": "range"
         },
         {
+          "type": "SYMBOL",
+          "name": "mask"
+        },
+        {
           "type": "STRING",
           "value": "default"
         },
@@ -2652,6 +2656,27 @@
           {
             "type": "STRING",
             "value": ".."
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_expression"
+          }
+        ]
+      }
+    },
+    "mask": {
+      "type": "PREC_LEFT",
+      "value": 1,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_expression"
+          },
+          {
+            "type": "STRING",
+            "value": "mask"
           },
           {
             "type": "SYMBOL",

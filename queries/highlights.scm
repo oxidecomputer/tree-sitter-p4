@@ -255,6 +255,8 @@
   ".."
 ] @operator
 
+"mask" @keyword.operator
+
 [
   "("
   ")"
