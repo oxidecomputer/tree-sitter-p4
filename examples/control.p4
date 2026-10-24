@@ -127,3 +127,11 @@ control included(inout Header_t h) {
     }
     apply { t.apply(); }
 }
+
+// Annotated blocks.
+control annotated_blocks(inout Header_t h) {
+    action a() {
+        @in_hash { h.h.e = h.h.e + 1; }
+    }
+    apply { }
+}

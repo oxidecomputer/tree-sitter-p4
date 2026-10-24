@@ -334,6 +334,10 @@
         {
           "type": "_statement",
           "named": true
+        },
+        {
+          "type": "annotation",
+          "named": true
         }
       ]
     }

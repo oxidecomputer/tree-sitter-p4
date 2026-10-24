@@ -404,7 +404,8 @@ module.exports = grammar({
         $.empty_statement,
       ),
 
-    block: ($) => seq("{", repeat($._statement), "}"),
+    // Annotated as in `@in_hash { h.x = h.y; }`.
+    block: ($) => seq(repeat($.annotation), "{", repeat($._statement), "}"),
 
     // Preferred to a macro invocation followed by an empty statement.
     call_statement: ($) => prec(1, seq($.call, ";")),
