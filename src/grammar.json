@@ -2244,8 +2244,17 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "lval"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "lval"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "call"
+            }
+          ]
         },
         {
           "type": "STRING",

@@ -490,8 +490,10 @@ module.exports = grammar({
       ),
 
     // `x[7:0]` and `x[W - 1:0]`. Whether `[` opens an index or a slice is
-    // known only at the `]` or `:`.
-    slice: ($) => seq($.lval, "[", $._expression, ":", $._expression, "]"),
+    // known only at the `]` or `:`. A call's result may be sliced too, as in
+    // `pkt.lookahead<bit<8>>()[7:0]`.
+    slice: ($) =>
+      seq(choice($.lval, $.call), "[", $._expression, ":", $._expression, "]"),
     tuple: ($) =>
       seq(
         "{",

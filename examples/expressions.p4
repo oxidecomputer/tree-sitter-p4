@@ -97,3 +97,12 @@ control c(inout hdr_t[4] stack) {
         hdr.f[7:4] = a;
     }
 }
+
+// Slices of a call's result.
+control call_slices(inout H h) {
+    action a() {
+        h.x = pkt.lookahead<bit<8>>()[7:0];
+        h.y = c_hash.get({h.a, h.b})[31:0];
+    }
+    apply { }
+}
