@@ -2,7 +2,8 @@
 
 ; highlights.scm
 ;
-; Capture names follow Helix's theme scopes. Helix and Neovim both let a later
+; Capture names follow Helix's theme scopes; the Neovim variant in nvim/ is
+; derived from this file with Neovim's names. Helix and Neovim both let a later
 ; pattern override an earlier one for the same node, so general patterns come
 ; first and the patterns that refine them follow.
 

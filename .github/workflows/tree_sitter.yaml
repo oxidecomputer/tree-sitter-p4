@@ -82,6 +82,13 @@ jobs:
             tree-sitter query "$query" examples/parser.p4 >/dev/null
           done
 
+      # Neovim's highlights are derived from Helix's and committed, so that
+      # they can be installed straight from the repository.
+      - name: check Neovim highlights are up to date
+        run: |
+          make -B queries/nvim/highlights.scm
+          git diff --exit-code queries/nvim/highlights.scm
+
       # The formatting queries name a couple of dozen node types, so a change
       # to the grammar can degrade the formatter without breaking a parse.
       # Topiary already checks that formatting twice (idempotence) gives the
