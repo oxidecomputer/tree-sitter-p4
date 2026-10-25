@@ -43,9 +43,12 @@
     (identifier) @type))
 
 ; Calls through a member, such as `pkt.extract(...)`, and method declarations.
+;
+; These patterns are not anchored to the dot. A pattern anchored to it matches
+; only after the first dot, which would miss `isValid` in `hdr.ipv4.isValid()`.
+; Only the head of a chain has no dot before it.
 (fval
   "."
-  .
   (method_identifier
     (identifier) @function.method))
 
@@ -65,17 +68,14 @@
 ; Members of a value, and the fields that declare them.
 (lval
   "."
-  .
   (identifier) @variable.other.member)
 
 (fval
   "."
-  .
   (identifier) @variable.other.member)
 
 (member_expression
   "."
-  .
   (identifier) @variable.other.member)
 
 (field
