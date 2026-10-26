@@ -110,6 +110,17 @@ tree-sitter generate
 tree-sitter parse examples/*.p4
 ```
 
+`tree-sitter test` runs the parse trees in `test/corpus`, and checks the
+highlights and tags that the comments in `test/highlight` and `test/tags`
+expect, as in
+
+```p4
+hdr.ethernet.dst = mac;
+//           ^ variable.other.member
+```
+
+where `^` marks the column above it.
+
 The repository also contains formatting queries for [Topiary][topiary]. See
 [`topiary/README.md`][topiary-readme] for setup and usage.
 
