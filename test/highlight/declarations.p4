@@ -54,9 +54,10 @@ parser P(packet_in pkt, out ipv4_h hdr) {
     state start {
 //  ^ keyword
 //        ^ label
-        pkt.extract(hdr);
+        pkt.extract(hdr.stack.next);
 //      ^ variable
-//          ^ function.method
+//          ^ function.builtin
+//                        ^ variable.other.member
         transition select(hdr.version) {
 //      ^ keyword.control
 //                 ^ keyword.control.conditional

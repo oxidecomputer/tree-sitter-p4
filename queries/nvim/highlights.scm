@@ -248,6 +248,41 @@
 
 "NoAction" @function.builtin
 
+; The methods P4-16 gives headers, header stacks, packets, and tables, and its
+; built-in functions. The properties of a header stack, such as `next`, are
+; left out, since they are common field names too.
+(fval
+  "."
+  (method_identifier
+    (identifier) @function.builtin)
+  (#any-of? @function.builtin
+    "advance" "apply" "emit" "extract" "isValid" "length" "lookahead"
+    "maxSizeInBits" "maxSizeInBytes" "minSizeInBits" "minSizeInBytes"
+    "pop_front" "push_front" "setInvalid" "setValid"))
+
+(call
+  function: (fval
+    .
+    (method_identifier
+      (identifier) @function.builtin)
+    .)
+  (#any-of? @function.builtin "static_assert" "verify"))
+
+; What applying a table tells: `t.apply().hit`.
+(member_expression
+  (identifier) @variable.builtin
+  (#any-of? @variable.builtin "action_run" "hit" "miss"))
+
+; Errors, as in `error.NoMatch`.
+((lval
+  .
+  (identifier) @type.builtin
+  .
+  "."
+  .
+  (identifier) @constant)
+  (#eq? @type.builtin "error"))
+
 ; Operators and punctuation
 ; -------------------------
 

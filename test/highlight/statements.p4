@@ -58,14 +58,19 @@ control C(inout headers_t hdr, in bit<9> port) {
 //  ^ keyword
         if (hdr.ipv4.isValid() && port < 4) {
 //      ^ keyword.control.conditional
-//                   ^ function.method
+//                   ^ function.builtin
 //                             ^ operator
 //                                     ^ operator
             route.apply();
 //          ^ variable
-//                ^ function.method
+//                ^ function.builtin
         } else {
 //        ^ keyword.control.conditional
+            verify(route.apply().hit, error.NoMatch);
+//          ^ function.builtin
+//                               ^ variable.builtin
+//                                    ^ type.builtin
+//                                          ^ constant
             exit;
 //          ^ keyword.control.return
         }
