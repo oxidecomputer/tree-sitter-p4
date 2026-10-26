@@ -326,6 +326,12 @@
     ">"
   ] @punctuation.bracket)
 
+(package
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
 (type_parameters
   [
     "<"
