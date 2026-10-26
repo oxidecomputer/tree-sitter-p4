@@ -8,7 +8,8 @@
       "file-types": ["p4"],
       "injection-regex": "^p4$",
       "highlights": "queries/highlights.scm",
-      "tags": "queries/tags.scm"
+      "tags": "queries/tags.scm",
+      "locals": []
     }
   ],
   "metadata": {
