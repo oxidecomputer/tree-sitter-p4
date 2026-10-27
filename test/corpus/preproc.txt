@@ -121,3 +121,43 @@ const bit<8> X = 1;
     (identifier)
     (number
       (decimal))))
+
+================================================================================
+An object-like macro holding declarations or key elements is text
+================================================================================
+
+#define MAC_KEY                 \
+    hdr.eth.src : ternary;      \
+    hdr.eth.dst : ternary; // keys
+#define SNAKE                   \
+    @name(".set_port")          \
+    action set_port() { }
+#define FIELDS \
+    hdr.a, \
+    hdr.b
+#define F(n) n; n
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (identifier_preproc)
+    (preproc_arg))
+  (comment)
+  (preproc
+    (identifier_preproc)
+    (preproc_arg))
+  (preproc
+    (identifier_preproc)
+    (line_continuation)
+    (lval
+      (identifier)
+      (identifier))
+    (line_continuation)
+    (lval
+      (identifier)
+      (identifier)))
+  (preproc
+    (identifier_preproc)
+    (identifier)
+    (preproc_arg)))

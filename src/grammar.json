@@ -4354,17 +4354,36 @@
                       "type": "CHOICE",
                       "members": [
                         {
-                          "type": "SYMBOL",
-                          "name": "_expression"
+                          "type": "SEQ",
+                          "members": [
+                            {
+                              "type": "CHOICE",
+                              "members": [
+                                {
+                                  "type": "SYMBOL",
+                                  "name": "_expression"
+                                },
+                                {
+                                  "type": "BLANK"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "SYMBOL",
+                              "name": "_define_end"
+                            }
+                          ]
                         },
                         {
-                          "type": "BLANK"
+                          "type": "ALIAS",
+                          "content": {
+                            "type": "SYMBOL",
+                            "name": "_macro_statements"
+                          },
+                          "named": true,
+                          "value": "preproc_arg"
                         }
                       ]
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "_define_end"
                     }
                   ]
                 },
@@ -4862,6 +4881,10 @@
     {
       "type": "SYMBOL",
       "name": "_macro_body"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_macro_statements"
     },
     {
       "type": "SYMBOL",

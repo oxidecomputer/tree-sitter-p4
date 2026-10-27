@@ -6,7 +6,12 @@ module.exports = grammar({
   extras: ($) => [/\s|\\\r?\n/, $.comment, $.preproc],
 
   // See src/scanner.c.
-  externals: ($) => [$._define_end, $._macro_body, $._error_sentinel],
+  externals: ($) => [
+    $._define_end,
+    $._macro_body,
+    $._macro_statements,
+    $._error_sentinel,
+  ],
 
   word: ($) => $.identifier,
 
@@ -938,8 +943,16 @@ module.exports = grammar({
           "#define",
           choice(
             // An object-like macro whose value, if any, is an expression on
-            // the rest of the line, as in `#define SIZE (1 << WIDTH)`.
-            seq($._macro_name, optional($._expression), $._define_end),
+            // the rest of the line, as in `#define SIZE (1 << WIDTH)`, or text
+            // holding declarations, statements, or key elements, which the
+            // grammar cannot parse out of context; see src/scanner.c.
+            seq(
+              $._macro_name,
+              choice(
+                seq(optional($._expression), $._define_end),
+                alias($._macro_statements, $.preproc_arg),
+              ),
+            ),
             seq(
               $.identifier_preproc,
               "{",

@@ -7,15 +7,27 @@
 // - The end of a `#define` with no value, such as an include guard: a
 //   zero-width token, emitted only when nothing but horizontal whitespace or a
 //   comment follows on the line.
-// - The body of a function-like macro: text up to the end of the logical line,
-//   which a backslash continues. A block comment inside the body is part of
-//   the text, while a comment that ends the line is left to be lexed as one.
+// - The body of a macro: text up to the end of the logical line, which a
+//   backslash continues. A block comment inside the body is part of the text,
+//   while a comment that ends the line is left to be lexed as one.
+//
+// A function-like macro's body is always text. An object-like macro's value
+// is parsed as an expression or a list of fields where it is one, and is text
+// only where it holds declarations, statements, or key elements, as in
+//
+//     #define MAC_KEY             \
+//         hdr.eth.src : ternary;  \
+//         hdr.eth.dst : ternary;
+//
+// which is told by a `;`, `@`, or brace that no expression contains. A value
+// that begins with a brace is a list of fields, which the grammar parses.
 
 #include "tree_sitter/parser.h"
 
 enum TokenType {
   DEFINE_END,
   MACRO_BODY,
+  MACRO_STATEMENTS,
   // Never used in the grammar. Every external token is marked valid during
   // error recovery, so this one being valid means the parser is recovering.
   ERROR_SENTINEL,
@@ -49,9 +61,11 @@ static bool at_line_end(TSLexer *lexer) {
 
 // Scans to the end of the logical line, marking the token's end after the last
 // character that is not whitespace, a line continuation, or a trailing
-// comment. Returns whether there was any such character.
-static bool scan_body(TSLexer *lexer) {
+// comment. Returns whether there was any such character, and sets
+// `*statements` if one of them can only belong to a statement or declaration.
+static bool scan_body(TSLexer *lexer, bool *statements) {
   bool has_text = false;
+  *statements = false;
   while (!at_line_end(lexer)) {
     int32_t c = lexer->lookahead;
     if (c == ' ' || c == '\t') {
@@ -107,6 +121,9 @@ static bool scan_body(TSLexer *lexer) {
       lexer->mark_end(lexer);
       has_text = true;
     } else {
+      if (c == ';' || c == '@' || c == '{' || c == '}') {
+        *statements = true;
+      }
       advance(lexer);
       lexer->mark_end(lexer);
       has_text = true;
@@ -121,20 +138,33 @@ bool tree_sitter_p4_external_scanner_scan(void *payload, TSLexer *lexer,
   if (valid_symbols[ERROR_SENTINEL]) {
     return false;
   }
-  if (!valid_symbols[DEFINE_END] && !valid_symbols[MACRO_BODY]) {
+  if (!valid_symbols[DEFINE_END] && !valid_symbols[MACRO_BODY] &&
+      !valid_symbols[MACRO_STATEMENTS]) {
     return false;
   }
 
   // Mark the end before looking ahead, so that the end of a define spans no
   // input and the directive does not take in trailing whitespace.
   lexer->mark_end(lexer);
+  // A parenthesis directly after a macro's name opens its parameters.
+  bool function_like = lexer->lookahead == '(';
   while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
     advance(lexer);
   }
 
-  if (valid_symbols[MACRO_BODY] && scan_body(lexer)) {
+  bool statements;
+  if (valid_symbols[MACRO_BODY] && scan_body(lexer, &statements)) {
     lexer->result_symbol = MACRO_BODY;
     return true;
+  }
+  if (valid_symbols[MACRO_STATEMENTS] && !function_like &&
+      lexer->lookahead != '{' && scan_body(lexer, &statements)) {
+    if (statements) {
+      lexer->result_symbol = MACRO_STATEMENTS;
+      return true;
+    }
+    // Any other value is left to the grammar, which lexes it afresh.
+    return false;
   }
   if (!valid_symbols[DEFINE_END]) {
     return false;
