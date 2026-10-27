@@ -1,0 +1,27 @@
+================================================================================
+A package's last parameter takes no comma
+================================================================================
+
+package Pipeline<H>(Parser<H> p, Ingress c);
+package Single(Parser p);
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (package
+    name: (method_identifier)
+    (type_parameters
+      (type_identifier))
+    (method_field
+      (method_identifier)
+      (type_argument_list
+        (type_identifier))
+      (identifier))
+    (method_field
+      (method_identifier)
+      (identifier)))
+  (package
+    name: (method_identifier)
+    (method_field
+      (method_identifier)
+      (identifier))))
