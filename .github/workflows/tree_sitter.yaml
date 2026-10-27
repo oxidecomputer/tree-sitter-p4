@@ -111,12 +111,19 @@ jobs:
 
           # The fixture pins the layout: changing it has to be deliberate, by
           # updating expected.p4. The loop below is weaker, and only checks
-          # that real programs come through with their text intact.
+          # that real programs come through with their text and syntax tree
+          # intact. The tree catches tokens that formatting joins, such as a
+          # macro name and the field that follows it, which the text alone
+          # does not.
           cp topiary/tests/input.p4 "$RUNNER_TEMP/fixture.p4"
           TOPIARY_LANGUAGE_DIR=topiary topiary format \
             -C topiary/languages.ncl "$RUNNER_TEMP/fixture.p4"
           diff -u topiary/tests/expected.p4 "$RUNNER_TEMP/fixture.p4"
 
+          tree() {
+            tree-sitter parse "$1" |
+              sed -E 's/ \[[0-9]+, [0-9]+\] - \[[0-9]+, [0-9]+\]//'
+          }
           for f in examples/*.p4; do
             staged="$RUNNER_TEMP/$(basename "$f")"
             cp "$f" "$staged"
@@ -127,6 +134,11 @@ jobs:
             if [ "$before" != "$after" ]; then
               echo "$f: formatting changed more than whitespace"
               diff -u "$f" "$staged" || true
+              exit 1
+            fi
+            if [ "$(tree "$f")" != "$(tree "$staged")" ]; then
+              echo "$f: formatting changed the syntax tree"
+              diff -u <(tree "$f") <(tree "$staged") || true
               exit 1
             fi
           done
