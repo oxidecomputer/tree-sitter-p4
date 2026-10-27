@@ -56,13 +56,6 @@
     .
     ","? @parameter.around) @parameter.around)
 
-; A macro invocation among declarations lists its arguments directly.
-(macro_invocation
-  !function
-  ((_expression) @parameter.inside
-    .
-    ","? @parameter.around) @parameter.around)
-
 (comment) @comment.inside
 
 (comment)+ @comment.around

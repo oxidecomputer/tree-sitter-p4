@@ -241,7 +241,6 @@
 (
   [
     (argument_list "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-    (macro_invocation "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
     (tuple_keyset "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
   ]
   (#scope_id! "argument_list")
@@ -250,7 +249,6 @@
 (
   [
     (argument_list ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-    (macro_invocation ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
     (tuple_keyset ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
   ]
   (#scope_id! "argument_list")
@@ -259,18 +257,15 @@
 (
   [
     (argument_list "," @append_spaced_scoped_softline)
-    (macro_invocation "," @append_spaced_scoped_softline)
     (tuple_keyset "," @append_spaced_scoped_softline)
   ]
   (#scope_id! "argument_list")
 )
 
-; A parameter carries its own trailing comma; a package instantiation separates
-; its arguments with commas of its own.
+; A parameter carries its own trailing comma.
 (
   [
     (method_field "," @append_spaced_scoped_softline)
-    (package "," @append_spaced_scoped_softline)
     (parameter "," @append_spaced_scoped_softline)
   ]
   (#scope_id! "parameter_list")
@@ -300,8 +295,19 @@
   "transition"
   "type"
   "typedef"
-  (binop)
 ] @prepend_space @append_space
+
+(binary_expression
+  operator: _ @prepend_space @append_space
+)
+
+(mask
+  "&&&" @prepend_space @append_space
+)
+
+(named_expression
+  "=" @prepend_space @append_space
+)
 
 ; A returned value is separated from `return`; `return;` stays tight.
 (return_statement
@@ -383,9 +389,7 @@
 [
   (action "(" @prepend_antispace)
   (argument_list "(" @prepend_antispace)
-  (macro_invocation "(" @prepend_antispace)
   (control_definition "(" @prepend_antispace)
-  (control_var "(" @prepend_antispace)
   (extern_function_declaration "(" @prepend_antispace)
   (function_declaration "(" @prepend_antispace)
   (method "(" @prepend_antispace)
@@ -420,7 +424,7 @@
 )
 
 ; Angle brackets delimit type arguments, never comparisons: the comparison
-; operators are reached through (binop).
+; operators are reached through (binary_expression).
 [
   (bit_type "<" @prepend_antispace @append_antispace)
   (int_type "<" @prepend_antispace @append_antispace)

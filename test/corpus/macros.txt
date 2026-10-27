@@ -18,19 +18,22 @@ V1Switch(c()) main;
 (source_file
   (macro_invocation
     (method_identifier)
-    (number
-      (decimal)))
+    (argument_list
+      (number
+        (decimal))))
   (control_definition
     (method_identifier)
     (control_body
       (control_body_element
         (macro_invocation
           (method_identifier)
-          (number
-            (decimal))))
+          (argument_list
+            (number
+              (decimal)))))
       (control_body_element
         (control_var
           (type_identifier)
+          (argument_list)
           (identifier)))
       (block
         (macro_invocation
@@ -46,9 +49,10 @@ V1Switch(c()) main;
                 (decimal))))))))
   (package
     (method_identifier)
-    (call_expression
-      (identifier)
-      (argument_list))
+    (argument_list
+      (call_expression
+        (identifier)
+        (argument_list)))
     (identifier)))
 
 ================================================================================

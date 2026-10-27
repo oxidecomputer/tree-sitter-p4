@@ -1,8 +1,23 @@
 // Copyright 2026 Oxide Computer Company
 
 // Binding strength, from loosest to tightest, after the P4-16 grammar.
+// Binding strength, loosest first, following the precedence declarations
+// of the P4-16 grammar in p4c. A keyset's mask and range bind looser than any
+// operator.
 const PREC = {
-  postfix: 5,
+  keyset: 1,
+  logical_or: 2,
+  logical_and: 3,
+  equality: 4,
+  relational: 5,
+  bit_or: 6,
+  bit_xor: 7,
+  bit_and: 8,
+  shift: 9,
+  additive: 10,
+  multiplicative: 11,
+  unary: 12,
+  postfix: 13,
 };
 
 module.exports = grammar({
@@ -122,11 +137,7 @@ module.exports = grammar({
     macro_invocation: ($) =>
       seq(
         field("name", $._method_identifier),
-        "(",
-        optional(
-          seq($._expression, repeat(seq(",", $._expression)), optional(",")),
-        ),
-        ")",
+        field("arguments", $.argument_list),
       ),
 
     // An object-like macro standing for declarations, key elements, or
@@ -144,9 +155,7 @@ module.exports = grammar({
         1,
         seq(
           alias($.identifier, $.method_identifier),
-          "(",
-          repeat(seq($._expression, optional(","))),
-          ")",
+          field("arguments", $.argument_list),
         ),
       ),
 
@@ -169,11 +178,7 @@ module.exports = grammar({
         seq(
           field("name", $._method_identifier),
           optional(seq("<", $.type_argument_list, ">")),
-          "(",
-          optional(
-            seq($._expression, repeat(seq(",", $._expression)), optional(",")),
-          ),
-          ")",
+          field("arguments", $.argument_list),
           field("instance", $.identifier),
           ";",
         ),
@@ -640,10 +645,19 @@ module.exports = grammar({
       seq(
         "(",
         optional(
-          seq($._expression, repeat(seq(",", $._expression)), optional(",")),
+          seq(
+            choice($._expression, $.named_expression),
+            repeat(seq(",", choice($._expression, $.named_expression))),
+            optional(","),
+          ),
         ),
         ")",
       ),
+
+    // A named argument, `f(x = 1)`, or a member of a structure-valued
+    // expression, `{ a = 1, b = 2 }`.
+    named_expression: ($) =>
+      seq(field("name", $.identifier), "=", field("value", $._expression)),
 
     type_arguments: ($) => seq("<", $.type_argument_list, ">"),
 
@@ -684,8 +698,8 @@ module.exports = grammar({
     tuple: ($) =>
       seq(
         "{",
-        $._expression,
-        repeat(seq(",", $._expression)),
+        choice($._expression, $.named_expression),
+        repeat(seq(",", choice($._expression, $.named_expression))),
         optional(","),
         "}",
       ),
@@ -741,23 +755,45 @@ module.exports = grammar({
       ),
 
     binary_expression: ($) =>
-      prec.left(
-        2,
-        seq(
-          field("left", $._expression),
-          field("operator", $.binop),
-          field("right", $._expression),
+      choice(
+        ...[
+          [PREC.logical_or, "||"],
+          [PREC.logical_and, "&&"],
+          [PREC.equality, choice("==", "!=")],
+          [PREC.relational, choice("<", ">", "<=", ">=")],
+          [PREC.bit_or, "|"],
+          [PREC.bit_xor, "^"],
+          [PREC.bit_and, "&"],
+          [PREC.shift, choice("<<", ">>")],
+          // Saturating addition and subtraction, and concatenation.
+          [PREC.additive, choice("+", "-", "|+|", "|-|", "++")],
+          [PREC.multiplicative, choice("*", "/", "%")],
+        ].map(([p, operator]) =>
+          prec.left(
+            p,
+            seq(
+              field("left", $._expression),
+              field("operator", operator),
+              field("right", $._expression),
+            ),
+          ),
         ),
       ),
 
     unary_expression: ($) =>
-      prec(4, seq(field("operator", $.unop), field("argument", $._expression))),
+      prec(
+        PREC.unary,
+        seq(
+          field("operator", choice("!", "~", "-", "+")),
+          field("argument", $._expression),
+        ),
+      ),
 
     // A cast binds tighter than any binary operator. When the operand could
     // also begin a binary operation, as in `(x) - y`, the parenthesized
     // reading wins.
     cast_expression: ($) =>
-      prec(4, seq($._cast_type, field("value", $._expression))),
+      prec(PREC.unary, seq($._cast_type, field("value", $._expression))),
 
     parenthesized_expression: ($) =>
       prec.dynamic(1, prec(-1, seq("(", $._expression, ")"))),
@@ -766,11 +802,16 @@ module.exports = grammar({
     // and a parenthesized expression until the next token.
     _cast_type: ($) => seq("(", choice($._type, $._type_identifier), ")"),
 
-    range: ($) => prec.left(1, seq($._expression, "..", $._expression)),
+    range: ($) =>
+      prec.left(PREC.keyset, seq($._expression, "..", $._expression)),
 
     // A value and the bits of it that matter, as in `0x0800 &&& 0x0f00`
     // or, equivalently, `0x0800 mask 0x0f00`.
-    mask: ($) => prec.left(1, seq($._expression, "mask", $._expression)),
+    mask: ($) =>
+      prec.left(
+        PREC.keyset,
+        seq($._expression, choice("&&&", "mask"), $._expression),
+      ),
 
     string_literal: (_) =>
       token(
@@ -785,36 +826,6 @@ module.exports = grammar({
           '"',
         ),
       ),
-
-    binop: (_) =>
-      choice(
-        "==",
-        "!=",
-        ">=",
-        "<=",
-        ">",
-        "<",
-        "=",
-        "+",
-        "-",
-        // Saturating addition and subtraction, and concatenation.
-        "|+|",
-        "|-|",
-        "++",
-        "*",
-        "/",
-        "%",
-        "|",
-        "||",
-        "&",
-        "&&",
-        "&&&",
-        "<<",
-        ">>",
-        "^",
-      ),
-
-    unop: (_) => choice("!", "~", "-", "+"),
 
     // As in P4-16, each branch is any statement, so `else if` is a
     // conditional nested in the else branch, and a branch need not be a
@@ -836,9 +847,7 @@ module.exports = grammar({
         seq(
           field("type", $._type_identifier),
           optional(seq("<", $.type_argument_list, ">")),
-          "(",
-          repeat(seq($._expression, optional(","))),
-          ")",
+          field("arguments", $.argument_list),
           field("name", $.identifier),
           optional(seq("=", $.obj_initializer)),
           ";",

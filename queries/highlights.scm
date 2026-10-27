@@ -268,11 +268,16 @@
 ; -------------------------
 
 [
-  (binop)
-  (unop)
   "="
   ".."
+  "&&&"
 ] @operator
+
+(binary_expression
+  operator: _ @operator)
+
+(unary_expression
+  operator: _ @operator)
 
 "mask" @keyword.operator
 
@@ -299,7 +304,7 @@
   ] @operator)
 
 ; Angle brackets enclose type arguments. In a comparison they are operators,
-; reached through binop.
+; reached through binary_expression.
 (bit_type
   [
     "<"

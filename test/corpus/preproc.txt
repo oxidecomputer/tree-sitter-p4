@@ -43,7 +43,6 @@ const bit<8> A = 1;
       (binary_expression
         (number
           (decimal))
-        (binop)
         (identifier))))
   (preproc
     (identifier_preproc)

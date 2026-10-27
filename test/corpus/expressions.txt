@@ -22,14 +22,12 @@ control c() {
           (binary_expression
             (parenthesized_expression
               (identifier))
-            (binop)
             (identifier)))
         (var_decl
           (identifier)
           (binary_expression
             (parenthesized_expression
               (identifier))
-            (binop)
             (identifier)))
         (var_decl
           (identifier)
@@ -37,7 +35,6 @@ control c() {
             (cast_expression
               (type_identifier)
               (identifier))
-            (binop)
             (number
               (decimal))))))))
 
@@ -96,17 +93,13 @@ control c() {
           (identifier)
           (binary_expression
             (unary_expression
-              (unop)
               (identifier))
-            (binop)
             (identifier)))
         (var_decl
           (identifier)
           (binary_expression
             (identifier)
-            (binop)
             (unary_expression
-              (unop)
               (identifier))))))))
 
 ================================================================================
@@ -141,7 +134,6 @@ control c(in bit<8> x = 1) {
             (conditional
               condition: (binary_expression
                 left: (identifier)
-                operator: (binop)
                 right: (number
                   (decimal)))
               consequence: (var_decl
@@ -149,7 +141,6 @@ control c(in bit<8> x = 1) {
                   object: (identifier)
                   member: (identifier))
                 right: (unary_expression
-                  operator: (unop)
                   argument: (identifier)))
               alternative: (var_decl
                 left: (member_expression
@@ -158,7 +149,6 @@ control c(in bit<8> x = 1) {
                 right: (conditional_expression
                   condition: (binary_expression
                     left: (identifier)
-                    operator: (binop)
                     right: (number
                       (decimal)))
                   consequence: (cast_expression
@@ -173,3 +163,168 @@ control c(in bit<8> x = 1) {
           (call_expression
             function: (identifier)
             arguments: (argument_list)))))))
+
+================================================================================
+Binary operators bind as in P4-16
+================================================================================
+
+control C() {
+    apply {
+        x = a || b && c == d < e | f ^ g & h << i + j * k;
+        x = k * j + i << h & g ^ f | e < d == c && b || a;
+        x = a - b - c;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_definition
+    (method_identifier)
+    (control_body
+      (block
+        (var_decl
+          (identifier)
+          (binary_expression
+            (identifier)
+            (binary_expression
+              (identifier)
+              (binary_expression
+                (identifier)
+                (binary_expression
+                  (identifier)
+                  (binary_expression
+                    (identifier)
+                    (binary_expression
+                      (identifier)
+                      (binary_expression
+                        (identifier)
+                        (binary_expression
+                          (identifier)
+                          (binary_expression
+                            (identifier)
+                            (binary_expression
+                              (identifier)
+                              (identifier))))))))))))
+        (var_decl
+          (identifier)
+          (binary_expression
+            (binary_expression
+              (binary_expression
+                (binary_expression
+                  (binary_expression
+                    (binary_expression
+                      (binary_expression
+                        (binary_expression
+                          (binary_expression
+                            (binary_expression
+                              (identifier)
+                              (identifier))
+                            (identifier))
+                          (identifier))
+                        (identifier))
+                      (identifier))
+                    (identifier))
+                  (identifier))
+                (identifier))
+              (identifier))
+            (identifier)))
+        (var_decl
+          (identifier)
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (identifier))
+            (identifier)))))))
+
+================================================================================
+Named arguments and structure members
+================================================================================
+
+Alpm(number_partitions = 1024, 2) alpm;
+control C() {
+    apply {
+        f(x = 1, y);
+        s = { a = 1, b = 2 };
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (package
+    (method_identifier)
+    (argument_list
+      (named_expression
+        (identifier)
+        (number
+          (decimal)))
+      (number
+        (decimal)))
+    (identifier))
+  (control_definition
+    (method_identifier)
+    (control_body
+      (block
+        (call_statement
+          (call_expression
+            (identifier)
+            (argument_list
+              (named_expression
+                (identifier)
+                (number
+                  (decimal)))
+              (identifier))))
+        (var_decl
+          (identifier)
+          (tuple
+            (named_expression
+              (identifier)
+              (number
+                (decimal)))
+            (named_expression
+              (identifier)
+              (number
+                (decimal)))))))))
+
+================================================================================
+A mask binds looser than any operator
+================================================================================
+
+parser P() {
+    state start {
+        transition select(x) {
+            0x800 &&& 0xf00 + 1: s;
+            default: accept;
+        }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (parser_definition
+    (method_identifier)
+    (state
+      (method_identifier)
+      (block
+        (transition
+          (select_expr
+            (expression_list
+              (identifier))
+            (select_case
+              (keyset_expression
+                (simple_keyset_expression
+                  (mask
+                    (number
+                      (hex))
+                    (binary_expression
+                      (number
+                        (hex))
+                      (number
+                        (decimal))))))
+              (identifier))
+            (select_case
+              (keyset_expression
+                (simple_keyset_expression))
+              (identifier))))))))

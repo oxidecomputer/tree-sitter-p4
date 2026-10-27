@@ -308,6 +308,10 @@
         {
           "type": "_expression",
           "named": true
+        },
+        {
+          "type": "named_expression",
+          "named": true
         }
       ]
     }
@@ -331,8 +335,88 @@
         "required": true,
         "types": [
           {
-            "type": "binop",
-            "named": true
+            "type": "!=",
+            "named": false
+          },
+          {
+            "type": "%",
+            "named": false
+          },
+          {
+            "type": "&",
+            "named": false
+          },
+          {
+            "type": "&&",
+            "named": false
+          },
+          {
+            "type": "*",
+            "named": false
+          },
+          {
+            "type": "+",
+            "named": false
+          },
+          {
+            "type": "++",
+            "named": false
+          },
+          {
+            "type": "-",
+            "named": false
+          },
+          {
+            "type": "/",
+            "named": false
+          },
+          {
+            "type": "<",
+            "named": false
+          },
+          {
+            "type": "<<",
+            "named": false
+          },
+          {
+            "type": "<=",
+            "named": false
+          },
+          {
+            "type": "==",
+            "named": false
+          },
+          {
+            "type": ">",
+            "named": false
+          },
+          {
+            "type": ">=",
+            "named": false
+          },
+          {
+            "type": ">>",
+            "named": false
+          },
+          {
+            "type": "^",
+            "named": false
+          },
+          {
+            "type": "|",
+            "named": false
+          },
+          {
+            "type": "|+|",
+            "named": false
+          },
+          {
+            "type": "|-|",
+            "named": false
+          },
+          {
+            "type": "||",
+            "named": false
           }
         ]
       },
@@ -347,11 +431,6 @@
         ]
       }
     }
-  },
-  {
-    "type": "binop",
-    "named": true,
-    "fields": {}
   },
   {
     "type": "bit_type",
@@ -761,6 +840,16 @@
     "type": "control_var",
     "named": true,
     "fields": {
+      "arguments": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "argument_list",
+            "named": true
+          }
+        ]
+      },
       "name": {
         "multiple": false,
         "required": true,
@@ -838,10 +927,6 @@
       "multiple": true,
       "required": false,
       "types": [
-        {
-          "type": "_expression",
-          "named": true
-        },
         {
           "type": "obj_initializer",
           "named": true
@@ -1432,13 +1517,9 @@
       }
     },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
-        {
-          "type": "_expression",
-          "named": true
-        },
         {
           "type": "method_identifier",
           "named": true
@@ -1618,6 +1699,32 @@
     }
   },
   {
+    "type": "named_expression",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "number",
     "named": true,
     "fields": {},
@@ -1679,6 +1786,16 @@
     "type": "package",
     "named": true,
     "fields": {
+      "arguments": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "argument_list",
+            "named": true
+          }
+        ]
+      },
       "instance": {
         "multiple": false,
         "required": false,
@@ -1704,10 +1821,6 @@
       "multiple": true,
       "required": false,
       "types": [
-        {
-          "type": "_expression",
-          "named": true
-        },
         {
           "type": "annotation",
           "named": true
@@ -2334,6 +2447,10 @@
         {
           "type": "_expression",
           "named": true
+        },
+        {
+          "type": "named_expression",
+          "named": true
         }
       ]
     }
@@ -2614,17 +2731,24 @@
         "required": true,
         "types": [
           {
-            "type": "unop",
-            "named": true
+            "type": "!",
+            "named": false
+          },
+          {
+            "type": "+",
+            "named": false
+          },
+          {
+            "type": "-",
+            "named": false
+          },
+          {
+            "type": "~",
+            "named": false
           }
         ]
       }
     }
-  },
-  {
-    "type": "unop",
-    "named": true,
-    "fields": {}
   },
   {
     "type": "var_decl",
