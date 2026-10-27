@@ -252,8 +252,8 @@ control C() {
 --------------------------------------------------------------------------------
 
 (source_file
-  (package
-    (method_identifier)
+  (instantiation
+    (type_identifier)
     (argument_list
       (named_expression
         (identifier)

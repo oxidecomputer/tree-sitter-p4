@@ -40,6 +40,10 @@
         "named": true
       },
       {
+        "type": "instantiation",
+        "named": true
+      },
+      {
         "type": "macro_invocation",
         "named": true
       },
@@ -1507,16 +1511,6 @@
           }
         ]
       }
-    },
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "method_identifier",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -1782,26 +1776,6 @@
     "type": "package",
     "named": true,
     "fields": {
-      "arguments": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "argument_list",
-            "named": true
-          }
-        ]
-      },
-      "instance": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      },
       "name": {
         "multiple": false,
         "required": true,
@@ -1823,10 +1797,6 @@
         },
         {
           "type": "method_field",
-          "named": true
-        },
-        {
-          "type": "type_argument_list",
           "named": true
         },
         {

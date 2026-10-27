@@ -47,8 +47,8 @@ V1Switch(c()) main;
             (argument_list
               (number
                 (decimal))))))))
-  (package
-    (method_identifier)
+  (instantiation
+    (type_identifier)
     (argument_list
       (call_expression
         (identifier)

@@ -98,7 +98,6 @@ module.exports = grammar({
     [$._macro_declaration, $._type_identifier],
     [$._expression, $._type_identifier],
     [$._expression, $.call_expression],
-    [$.macro_invocation, $.package],
     [$.preproc, $._macro_name],
   ],
 
@@ -121,19 +120,11 @@ module.exports = grammar({
         $.parser_definition,
         $.control_definition,
         $.package,
+        // A package instance, as in `V1Switch(p(), c()) main;`.
+        $.instantiation,
         $.action,
         $.table,
-        $.macro_invocation,
-      ),
-
-    // A macro expanding to declarations or statements, invoked without a
-    // trailing semicolon, as in `ROTATE_BY_N(1)`. The grammar does not expand
-    // macros, so this is the closest it gets to the expansion. It shares its
-    // prefix with a call, and is told apart only by the missing semicolon.
-    macro_invocation: ($) =>
-      seq(
-        field("name", $._method_identifier),
-        field("arguments", $.argument_list),
+        alias($._macro_declaration, $.macro_invocation),
       ),
 
     // An object-like macro standing for declarations, key elements, or
@@ -141,43 +132,30 @@ module.exports = grammar({
     // tells it apart from the start of what it stands for.
     _macro_use: ($) => alias(prec(-1, $.identifier), $.macro_invocation),
 
-    // The same among declarations, where it shares its prefix with an
-    // instantiation, `T(args) name;`, and is told apart only by the missing
-    // name. The prefix has to be the instantiation's, type and all, because
-    // `type_identifier` would otherwise win statically before the parser
-    // reaches the token that decides.
+    // A macro expanding to declarations, invoked without a trailing
+    // semicolon, as in `ROTATE_BY_N(1)`. The grammar does not expand macros,
+    // so this is the closest it gets to the expansion. It shares its prefix
+    // with an instantiation, `T(args) name;`, and is told apart only by the
+    // missing name.
     _macro_declaration: ($) =>
       prec(
         1,
         seq(
-          alias($.identifier, $.method_identifier),
+          field("name", alias($.identifier, $.method_identifier)),
           field("arguments", $.argument_list),
         ),
       ),
 
     package: ($) =>
-      choice(
-        seq(
-          repeat($.annotation),
-          "package",
-          field("name", $._method_identifier),
-          optional($.type_parameters),
-          "(",
-          repeat($.method_field),
-          ")",
-          ";",
-        ),
-        // An instantiation, as in `V1Switch(p(), c()) main;`, with type
-        // arguments for a generic package, as in `Pipeline<H, M>(...) pipe;`.
-        // Its arguments are expressions so that it shares its prefix with a
-        // macro invocation, from which only the instance name tells it apart.
-        seq(
-          field("name", $._method_identifier),
-          optional(seq("<", $.type_argument_list, ">")),
-          field("arguments", $.argument_list),
-          field("instance", $.identifier),
-          ";",
-        ),
+      seq(
+        repeat($.annotation),
+        "package",
+        field("name", $._method_identifier),
+        optional($.type_parameters),
+        "(",
+        repeat($.method_field),
+        ")",
+        ";",
       ),
 
     // The match kinds an architecture adds, as in

@@ -370,12 +370,6 @@
   "=" @prepend_space @append_space
 )
 
-; The instance name of a package instantiation, as in `V1Switch(...) main;`.
-; Every other identifier in the production is wrapped in a method_identifier.
-(package
-  (identifier) @prepend_space
-)
-
 ; A package declaration lists the types of its arguments as method identifiers,
 ; each followed by the name it binds.
 (method_field
@@ -434,7 +428,6 @@
   (bit_type "<" @prepend_antispace @append_antispace)
   (int_type "<" @prepend_antispace @append_antispace)
   (method_field "<" @prepend_antispace @append_antispace)
-  (package "<" @prepend_antispace @append_antispace)
   (type_arguments "<" @prepend_antispace @append_antispace)
   (instantiation "<" @prepend_antispace @append_antispace)
   (list_type "<" @prepend_antispace @append_antispace)
@@ -447,7 +440,6 @@
   (bit_type ">" @prepend_antispace)
   (int_type ">" @prepend_antispace)
   (method_field ">" @prepend_antispace)
-  (package ">" @prepend_antispace)
   (type_arguments ">" @prepend_antispace)
   (instantiation ">" @prepend_antispace)
   (list_type ">" @prepend_antispace)
