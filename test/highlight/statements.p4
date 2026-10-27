@@ -86,6 +86,10 @@ control C(inout headers_t hdr, in bit<9> port) {
 //                          ^ operator
 //                            ^ constant.numeric
 //                                ^ operator
+        hdr.ipv4 = {#};
+//                 ^ constant.builtin
+        x = hdr.ipv4.ttl[i +: 4];
+//                         ^ operator
         for (bit<8> i in 0 .. 3) {
 //      ^ keyword.control.repeat
 //                    ^ keyword.control.repeat

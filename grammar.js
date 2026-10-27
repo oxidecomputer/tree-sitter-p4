@@ -72,6 +72,7 @@ module.exports = grammar({
       "struct",
       "switch",
       "table",
+      "this",
       "transition",
       "true",
       "tuple",
@@ -593,6 +594,7 @@ module.exports = grammar({
         2,
         choice(
           $.identifier,
+          $.this,
           $.member_expression,
           $.index_expression,
           $.slice_expression,
@@ -736,28 +738,40 @@ module.exports = grammar({
       ),
 
     // `x[7:0]`, `x[W - 1:0]`, or `pkt.lookahead<bit<8>>()[7:0]`. Whether `[`
-    // opens an index or a slice is known only at the `]` or `:`.
+    // opens an index or a slice is known only at the `]` or `:`. `x[i +: 8]`
+    // takes 8 bits upward from bit `i`.
     slice_expression: ($) =>
       prec(
         PREC.postfix,
         seq(
           field("value", $._expression),
           "[",
-          field("high", $._expression),
-          ":",
-          field("low", $._expression),
+          choice(
+            seq(field("high", $._expression), ":", field("low", $._expression)),
+            seq(
+              field("low", $._expression),
+              "+:",
+              field("width", $._expression),
+            ),
+          ),
           "]",
         ),
       ),
 
+    // A list, `{ a, b }`, or a structure, `{ x = a, y = b }`, whose last
+    // member may be `...` to leave the rest at their defaults.
     tuple: ($) =>
       seq(
         "{",
-        choice($._expression, $.named_expression),
-        repeat(seq(",", choice($._expression, $.named_expression))),
+        commaSep1(choice($._expression, $.named_expression, "...")),
         optional(","),
         "}",
       ),
+
+    // An invalid header or header union.
+    invalid_header: (_) => "{#}",
+
+    this: (_) => "this",
 
     // Parenthesized keysets use the tupleKeysetExpression production in the
     // P4-16 grammar. A single element remains valid for existing table keys.
@@ -791,6 +805,8 @@ module.exports = grammar({
         $.cast_expression,
         $.parenthesized_expression,
         prec(1, $.tuple),
+        $.invalid_header,
+        $.this,
         prec(1, $.identifier_preproc),
         prec(1, $.string_literal),
         $.number,

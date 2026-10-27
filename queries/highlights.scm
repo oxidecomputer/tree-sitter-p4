@@ -218,7 +218,13 @@
 
 "default" @keyword.control
 
-"_" @variable.builtin
+[
+  "_"
+  "..."
+  (this)
+] @variable.builtin
+
+(invalid_header) @constant.builtin
 
 ; Match kinds.
 (match_kind
@@ -280,6 +286,7 @@
   "="
   ".."
   "&&&"
+  "+:"
 ] @operator
 
 (binary_expression

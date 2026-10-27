@@ -328,3 +328,76 @@ parser P() {
               (keyset_expression
                 (simple_keyset_expression))
               (identifier))))))))
+
+================================================================================
+This, invalid headers, structures with defaults, and plus slices
+================================================================================
+
+control C(inout H h) {
+    E() e = {
+        void f() { this.g(); }
+    };
+    apply {
+        h.a = {#};
+        h.b = { x = 1, ... };
+        h.c[i +: 8] = h.d[7:0];
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    (parameter
+      (direction)
+      type: (type_identifier)
+      name: (identifier))
+    body: (control_body
+      (control_body_element
+        (instantiation
+          type: (type_identifier)
+          arguments: (argument_list)
+          name: (identifier)
+          initializer: (object_initializer
+            (function_declaration
+              type: (type_identifier)
+              name: (method_identifier)
+              body: (block
+                (call_statement
+                  (call_expression
+                    function: (member_expression
+                      object: (this)
+                      member: (identifier))
+                    arguments: (argument_list))))))))
+      (block
+        (assignment_statement
+          left: (member_expression
+            object: (identifier)
+            member: (identifier))
+          right: (invalid_header))
+        (assignment_statement
+          left: (member_expression
+            object: (identifier)
+            member: (identifier))
+          right: (tuple
+            (named_expression
+              name: (identifier)
+              value: (number
+                (decimal)))))
+        (assignment_statement
+          left: (slice_expression
+            value: (member_expression
+              object: (identifier)
+              member: (identifier))
+            low: (identifier)
+            width: (number
+              (decimal)))
+          right: (slice_expression
+            value: (member_expression
+              object: (identifier)
+              member: (identifier))
+            high: (number
+              (decimal))
+            low: (number
+              (decimal))))))))

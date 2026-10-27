@@ -436,6 +436,11 @@
   ":" @prepend_antispace @append_antispace
 )
 
+; `x[i +: 8]` is spaced as an operator.
+(slice_expression
+  "+:" @prepend_space @append_space
+)
+
 ; Angle brackets delimit type arguments, never comparisons: the comparison
 ; operators are reached through (binary_expression).
 [
