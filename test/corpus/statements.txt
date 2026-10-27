@@ -316,3 +316,86 @@ parser P(packet_in pkt, out H h) {
                 (simple_keyset_expression))
               (identifier))))
         (preproc)))))
+
+================================================================================
+Assignment targets and called methods that begin like declarations
+================================================================================
+
+control C() {
+    apply {
+        s[a].z = 1;
+        n[7:4][3:0] = 4w0;
+        h[f(2)].setValid();
+        f<bit<32>>(32w0);
+        T[2] x;
+        G<bit<8>> y;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    body: (control_body
+      (block
+        (assignment_statement
+          left: (member_expression
+            object: (index_expression
+              object: (identifier)
+              index: (identifier))
+            member: (identifier))
+          right: (number
+            (decimal)))
+        (assignment_statement
+          left: (slice_expression
+            value: (slice_expression
+              value: (identifier)
+              high: (number
+                (decimal))
+              low: (number
+                (decimal)))
+            high: (number
+              (decimal))
+            low: (number
+              (decimal)))
+          right: (number
+            (wdecimal)))
+        (call_statement
+          (call_expression
+            function: (member_expression
+              object: (index_expression
+                object: (identifier)
+                index: (call_expression
+                  function: (identifier)
+                  arguments: (argument_list
+                    (number
+                      (decimal)))))
+              member: (identifier))
+            arguments: (argument_list)))
+        (call_statement
+          (call_expression
+            function: (identifier)
+            type_arguments: (type_arguments
+              (type_argument_list
+                (bit_type
+                  (number
+                    (decimal)))))
+            arguments: (argument_list
+              (number
+                (wdecimal)))))
+        (variable_declaration
+          type: (array_type
+            element: (type_identifier)
+            size: (number
+              (decimal)))
+          name: (identifier))
+        (variable_declaration
+          type: (generic_type
+            type: (type_identifier)
+            type_arguments: (type_arguments
+              (type_argument_list
+                (bit_type
+                  (number
+                    (decimal))))))
+          name: (identifier))))))

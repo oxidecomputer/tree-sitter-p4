@@ -109,12 +109,11 @@ module.exports = grammar({
   // parenthesized expression otherwise. Without a symbol table the parser keeps
   // both readings until the next token settles it.
   conflicts: ($) => [
-    [$.block, $.tuple],
-    [$._parser_block, $.tuple],
     [$.type_parameters, $._type_ref],
     [$.call_expression, $._expression, $._type_identifier],
     [$._macro_declaration, $._type_identifier],
     [$._expression, $._type_identifier],
+    [$._lvalue, $._type_identifier],
     [$._expression, $.call_expression],
     [$.preproc, $._macro_name],
   ],
@@ -571,7 +570,7 @@ module.exports = grammar({
         $.constant_declaration,
         $.assignment_statement,
         $.call_statement,
-        prec(-1, alias($.call_expression, $.macro_invocation)),
+        prec(-1, alias($._statement_call, $.macro_invocation)),
         $.empty_statement,
       ),
 
@@ -589,9 +588,9 @@ module.exports = grammar({
         $.variable_declaration,
         $.assignment_statement,
         $.call_statement,
-        // A macro invocation: a call without its semicolon. Yields to a
-        // longer expression, as in `F(a)(b);`.
-        prec(-1, alias($.call_expression, $.macro_invocation)),
+        // A macro invocation: a call without its semicolon. Yields to a call
+        // statement, which the semicolon makes the longer match.
+        prec(-1, alias($._statement_call, $.macro_invocation)),
         // A constant local to a block, as in `const bit<8> n = 4;`.
         $.constant_declaration,
         $.for_statement,
@@ -611,11 +610,21 @@ module.exports = grammar({
         1,
         seq(
           choice(
-            $.call_expression,
+            alias($._statement_call, $.call_expression),
             alias($._specialized_call, $.call_expression),
           ),
           ";",
         ),
+      ),
+
+    // A call standing as a statement, whose callee is an lvalue, as in
+    // `pkt.extract(hdr.eth)` or `pkt.lookahead<bit<8>>()`, and not the result
+    // of another call.
+    _statement_call: ($) =>
+      seq(
+        field("function", $._lvalue),
+        optional(field("type_arguments", $.type_arguments)),
+        field("arguments", $.argument_list),
       ),
 
     // A method of a generic type given its arguments, as in
@@ -658,7 +667,7 @@ module.exports = grammar({
                   choice(
                     alias($._variable, $.variable_declaration),
                     alias($._assignment, $.assignment_statement),
-                    $.call_expression,
+                    alias($._statement_call, $.call_expression),
                   ),
                 ),
               ),
@@ -672,7 +681,7 @@ module.exports = grammar({
                   "update",
                   choice(
                     alias($._assignment, $.assignment_statement),
-                    $.call_expression,
+                    alias($._statement_call, $.call_expression),
                   ),
                 ),
               ),
@@ -720,21 +729,45 @@ module.exports = grammar({
         optional(seq("=", field("value", $._expression))),
       ),
 
-    // What may be assigned to. Preferred to an expression, which `=` may also
-    // continue, as in a named argument.
+    // What may be assigned to or called as a statement: lvalue in the P4-16
+    // grammar, a name followed by members, indexes, and slices, as in
+    // `hdr.vlan[0].vid` or `x[15:8]`, but not a call's result or any other
+    // expression. The nodes are those of the same expressions.
     _lvalue: ($) =>
+      choice(
+        // Level with a type name: `a[1]` and `a<T>` may begin either an
+        // assignment or call, or a declaration, as in `a[1] x;`.
+        prec(1, $.identifier),
+        $.prefixed_identifier,
+        $.this,
+        alias($._lvalue_member, $.member_expression),
+        alias($._lvalue_index, $.index_expression),
+        alias($._lvalue_slice, $.slice_expression),
+        // As in `(x) = 1;`.
+        alias($._parenthesized_lvalue, $.parenthesized_expression),
+      ),
+
+    _lvalue_member: ($) =>
       prec(
-        2,
-        choice(
-          $.identifier,
-          $.prefixed_identifier,
-          $.this,
-          $.member_expression,
-          $.index_expression,
-          $.slice_expression,
-          // As in `(x) = 1;`.
-          alias($._parenthesized_lvalue, $.parenthesized_expression),
+        PREC.postfix,
+        seq(field("object", $._lvalue), ".", field("member", $.identifier)),
+      ),
+
+    _lvalue_index: ($) =>
+      prec(
+        PREC.postfix,
+        seq(
+          field("object", $._lvalue),
+          "[",
+          field("index", $._expression),
+          "]",
         ),
+      ),
+
+    _lvalue_slice: ($) =>
+      prec(
+        PREC.postfix,
+        seq(field("value", $._lvalue), "[", $._slice_bounds, "]"),
       ),
 
     _parenthesized_lvalue: ($) => seq("(", $._lvalue, ")"),
@@ -886,19 +919,13 @@ module.exports = grammar({
     slice_expression: ($) =>
       prec(
         PREC.postfix,
-        seq(
-          field("value", $._expression),
-          "[",
-          choice(
-            seq(field("high", $._expression), ":", field("low", $._expression)),
-            seq(
-              field("low", $._expression),
-              "+:",
-              field("width", $._expression),
-            ),
-          ),
-          "]",
-        ),
+        seq(field("value", $._expression), "[", $._slice_bounds, "]"),
+      ),
+
+    _slice_bounds: ($) =>
+      choice(
+        seq(field("high", $._expression), ":", field("low", $._expression)),
+        seq(field("low", $._expression), "+:", field("width", $._expression)),
       ),
 
     // A list, `{ a, b }`, or a structure, `{ x = a, y = b }`, whose last

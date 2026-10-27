@@ -11,11 +11,9 @@ testdata/p4_16_errors/constructor2_e.p4
 testdata/p4_16_errors/type-in-expr-lex0.p4
 testdata/p4_16_errors/type-in-expr-lex1.p4
 
-# Calls the grammar allows so that macros may be used: `c.c(_)` without its
-# semicolon, which it takes for a macro invocation, and `t.apply()();`, a
-# call of a call's result, as when a macro expands to the callee, `F(a)(b);`.
+# A call without its semicolon, as in `c.c(_)` before a `}`, which the
+# grammar takes for a macro invocation that expands to a statement.
 testdata/p4_16_errors/expr-call-on-type-with-arguments.p4
-testdata/p4_16_errors/issue5437_table.p4
 
 # An annotation P4-16 allows, `@pkginfo` without a body, which p4c rejects
 # when it checks the bodies of the annotations it knows.
