@@ -808,17 +808,18 @@ module.exports = grammar({
       ),
 
     argument_list: ($) =>
-      seq(
-        "(",
-        optional(
-          seq(
-            choice($._expression, $.named_expression),
-            repeat(seq(",", choice($._expression, $.named_expression))),
-            optional(","),
-          ),
-        ),
-        ")",
+      seq("(", optional(seq(commaSep1($._argument), optional(","))), ")"),
+
+    // An argument may be left out with `_`, as in `f(_)` or `f(x = _)`.
+    _argument: ($) =>
+      choice(
+        $._expression,
+        $.named_expression,
+        "_",
+        alias($._named_dont_care, $.named_expression),
       ),
+
+    _named_dont_care: ($) => seq(field("name", $.identifier), "=", "_"),
 
     // A named argument, `f(x = 1)`, or a member of a structure-valued
     // expression, `{ a = 1, b = 2 }`.
@@ -1159,7 +1160,8 @@ module.exports = grammar({
     type_parameters: ($) =>
       seq("<", $._type_identifier, repeat(seq(",", $._type_identifier)), ">"),
 
-    type_argument_list: ($) => commaSep1($._type_ref),
+    // `_` leaves a type argument to be inferred, as in `Register<bit<8>, _>`.
+    type_argument_list: ($) => commaSep1(choice($._type_ref, "_")),
 
     _type_identifier: ($) => prec(1, alias($.identifier, $.type_identifier)),
 
@@ -1195,7 +1197,9 @@ module.exports = grammar({
 
     _method_identifier: ($) => alias($.identifier, $.method_identifier),
 
-    identifier: (_) => /[a-zA-Z_][a-zA-Z0-9_]*/,
+    // A lone `_` is not a name but the don't-care token, which P4-16 allows
+    // only as a keyset, an argument, or a type argument.
+    identifier: (_) => /[a-zA-Z][a-zA-Z0-9_]*|_[a-zA-Z0-9_]+/,
     identifier_preproc: (_) => /[A-Z][A-Z0-9_]*/,
 
     boolean_literal: (_) => choice("true", "false"),

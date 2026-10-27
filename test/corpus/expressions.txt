@@ -541,3 +541,27 @@ control c(in .e a) {
                   (number
                     (decimal))))))
           name: (identifier))))))
+
+================================================================================
+Arguments left out with an underscore
+================================================================================
+
+control C() {
+    apply {
+        f(_, x = _);
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    body: (control_body
+      (block
+        (call_statement
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (named_expression
+                name: (identifier)))))))))

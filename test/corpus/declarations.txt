@@ -580,8 +580,7 @@ control C(Checksum<bit<16>> c) {
               (type_argument_list
                 (bit_type
                   (number
-                    (decimal)))
-                (type_identifier))))
+                    (decimal))))))
           arguments: (argument_list
             (number
               (decimal)))
