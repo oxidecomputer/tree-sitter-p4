@@ -961,24 +961,28 @@ module.exports = grammar({
         $.octal,
         $.whex,
         $.wbinary,
+        $.woctal,
         $.wdecimal,
       ),
 
     // P4-16 integer literals: a base prefix, digits that may be separated by
     // underscores, and optionally a width with `w` (unsigned) or `s` (signed).
-    decimal: (_) => /\d[\d_]*/,
+    // As in p4c, an underscore may follow the prefix, as in `0x_FF`.
+    decimal: (_) => /\d[\d_]*|0[dD][\d_]+/,
 
-    hex: (_) => /0[xX][0-9a-fA-F][0-9a-fA-F_]*/,
+    hex: (_) => /0[xX][0-9a-fA-F_]+/,
 
-    binary: (_) => /0[bB][01][01_]*/,
+    binary: (_) => /0[bB][01_]+/,
 
-    octal: (_) => /0[oO][0-7][0-7_]*/,
+    octal: (_) => /0[oO][0-7_]+/,
 
-    whex: (_) => /\d+[ws]0[xX][0-9a-fA-F][0-9a-fA-F_]*/,
+    whex: (_) => /\d+[ws]0[xX][0-9a-fA-F_]+/,
 
-    wbinary: (_) => /\d+[ws]0[bB][01][01_]*/,
+    wbinary: (_) => /\d+[ws]0[bB][01_]+/,
 
-    wdecimal: (_) => /\d+[ws]\d[\d_]*/,
+    woctal: (_) => /\d+[ws]0[oO][0-7_]+/,
+
+    wdecimal: (_) => /\d+[ws]([\d_]+|0[dD][\d_]+)/,
 
     // A following `(` always opens the body, as in the spec's grammar.
     annotation: ($) =>

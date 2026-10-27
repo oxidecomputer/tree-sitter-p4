@@ -1745,6 +1745,10 @@
         {
           "type": "whex",
           "named": true
+        },
+        {
+          "type": "woctal",
+          "named": true
         }
       ]
     }
@@ -3192,6 +3196,10 @@
   },
   {
     "type": "whex",
+    "named": true
+  },
+  {
+    "type": "woctal",
     "named": true
   },
   {
