@@ -341,7 +341,7 @@
     ">"
   ] @punctuation.bracket)
 
-(control_var
+(instantiation
   [
     "<"
     ">"

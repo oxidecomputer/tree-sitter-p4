@@ -27,12 +27,12 @@ control C(inout H h) {
           body: (block
             (ERROR
               (identifier))
-            (var_decl
+            (variable_declaration
               type: (bit_type
                 (number
                   (decimal)))
-              left: (identifier)
-              right: (number
+              name: (identifier)
+              value: (number
                 (decimal))))))
       (control_body_element
         (table

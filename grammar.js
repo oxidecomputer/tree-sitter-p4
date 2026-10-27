@@ -95,14 +95,10 @@ module.exports = grammar({
   // parenthesized expression otherwise. Without a symbol table the parser keeps
   // both readings until the next token settles it.
   conflicts: ($) => [
-    [$.call_expression, $._expression, $._type_identifier],
-    [$._cast_type, $.type_decl],
+    [$._macro_declaration, $._type_identifier],
     [$._expression, $._type_identifier],
-    [$._macro_use, $._expression, $._type_identifier],
     [$._expression, $.call_expression],
     [$.macro_invocation, $.package],
-    [$._macro_use, $._macro_declaration, $._expression, $._type_identifier],
-    [$._macro_declaration, $._expression, $._type_identifier],
     [$.preproc, $._macro_name],
   ],
 
@@ -346,8 +342,10 @@ module.exports = grammar({
     parser_local_element: ($) =>
       choice(
         $.const_definition,
-        $.var_decl,
-        seq(repeat($.annotation), $.control_var),
+        seq(
+          repeat($.annotation),
+          choice($.variable_declaration, $.instantiation),
+        ),
         alias($._macro_declaration, $.macro_invocation),
       ),
 
@@ -387,11 +385,13 @@ module.exports = grammar({
 
     control_body_element: ($) =>
       choice(
-        seq(repeat($.annotation), $.control_var),
+        seq(
+          repeat($.annotation),
+          choice($.variable_declaration, $.instantiation),
+        ),
         seq(repeat($.annotation), $.table),
         seq(repeat($.annotation), $.action),
         $.const_definition,
-        $.var_decl,
         alias($._macro_declaration, $.macro_invocation),
         $._macro_use,
       ),
@@ -498,8 +498,8 @@ module.exports = grammar({
         $.conditional,
         $.switch_statement,
         $.action,
-        $.var_decl,
-        $.type_decl,
+        $.variable_declaration,
+        $.assignment_statement,
         $.transition,
         $.call_statement,
         // A macro invocation: a call without its semicolon. Yields to a
@@ -540,12 +540,12 @@ module.exports = grammar({
     switch_case: ($) =>
       prec.right(seq(choice("default", $._expression), ":", optional($.block))),
 
-    type_decl: ($) =>
+    // `bit<8> x;` or `bit<8> x = 0;`.
+    variable_declaration: ($) =>
       seq(
-        optional("("),
-        field("type", choice($._type, $._type_identifier)),
-        optional(")"),
+        field("type", choice($.stack_type, $._type, $._type_identifier)),
         field("name", $.identifier),
+        optional(seq("=", field("value", $._expression))),
         ";",
       ),
 
@@ -562,15 +562,9 @@ module.exports = grammar({
         ),
       ),
 
-    var_decl: ($) =>
-      seq(
-        optional(field("type", choice($._type, $._type_identifier))),
-        // A slice may be assigned to, as in `x[15:8] = y;`.
-        field("left", $._lvalue),
-        "=",
-        field("right", $._expression),
-        ";",
-      ),
+    // A slice may be assigned to, as in `x[15:8] = y;`.
+    assignment_statement: ($) =>
+      seq(field("left", $._lvalue), "=", field("right", $._expression), ";"),
 
     action: ($) =>
       seq(
@@ -842,27 +836,32 @@ module.exports = grammar({
         ),
       ),
 
-    control_var: ($) =>
-      choice(
-        seq(
-          field("type", $._type_identifier),
-          optional(seq("<", $.type_argument_list, ">")),
-          field("arguments", $.argument_list),
-          field("name", $.identifier),
-          optional(seq("=", $.obj_initializer)),
-          ";",
-        ),
-        seq(
-          field("type", choice($.stack_type, $._type, $._type_identifier)),
-          field("name", $.identifier),
-          ";",
-        ),
+    // `Checksum() csum;`, or with type arguments and an initializer,
+    // `RegisterAction<...>(reg) ra = { ... };`.
+    instantiation: ($) =>
+      seq(
+        field("type", $._type_identifier),
+        optional(seq("<", $.type_argument_list, ">")),
+        field("arguments", $.argument_list),
+        field("name", $.identifier),
+        optional(seq("=", field("initializer", $.obj_initializer))),
+        ";",
       ),
 
     // The methods an instance defines, as in
     // `RegisterAction<...>(reg) ra = { void apply(...) { ... } };`.
     obj_initializer: ($) =>
-      seq("{", repeat(choice($.function_declaration, $.control_var)), "}"),
+      seq(
+        "{",
+        repeat(
+          choice(
+            $.function_declaration,
+            $.instantiation,
+            $.variable_declaration,
+          ),
+        ),
+        "}",
+      ),
 
     // A method of an extern. A constructor has no return type, as in
     // `Register(bit<32> size);`.

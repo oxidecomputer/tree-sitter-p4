@@ -339,7 +339,11 @@
   "=" @prepend_space @append_space
 )
 
-(var_decl
+(variable_declaration
+  "=" @prepend_space @append_space
+)
+
+(assignment_statement
   "=" @prepend_space @append_space
 )
 
@@ -347,15 +351,16 @@
   "=" @prepend_space @append_space
 )
 
-(control_var
+(instantiation
   "=" @prepend_space @append_space
 )
 
 ; The methods of an instance's initializer, one per line.
 (obj_initializer
   [
-    (control_var)
     (function_declaration)
+    (instantiation)
+    (variable_declaration)
   ] @allow_blank_line_before @append_spaced_softline
   .
   (comment)* @do_nothing
@@ -379,8 +384,8 @@
 
 ; An instantiation names its instance after the argument list, as in
 ; `Checksum() csum;`.
-(control_var
-  (identifier) @prepend_space
+(instantiation
+  name: (identifier) @prepend_space
 )
 
 ; An argument or parameter list hugs the name in front of it. `if` and
@@ -431,7 +436,7 @@
   (method_field "<" @prepend_antispace @append_antispace)
   (package "<" @prepend_antispace @append_antispace)
   (type_arguments "<" @prepend_antispace @append_antispace)
-  (control_var "<" @prepend_antispace @append_antispace)
+  (instantiation "<" @prepend_antispace @append_antispace)
   (list_type "<" @prepend_antispace @append_antispace)
   (tuple_type "<" @prepend_antispace @append_antispace)
   (type_parameters "<" @prepend_antispace @append_antispace)
@@ -444,7 +449,7 @@
   (method_field ">" @prepend_antispace)
   (package ">" @prepend_antispace)
   (type_arguments ">" @prepend_antispace)
-  (control_var ">" @prepend_antispace)
+  (instantiation ">" @prepend_antispace)
   (list_type ">" @prepend_antispace)
   (tuple_type ">" @prepend_antispace)
   (type_parameters ">" @prepend_antispace)

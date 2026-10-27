@@ -31,7 +31,7 @@ V1Switch(c()) main;
             (number
               (decimal)))))
       (control_body_element
-        (control_var
+        (instantiation
           (type_identifier)
           (argument_list)
           (identifier)))

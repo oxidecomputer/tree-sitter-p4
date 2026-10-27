@@ -21,12 +21,10 @@
 (parameter
   name: (identifier) @local.definition.variable.parameter)
 
-; A declaration names its variable, an assignment does not.
-(var_decl
-  type: (_)
-  left: (identifier) @local.definition.variable)
+(variable_declaration
+  name: (identifier) @local.definition.variable)
 
-(control_var
+(instantiation
   name: (identifier) @local.definition.variable)
 
 (const_definition
@@ -36,6 +34,5 @@
 ; `hdr` in `hdr.ipv4.ttl` is a reference and `ipv4` is not.
 (_expression/identifier) @local.reference
 
-(var_decl
-  !type
+(assignment_statement
   left: (identifier) @local.reference)
