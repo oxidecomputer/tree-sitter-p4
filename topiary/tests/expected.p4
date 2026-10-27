@@ -51,7 +51,7 @@ bit<8> ttl_of(in ipv4_t hdr) {
 parser MyParser(
     packet_in packet,
     out headers hdr,
-    inout metadata meta,
+    inout metadata meta
 ) {
     state start {
         packet.extract(hdr.ethernet);
@@ -71,6 +71,8 @@ parser MyParser(
 
 control MyIngress(inout headers hdr, inout metadata meta) {
     Checksum() csum;
+    @name(".hits") Counter<bit<32>, bit<8>>(8) hits;
+    @flexible bit<8> scratch;
 
     action drop() {
         mark_to_drop();
@@ -82,15 +84,22 @@ control MyIngress(inout headers hdr, inout metadata meta) {
         meta.ecmp_select = hdr.ipv4.dstAddr[13:0];
         csum.run(
             hdr.ipv4.srcAddr,
-            hdr.ipv4.dstAddr,
+            hdr.ipv4.dstAddr
         );
         csum.run({hdr.ipv4.srcAddr, hdr.ipv4.dstAddr});
+        csum.run(
+            {
+                hdr.ipv4.srcAddr, // source first
+                hdr.ipv4.dstAddr
+            }
+        );
+        if (!hdr.ipv4.isValid()) { return; }
     }
 
     table ipv4_lpm {
         key = {
-            hdr.ipv4.dstAddr: lpm;
-            hdr.ipv4.ttl: range;
+            hdr.ipv4.dstAddr: lpm; // longest prefix
+            hdr.ipv4.ttl: range @name("ttl");
         }
         actions = { ipv4_forward; drop; NoAction; }
         size = 1024;
@@ -98,7 +107,7 @@ control MyIngress(inout headers hdr, inout metadata meta) {
         const entries = {
             (
                 0xC0A80000,
-                1..64,
+                1..64
             ): ipv4_forward(0x001122334455, 1);
         }
     }
@@ -114,7 +123,8 @@ control MyIngress(inout headers hdr, inout metadata meta) {
 
 package MySwitch(
     MyParser p,
-    MyIngress ig,
+    Generic<H, M> g,
+    MyIngress ig
 );
 
 V1Switch(

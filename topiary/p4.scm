@@ -16,18 +16,45 @@
   (string_literal)
 ] @leaf
 
+; An annotation is separated from its neighbors, except for the semicolon
+; after the annotations of a key element.
+(annotation) @append_space
+
+(
+  (annotation)
+  .
+  ";" @prepend_antispace
+)
+
+(key_element
+  (match_kind) @append_space
+  .
+  (annotation)
+)
+
+(entry
+  (action_item) @append_space
+  .
+  (annotation)
+)
+
+; A directive has to begin a line. As an extra it may follow any token, such as
+; the brace before `#endif` that closes an apply block inside `#if`.
+(preproc) @prepend_hardline
+
 ; Allow blank line before
 [
   (comment)
   (control_body_element)
   (field)
   (method)
+  (parser_local_element)
   (preproc)
   (select_case)
-  (state)
-  (stmt)
-  (table_element)
-  (top)
+  (parser_state)
+  (switch_case)
+  (table_property)
+  (_declaration)
 ] @allow_blank_line_before
 
 ; Input softlines before comments, so that the input decides whether a comment
@@ -50,15 +77,56 @@
     (control_body_element)
     (field)
     (method)
+    (parser_local_element)
     (preproc)
     (select_case)
-    (state)
-    (stmt)
-    (table_element)
-    (top)
+    (parser_state)
+    (switch_case)
+    (table_property)
+    (_declaration)
   ] @append_spaced_softline
   .
   (comment)* @do_nothing
+)
+
+; Statements of a block, each on a line of its own, and of a parser state,
+; whose statements are a set of their own and end in transitions. A branch of a
+; conditional is a statement too, but is not matched here, which keeps
+; `} else {` together.
+(block
+  [
+    (_statement)
+    (_parser_statement)
+    (transition_statement)
+  ] @allow_blank_line_before
+)
+
+(block
+  [
+    (_statement)
+    (_parser_statement)
+    (transition_statement)
+  ] @append_spaced_softline
+  .
+  (comment)* @do_nothing
+)
+
+; A branch that is not a block follows its condition on the same line.
+(if_statement
+  ")" @append_space
+)
+
+; So does a loop's body. The clauses of a for loop are spaced as arguments.
+(for_statement
+  ")" @append_space
+)
+
+(for_statement
+  ";" @append_space
+)
+
+(for_statement
+  "in" @prepend_space @append_space
 )
 
 ; Braces. A softline breaks only where the construct holding it already spans
@@ -69,52 +137,58 @@
 ; matches every pairing of them, and a conditional with an else branch would
 ; then collect the indentation markers four times over.
 [
-  (action "{" @prepend_space)
-  (conditional "{" @prepend_space)
-  (control_body "{" @prepend_space)
-  (control_definition "{" @prepend_space)
-  (extern_definition "{" @prepend_space)
-  (function_declaration "{" @prepend_space)
-  (header_definition "{" @prepend_space)
-  (parser_definition "{" @prepend_space)
-  (select_expr "{" @prepend_space)
-  (state "{" @prepend_space)
-  (struct_definition "{" @prepend_space)
+  (block "{" @prepend_space)
+  (control_declaration "{" @prepend_space)
+  (extern_declaration "{" @prepend_space)
+  (header_declaration "{" @prepend_space)
+  (header_union_declaration "{" @prepend_space)
+  (enum_declaration "{" @prepend_space)
+  (error_declaration "{" @prepend_space)
+  (match_kind_declaration "{" @prepend_space)
+  (object_initializer "{" @prepend_space)
+  (parser_declaration "{" @prepend_space)
+  (select_expression "{" @prepend_space)
+  (struct_declaration "{" @prepend_space)
+  (switch_statement "{" @prepend_space)
   (table "{" @prepend_space)
-  (table_element "{" @prepend_space)
+  (table_property "{" @prepend_space)
 ]
 
 [
-  (action "{" @append_spaced_softline @append_indent_start)
-  (conditional "{" @append_spaced_softline @append_indent_start)
-  (control_body "{" @append_spaced_softline @append_indent_start)
-  (control_definition "{" @append_spaced_softline @append_indent_start)
-  (extern_definition "{" @append_spaced_softline @append_indent_start)
-  (function_declaration "{" @append_spaced_softline @append_indent_start)
-  (header_definition "{" @append_spaced_softline @append_indent_start)
-  (parser_definition "{" @append_spaced_softline @append_indent_start)
-  (select_expr "{" @append_spaced_softline @append_indent_start)
-  (state "{" @append_spaced_softline @append_indent_start)
-  (struct_definition "{" @append_spaced_softline @append_indent_start)
+  (block "{" @append_spaced_softline @append_indent_start)
+  (control_declaration "{" @append_spaced_softline @append_indent_start)
+  (extern_declaration "{" @append_spaced_softline @append_indent_start)
+  (header_declaration "{" @append_spaced_softline @append_indent_start)
+  (header_union_declaration "{" @append_spaced_softline @append_indent_start)
+  (enum_declaration "{" @append_spaced_softline @append_indent_start)
+  (error_declaration "{" @append_spaced_softline @append_indent_start)
+  (match_kind_declaration "{" @append_spaced_softline @append_indent_start)
+  (object_initializer "{" @append_spaced_softline @append_indent_start)
+  (parser_declaration "{" @append_spaced_softline @append_indent_start)
+  (select_expression "{" @append_spaced_softline @append_indent_start)
+  (struct_declaration "{" @append_spaced_softline @append_indent_start)
+  (switch_statement "{" @append_spaced_softline @append_indent_start)
   (table "{" @append_spaced_softline @append_indent_start)
-  (table_element "{" @append_spaced_softline @append_indent_start)
+  (table_property "{" @append_spaced_softline @append_indent_start)
   (tuple "{" @append_empty_softline @append_indent_start)
 ]
 
 [
-  (action "}" @prepend_spaced_softline @prepend_indent_end)
-  (conditional "}" @prepend_spaced_softline @prepend_indent_end)
-  (control_body "}" @prepend_spaced_softline @prepend_indent_end)
-  (control_definition "}" @prepend_spaced_softline @prepend_indent_end)
-  (extern_definition "}" @prepend_spaced_softline @prepend_indent_end)
-  (function_declaration "}" @prepend_spaced_softline @prepend_indent_end)
-  (header_definition "}" @prepend_spaced_softline @prepend_indent_end)
-  (parser_definition "}" @prepend_spaced_softline @prepend_indent_end)
-  (select_expr "}" @prepend_spaced_softline @prepend_indent_end)
-  (state "}" @prepend_spaced_softline @prepend_indent_end)
-  (struct_definition "}" @prepend_spaced_softline @prepend_indent_end)
+  (block "}" @prepend_spaced_softline @prepend_indent_end)
+  (control_declaration "}" @prepend_spaced_softline @prepend_indent_end)
+  (extern_declaration "}" @prepend_spaced_softline @prepend_indent_end)
+  (header_declaration "}" @prepend_spaced_softline @prepend_indent_end)
+  (header_union_declaration "}" @prepend_spaced_softline @prepend_indent_end)
+  (enum_declaration "}" @prepend_spaced_softline @prepend_indent_end)
+  (error_declaration "}" @prepend_spaced_softline @prepend_indent_end)
+  (match_kind_declaration "}" @prepend_spaced_softline @prepend_indent_end)
+  (object_initializer "}" @prepend_spaced_softline @prepend_indent_end)
+  (parser_declaration "}" @prepend_spaced_softline @prepend_indent_end)
+  (select_expression "}" @prepend_spaced_softline @prepend_indent_end)
+  (struct_declaration "}" @prepend_spaced_softline @prepend_indent_end)
+  (switch_statement "}" @prepend_spaced_softline @prepend_indent_end)
   (table "}" @prepend_spaced_softline @prepend_indent_end)
-  (table_element "}" @prepend_spaced_softline @prepend_indent_end)
+  (table_property "}" @prepend_spaced_softline @prepend_indent_end)
   (tuple "}" @prepend_empty_softline @prepend_indent_end)
 ]
 
@@ -123,23 +197,53 @@
   "apply" @prepend_spaced_softline @allow_blank_line_before
 )
 
-; Entries of the braced forms of table_element (`key`, `actions`, entry lists)
+; Entries of the braced forms of table_property (`key`, `actions`, entry lists)
 ; are separated by semicolons, unlike the one in `size = 1024;`, which closes
 ; the element and breaks by the rule above.
-(
-  (table_element
-    "{"
-    ";" @append_spaced_softline
-  )
+;
+; A trailing comment is a sibling of the separator, so the anchor that keeps it
+; on the line sits inside the parent. Anchoring a quantified comment after the
+; parent instead matched the wrong node and took time cubic in the number of
+; entries: about 3 s for a table of 400 const entries.
+(table_property
+  "{"
+  ";" @append_spaced_softline
   .
   (comment)* @do_nothing
 )
 
+; Each key element, and each entry of an entry list.
+(table_property
+  [
+    (entry)
+    (key_element)
+  ] @append_spaced_softline
+  .
+  (comment)* @do_nothing
+)
+
+; A macro standing for key elements or actions, as in `key = { MAC_KEY }`, has
+; no semicolon of its own to break after.
+(table_property
+  (macro_invocation) @append_spaced_softline
+  .
+  (comment)* @do_nothing
+)
+
+; Members of an enum, one to a line when the enum spans several.
+(enum_declaration
+  "," @append_spaced_softline
+  .
+  (comment)* @do_nothing
+)
+
+(enum_member
+  "=" @prepend_space @append_space
+)
+
 ; Elements of a tuple literal.
-(
-  (tuple
-    "," @append_spaced_softline
-  )
+(tuple
+  "," @append_spaced_softline
   .
   (comment)* @do_nothing
 )
@@ -147,26 +251,12 @@
 ; A parameter list is its own line-breaking context: the parameters of a
 ; declaration that spans several lines are not themselves obliged to break.
 (
-  [
-    (action "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-    (control_definition "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-    (function_declaration "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-    (method "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-    (package "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-    (parser_definition "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-  ]
+  (parameter_list "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
   (#scope_id! "parameter_list")
 )
 
 (
-  [
-    (action ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-    (control_definition ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-    (function_declaration ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-    (method ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-    (package ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-    (parser_definition ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-  ]
+  (parameter_list ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
   (#scope_id! "parameter_list")
 )
 
@@ -174,7 +264,7 @@
 ; lists, but need a separate scope because they can occur inside parameters.
 (
   [
-    (call "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
+    (argument_list "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
     (tuple_keyset "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
   ]
   (#scope_id! "argument_list")
@@ -182,7 +272,7 @@
 
 (
   [
-    (call ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
+    (argument_list ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
     (tuple_keyset ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
   ]
   (#scope_id! "argument_list")
@@ -190,43 +280,63 @@
 
 (
   [
-    (call "," @append_spaced_scoped_softline)
+    (argument_list "," @append_spaced_scoped_softline)
     (tuple_keyset "," @append_spaced_scoped_softline)
   ]
   (#scope_id! "argument_list")
 )
 
-; A parameter carries its own trailing comma; a package instantiation separates
-; its arguments with commas of its own.
 (
-  [
-    (method_field "," @append_spaced_scoped_softline)
-    (package "," @append_spaced_scoped_softline)
-    (parameter "," @append_spaced_scoped_softline)
-  ]
+  (parameter_list "," @append_spaced_scoped_softline)
   (#scope_id! "parameter_list")
 )
 
 ; Surround spaces
 [
+  "abstract"
   "action"
   "apply"
   "const"
   "control"
   "default"
   "else"
+  "enum"
   "extern"
+  "for"
   "header"
+  "header_union"
   "if"
+  "mask"
+  "match_kind"
   "package"
   "parser"
   "state"
   "struct"
+  "switch"
   "table"
   "transition"
+  "type"
   "typedef"
-  (binop)
 ] @prepend_space @append_space
+
+(binary_expression
+  operator: _ @prepend_space @append_space
+)
+
+(mask
+  "&&&" @prepend_space @append_space
+)
+
+(named_expression
+  "=" @prepend_space @append_space
+)
+
+; A returned value is separated from `return`; `return;` stays tight.
+(return_statement
+  "return" @append_space
+  .
+  (_expression)
+)
 
 ; Append spaces
 [
@@ -234,59 +344,68 @@
   "bool"
   "error"
   "int"
+  "list"
   "packet_in"
   "packet_out"
   "varbit"
   (bit_type)
   (direction)
+  (generic_type)
+  (int_type)
+  (list_type)
   (tuple_type)
   (type_identifier)
   (varbit_type)
 ] @append_space
 
-(const_definition
+(constant_declaration
   "=" @prepend_space @append_space
 )
 
-(var_decl
+(variable_declaration
   "=" @prepend_space @append_space
 )
 
-(table_element
+(assignment_statement
+  operator: _ @prepend_space @append_space
+)
+
+(parameter
   "=" @prepend_space @append_space
 )
 
-; The instance name of a package instantiation, as in `V1Switch(...) main;`.
-; Every other identifier in the production is wrapped in a method_identifier.
-(package
-  (identifier) @prepend_space
+(instantiation
+  "=" @prepend_space @append_space
 )
 
-; A package declaration lists the types of its arguments as method identifiers,
-; each followed by the name it binds.
-(method_field
-  (identifier) @prepend_space
+; The methods of an instance's initializer, one per line.
+(object_initializer
+  [
+    (function_declaration)
+    (instantiation)
+    (variable_declaration)
+  ] @allow_blank_line_before @append_spaced_softline
+  .
+  (comment)* @do_nothing
+)
+
+(table_property
+  "=" @prepend_space @append_space
 )
 
 ; An instantiation names its instance after the argument list, as in
 ; `Checksum() csum;`.
-(control_var
-  (identifier) @prepend_space
+(instantiation
+  name: (identifier) @prepend_space
 )
 
 ; An argument or parameter list hugs the name in front of it. `if` and
 ; `else if` are the exception, which is why this is not a rule on every
 ; parenthesis.
 [
-  (action "(" @prepend_antispace)
-  (call "(" @prepend_antispace)
-  (control_definition "(" @prepend_antispace)
-  (control_var "(" @prepend_antispace)
-  (function_declaration "(" @prepend_antispace)
-  (method "(" @prepend_antispace)
-  (package "(" @prepend_antispace)
-  (parser_definition "(" @prepend_antispace)
-  (select_expr "(" @prepend_antispace)
+  (argument_list "(" @prepend_antispace)
+  (parameter_list "(" @prepend_antispace)
+  (select_expression "(" @prepend_antispace)
 ]
 
 ; Never put a space before a comma or a semicolon
@@ -304,35 +423,40 @@
 ; A colon separates a key from its match kind, or an entry from its action. In
 ; a bit slice it separates the bounds of a range and takes no space.
 [
+  (entry ":" @prepend_antispace @append_space)
+  (key_element ":" @prepend_antispace @append_space)
   (select_case ":" @prepend_antispace @append_space)
-  (table_element ":" @prepend_antispace @append_space)
+  (switch_case ":" @prepend_antispace @append_space)
 ]
 
-(slice
+(slice_expression
   ":" @prepend_antispace @append_antispace
 )
 
+; `x[i +: 8]` is spaced as an operator.
+(slice_expression
+  "+:" @prepend_space @append_space
+)
+
 ; Angle brackets delimit type arguments, never comparisons: the comparison
-; operators are reached through (binop).
+; operators are reached through (binary_expression).
 [
   (bit_type "<" @prepend_antispace @append_antispace)
-  (control_definition "<" @prepend_antispace @append_antispace)
-  (control_var "<" @prepend_antispace @append_antispace)
-  (method "<" @prepend_antispace @append_antispace)
-  (package "<" @prepend_antispace @append_antispace)
-  (parser_definition "<" @prepend_antispace @append_antispace)
+  (int_type "<" @prepend_antispace @append_antispace)
+  (type_arguments "<" @prepend_antispace @append_antispace)
+  (list_type "<" @prepend_antispace @append_antispace)
   (tuple_type "<" @prepend_antispace @append_antispace)
+  (type_parameters "<" @prepend_antispace @append_antispace)
   (varbit_type "<" @prepend_antispace @append_antispace)
 ]
 
 [
   (bit_type ">" @prepend_antispace)
-  (control_definition ">" @prepend_antispace)
-  (control_var ">" @prepend_antispace)
-  (method ">" @prepend_antispace)
-  (package ">" @prepend_antispace)
-  (parser_definition ">" @prepend_antispace)
+  (int_type ">" @prepend_antispace)
+  (type_arguments ">" @prepend_antispace)
+  (list_type ">" @prepend_antispace)
   (tuple_type ">" @prepend_antispace)
+  (type_parameters ">" @prepend_antispace)
   (varbit_type ">" @prepend_antispace)
 ]
 

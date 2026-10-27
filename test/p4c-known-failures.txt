@@ -1,0 +1,38 @@
+# Files from p4c, at the commit pinned in .github/workflows/tree_sitter.yaml,
+# that the grammar does not parse. CI parses p4c's samples, its architecture
+# includes, and those of its error tests that p4c rejects only after parsing,
+# and fails if one of these starts to parse, so that it can be taken off here.
+
+# Not P4-16: p4c accepts these as extensions of its own, which the spec's
+# grammar does not have and no program in dendrite or the SDE uses.
+#
+# A width that is an unparenthesized expression, as in `bit<2 + 2>` or
+# `bit<a < 3 ? 5 : 4>`. P4-16 requires `bit<(2 + 2)>`.
+testdata/p4_16_samples/bitexpr1.p4
+testdata/p4_16_samples/cfoldBitTypedefs.p4
+# An array declared in the style of C, as in `bit<8> a[16];`. P4-16 writes
+# `bit<8>[16] a;`.
+testdata/p4_16_samples/array2.p4
+testdata/p4_16_samples/externArray1.p4
+testdata/p4_16_samples/generic-extern-inference.p4
+testdata/p4_16_samples/unreach1.p4
+
+# Not P4-16: an instantiation inside a block, as in `apply { VC() vc; }`.
+# p4c parses it only to report a clearer error afterwards.
+testdata/p4_16_errors/control-inline.p4
+testdata/p4_16_errors/issue3210.p4
+testdata/p4_16_errors/issue3271-1.p4
+testdata/p4_16_errors/issue3271.p4
+
+# Not P4 until preprocessed: the branches of an `#if` each hold part of one
+# declaration, as in `#if ... extern register<T, I> #else extern register<T>
+# #endif { ... }`. The grammar keeps directives as extras and parses both
+# branches, so these are errors in any grammar that does not preprocess.
+p4include/v1model.p4
+
+# Valid P4-16 the grammar does not parse: an annotation whose body is free
+# text. P4-16 allows any balanced tokens there; the grammar parses a body as
+# expressions, types, and key-value pairs, which covers every other
+# annotation here. Accepting any tokens would let an unfinished annotation
+# take in the declarations after it while they are being typed.
+testdata/p4_16_samples/free-form-annotation.p4

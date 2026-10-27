@@ -10,3 +10,9 @@ header ipv6_h {
 	ipv6_addr_t	src_addr;
 	ipv6_addr_t	dst_addr;
 }
+
+// At most one of its members is valid.
+header_union ip_h {
+    ipv4_h v4;
+    ipv6_h v6;
+}

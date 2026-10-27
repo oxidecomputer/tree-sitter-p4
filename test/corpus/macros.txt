@@ -1,0 +1,138 @@
+================================================================================
+Macro invocations beside instantiations and calls
+================================================================================
+
+DECLARE(1)
+control c() {
+    ROTATE(1)
+    Checksum() csum;
+    apply {
+        APPLY(2)
+        f(3);
+    }
+}
+V1Switch(c()) main;
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (macro_invocation
+    name: (method_identifier)
+    arguments: (argument_list
+      (number
+        (decimal))))
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
+      (control_body_element
+        (macro_invocation
+          name: (method_identifier)
+          arguments: (argument_list
+            (number
+              (decimal)))))
+      (control_body_element
+        (instantiation
+          type: (type_identifier)
+          arguments: (argument_list)
+          name: (identifier)))
+      (block
+        (macro_invocation
+          function: (identifier)
+          arguments: (argument_list
+            (number
+              (decimal))))
+        (call_statement
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (number
+                (decimal))))))))
+  (instantiation
+    type: (type_identifier)
+    arguments: (argument_list
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list)))
+    name: (identifier)))
+
+================================================================================
+Macros standing for declarations, key elements, and actions
+================================================================================
+
+control c(inout H h) {
+    COUNTERS
+    table t {
+        key = { MAC_KEY h.x: exact; }
+        actions = { ACTIONS NoAction; }
+    }
+    apply { }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
+    body: (control_body
+      (control_body_element
+        (macro_invocation))
+      (control_body_element
+        (table
+          name: (type_identifier)
+          (table_property
+            (macro_invocation)
+            (key_element
+              value: (member_expression
+                object: (identifier)
+                member: (identifier))
+              match_kind: (match_kind)))
+          (table_property
+            (macro_invocation)
+            (action_item
+              (method_identifier)))))
+      (block))))
+
+================================================================================
+Annotations before a macro that expands to more of them
+================================================================================
+
+@pa_allow_pov_on_mocha
+CONTAINERS("ingress", hdr.main0)
+CONTAINERS("ingress", hdr.main1)
+@pa_solitary("ingress", "x")
+struct metadata {}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (macro_invocation
+    (annotation
+      (identifier))
+    name: (method_identifier)
+    arguments: (argument_list
+      (string_literal)
+      (member_expression
+        object: (identifier)
+        member: (identifier))))
+  (macro_invocation
+    name: (method_identifier)
+    arguments: (argument_list
+      (string_literal)
+      (member_expression
+        object: (identifier)
+        member: (identifier))))
+  (struct_declaration
+    (annotation
+      (identifier)
+      (annotation_body
+        (annotation_content
+          (string_literal))
+        (annotation_content
+          (string_literal))))
+    name: (type_identifier)))

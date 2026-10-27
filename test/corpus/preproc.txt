@@ -1,0 +1,242 @@
+================================================================================
+A define without a value ends at the end of its line
+================================================================================
+
+#ifndef _GUARD_
+#define _GUARD_
+#define ENABLE_X
+const bit<8> A = 1;
+#endif
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (identifier_preproc))
+  (preproc
+    (identifier_preproc))
+  (preproc
+    (identifier_preproc))
+  (constant_declaration
+    (bit_type
+      (number
+        (decimal)))
+    (identifier)
+    (number
+      (decimal)))
+  (preproc))
+
+================================================================================
+A define's value is an expression on the rest of its line
+================================================================================
+
+#define SIZE (1 << WIDTH)
+#define ALGO HashAlgorithm_t.CRC16 // a member
+const bit<8> A = 1;
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (identifier_preproc)
+    (parenthesized_expression
+      (binary_expression
+        (number
+          (decimal))
+        (identifier))))
+  (preproc
+    (identifier_preproc)
+    (member_expression
+      (identifier)
+      (identifier)))
+  (comment)
+  (constant_declaration
+    (bit_type
+      (number
+        (decimal)))
+    (identifier)
+    (number
+      (decimal))))
+
+================================================================================
+A condition continues on the next line after a backslash
+================================================================================
+
+#if defined(A) \
+    || defined(B)
+const bit<8> X = 1;
+#endif
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (preproc_arg))
+  (constant_declaration
+    (bit_type
+      (number
+        (decimal)))
+    (identifier)
+    (number
+      (decimal)))
+  (preproc))
+
+================================================================================
+A function-like macro body keeps its comments to the end of the line
+================================================================================
+
+#define F(n) a = n; \
+    /* check it */ \
+    b = n##1;
+#define G(x) x /* trailing */
+#define H(x)
+#define K(x) /* leading */ x
+const bit<8> X = 1;
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (identifier_preproc)
+    (identifier)
+    (preproc_arg))
+  (preproc
+    (identifier_preproc)
+    (identifier)
+    (preproc_arg))
+  (comment)
+  (preproc
+    (identifier_preproc)
+    (identifier))
+  (preproc
+    (identifier_preproc)
+    (identifier)
+    (preproc_arg))
+  (constant_declaration
+    (bit_type
+      (number
+        (decimal)))
+    (identifier)
+    (number
+      (decimal))))
+
+================================================================================
+An object-like macro holding declarations or key elements is text
+================================================================================
+
+#define MAC_KEY                 \
+    hdr.eth.src : ternary;      \
+    hdr.eth.dst : ternary; // keys
+#define SNAKE                   \
+    @name(".set_port")          \
+    action set_port() { }
+#define FIELDS \
+    hdr.a, \
+    hdr.b
+#define F(n) n; n
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (identifier_preproc)
+    (preproc_arg))
+  (comment)
+  (preproc
+    (identifier_preproc)
+    (preproc_arg))
+  (preproc
+    (identifier_preproc)
+    (member_expression
+      (identifier)
+      (identifier))
+    (member_expression
+      (identifier)
+      (identifier)))
+  (preproc
+    (identifier_preproc)
+    (identifier)
+    (preproc_arg)))
+
+================================================================================
+A slice's bounds are text, while a conditional is an expression
+================================================================================
+
+#define RANGE (W - 1):0
+#define PICK c ? x[7:0] : 0
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (identifier_preproc)
+    (preproc_arg))
+  (preproc
+    (identifier_preproc)
+    (conditional_expression
+      condition: (identifier)
+      consequence: (slice_expression
+        value: (identifier)
+        high: (number
+          (decimal))
+        low: (number
+          (decimal)))
+      alternative: (number
+        (decimal)))))
+
+================================================================================
+Line markers, and a function-like macro beginning with an underscore
+================================================================================
+
+#line 3 "file.p4"
+#define _STR(x) #x
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (preproc_arg))
+  (preproc
+    (identifier_preproc)
+    (identifier)
+    (preproc_arg)))
+
+================================================================================
+Includes, and a define holding fields
+================================================================================
+
+#include <core.p4>
+#include "headers.p4"
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#define FIELDS { \
+    bit<8> a; \
+    bit<8> b; \
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (include_path))
+  (preproc
+    (include_path))
+  (preproc
+    (method_not_constant)
+    (identifier)
+    (identifier)
+    (preproc_arg))
+  (preproc
+    (identifier_preproc)
+    (line_continuation)
+    (field
+      type: (bit_type
+        (number
+          (decimal)))
+      name: (identifier)
+      (line_continuation))
+    (field
+      type: (bit_type
+        (number
+          (decimal)))
+      name: (identifier)
+      (line_continuation))))

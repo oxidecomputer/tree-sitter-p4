@@ -12,14 +12,14 @@ struct headers_t { }
 parser parse(
     packet_in pkt,
     out headers_t headers,
-    inout ingress_metadata_t ingress,
+    inout ingress_metadata_t ingress
 ){
     state start { transition accept; }
 }
 
 control resolver(
     in bit<32> x,
-    out bool resolved,
+    out bool resolved
 ) {
     action resolve() {
         resolved = true;
@@ -52,7 +52,7 @@ control bar() {
 control ingress(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
     foo() taco;
     bar() pizza;
@@ -66,7 +66,7 @@ control ingress(
 control egress(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
 
 }

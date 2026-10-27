@@ -37,3 +37,69 @@ const bit<47> enterprise = ENTERPRISE;
 	hdr.inner_ipv6
 
 header starship STARSHIP
+
+#define ALIAS ENTERPRISE
+#undef ALIAS
+#if ENTERPRISE == 1
+#error "unreachable"
+#elif ENTERPRISE == 1701
+#pragma once
+#endif
+
+// Directives are extras, so both branches of a conditional reach the parser,
+// here as two apply blocks.
+control Egress(inout headers hdr) {
+#if __TARGET_TOFINO__ == 2
+    apply {
+        hdr.a.setValid();
+    }
+#elif __TARGET_TOFINO__ == 3
+    apply {
+    }
+#else
+    apply { }
+#endif
+}
+
+// A function-like macro keeps its body as text: it need not be an expression.
+#define IS_SERVICE(p) ((p) == USER_SPACE_SERVICE_PORT)
+#define ROTATE(n) \
+    action rotate_by_##n() { \
+        x = y[##n-1:0]; \
+    }
+
+#define switch_hash_width 16
+
+// Macros invoked without a semicolon, where they expand to declarations.
+control Rotations(inout headers hdr) {
+    ROTATE(1)
+    ROTATE(2)
+    apply { }
+}
+#define ipv4_lpm_partitions 2048
+
+// Macros that stand for key elements, actions, and declarations.
+#define MAC_KEY                   \
+    hdr.inner_eth.dst : ternary;  \
+    hdr.inner_eth.src : ternary;
+#define MAC_ACTIONS forward; drop;
+#define COUNTERS                  \
+    @name(".hits")                \
+    Counter<bit<32>, bit<8>>(256) hits;
+
+control mac_acl(inout headers_t hdr) {
+    action forward() { }
+    action drop() { }
+    COUNTERS
+    table acl {
+        key = {
+            MAC_KEY
+            hdr.udp.dst_port : exact;
+        }
+        actions = {
+            MAC_ACTIONS
+            NoAction;
+        }
+    }
+    apply { acl.apply(); }
+}

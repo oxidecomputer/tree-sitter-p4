@@ -54,3 +54,108 @@ control ingress(
     }
 
 }
+
+// Constants and variables among a control's declarations.
+control locals(inout Header_t h) {
+    const bit<8> K = 1;
+    bit<16> mask = 16w0xff;
+    apply {
+        h.h.t = mask;
+    }
+}
+
+// Constructor parameters, one with a default value.
+control sized(inout Header_t h)(bit<32> table_size, bit<32> meter_size = 1024) {
+    apply { }
+}
+
+// A switch on the action a table ran, with a label that falls through.
+control dispatch(inout Header_t h) {
+    action a() { }
+    action b() { }
+    table t {
+        actions = { a; b; NoAction; }
+    }
+    apply {
+        switch (t.apply().action_run) {
+            a: { h.h.e = 1; }
+            b:
+            NoAction: {
+                h.h.e = 2;
+            }
+            default: { }
+        }
+    }
+}
+
+// An instance whose initializer defines a method.
+control stateful(inout Header_t h) {
+    Register<bit<32>, bit<32>>(1024) reg;
+    RegisterAction<bit<32>, bit<32>, bit<32>>(reg) count = {
+        void apply(inout bit<32> value, out bit<32> read_value) {
+            read_value = value;
+            value = value + 1;
+        }
+    };
+    apply {
+        count.execute(0);
+    }
+}
+
+// Properties an architecture defines, beside the standard ones.
+control profiled(inout Header_t h) {
+    action a() { }
+    table t {
+        key = { h.h.e: exact; }
+        actions = { a; }
+        implementation = action_profile;
+        idle_timeout = true;
+        @name(".t_timeout") supports_timeout = true;
+    }
+    apply { t.apply(); }
+}
+
+// Entries kept in a separate file.
+control included(inout Header_t h) {
+    action a() { }
+    table t {
+        key = { h.h.e: exact; }
+        actions = { a; }
+        const entries = {
+            #include "entries.p4"
+        }
+    }
+    apply { t.apply(); }
+}
+
+// Annotated blocks.
+control annotated_blocks(inout Header_t h) {
+    action a() {
+        @in_hash { h.h.e = h.h.e + 1; }
+    }
+    apply { }
+}
+
+// Empty key and action lists.
+control keyless(inout Header_t h) {
+    table t {
+        key = { }
+        actions = { }
+    }
+    apply { t.apply(); }
+}
+
+// Entries with priorities, some of them const.
+control prioritized(inout Header_t h) {
+    action a(bit<8> x) { }
+    table t {
+        key = { h.h.e: ternary; }
+        actions = { a; }
+        entries = {
+            const priority=10: 0x0800 &&& 0xff00 : a(1);
+            priority=(5 + 5): 0x86dd : a(2); // IPv6
+            0x0806 : a(3) @name("arp");
+        }
+    }
+    apply { t.apply(); }
+}

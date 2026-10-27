@@ -12,3 +12,38 @@ extern packet_in {
 extern packet_out {
     void emit<T>(in T hdr);
 }
+
+// A stray semicolon after a declaration.
+struct empty_t { };
+
+// Match kinds an architecture adds, and a table that uses one.
+match_kind {
+    selector,
+    dleft_hash,
+}
+
+control Selected(inout headers hdr) {
+    action a() { }
+    table t {
+        key = { hdr.ethernet.etherType: selector; }
+        actions = { a; }
+    }
+    apply { t.apply(); }
+}
+
+// Generic declarations with several type parameters.
+parser GenericParser<H, M>(packet_in b, out H hdr, inout M meta);
+control GenericControl<H, M>(inout H hdr, inout M meta);
+package GenericSwitch<IH, IM>(GenericParser<IH, IM> p, GenericControl<IH, IM> c);
+GenericSwitch<h_t, m_t>(GenericParser(), GenericControl()) generic;
+extern GenericRegister<T, I> {
+    GenericRegister(bit<32> size);
+    T read(in I index);
+    void write<V>(in I index, in V value);
+    @synchronous(write) abstract T update(in T value);
+}
+
+// Functions the target provides.
+@name("drop")
+extern void mark_to_drop();
+extern bit<16> fold<T>(in T data);

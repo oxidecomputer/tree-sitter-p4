@@ -34,6 +34,12 @@ jobs:
           tree-sitter generate
           git diff --exit-code src/
 
+      # The examples below are checked only for errors. The corpus pins the
+      # trees of inputs that parse cleanly under more than one reading, such
+      # as a cast against a parenthesized expression.
+      - name: run Tree-sitter corpus tests
+        run: tree-sitter test
+
       - name: run Tree-sitter stats
         run: tree-sitter parse -q -s examples/*.p4 || exit 0
 
@@ -57,12 +63,123 @@ jobs:
             exit 1
           fi
 
+      # Real programs use far more of the language than the examples do:
+      # p4c's 1,300 sample programs, its architecture includes, and its 600
+      # error tests, and dendrite's sidecar. Both are pinned, so that a change upstream
+      # cannot turn this job red; move a pin deliberately.
+      - name: check out p4c's samples
+        uses: actions/checkout@v4
+        with:
+          repository: p4lang/p4c
+          ref: 15b81c81f9911439215de6a6236c201d08212dbc
+          path: .real-world/p4c
+          filter: blob:none
+          sparse-checkout: |
+            testdata/p4_16_samples
+            testdata/p4_16_errors
+            testdata/p4_16_errors_outputs
+            p4include
+          persist-credentials: false
+
+      - name: check out dendrite
+        uses: actions/checkout@v4
+        with:
+          repository: oxidecomputer/dendrite
+          ref: 9ffd5a1a49eb4b0c48eb66a139298e90b0951796
+          path: .real-world/dendrite
+          filter: blob:none
+          sparse-checkout: dpd/p4
+          persist-credentials: false
+
+      # Every program here should parse but for those listed, with the
+      # reason, in test/p4c-known-failures.txt. That includes p4c's error
+      # tests that p4c rejects only after parsing, which it tells by the
+      # absence of "syntax error" in the expected output. A listed file that
+      # parses fails the step too, so that the list only ever shrinks. Only
+      # regular files are parsed: some samples are links into p4c's backends,
+      # which the sparse checkout leaves out, and one missing file stops the
+      # CLI.
+      - name: parse real-world programs
+        run: |
+          sed -e '/^#/d' -e '/^$/d' -e 's|^|.real-world/p4c/|' \
+            test/p4c-known-failures.txt | sort > "$RUNNER_TEMP/known.txt"
+          grep -l "syntax error" .real-world/p4c/testdata/p4_16_errors_outputs/*.p4-stderr |
+            sed -e 's|_outputs/|/|' -e 's|-stderr$||' | sort > "$RUNNER_TEMP/syntax-errors.txt"
+          find .real-world/p4c/testdata/p4_16_samples .real-world/p4c/testdata/p4_16_errors \
+            .real-world/p4c/p4include .real-world/dendrite/dpd/p4 \
+            -maxdepth 1 -type f -name '*.p4' | sort |
+            comm -23 - "$RUNNER_TEMP/syntax-errors.txt" |
+            comm -23 - "$RUNNER_TEMP/known.txt" > "$RUNNER_TEMP/paths.txt"
+          echo "parsing $(wc -l < "$RUNNER_TEMP/paths.txt") files"
+
+          set +e
+          output=$(tree-sitter parse -q --paths "$RUNNER_TEMP/paths.txt" 2>&1)
+          status=$?
+          set -e
+          if [ "$status" -ne 0 ] || grep -Eq "ERROR|MISSING" <<<"$output"; then
+            printf '%s\n' "$output"
+            exit 1
+          fi
+
+          tree-sitter parse -q --paths "$RUNNER_TEMP/known.txt" 2>&1 |
+            grep -E "ERROR|MISSING" | awk '{print $1}' | sort > "$RUNNER_TEMP/failing.txt" || true
+          fixed=$(comm -23 "$RUNNER_TEMP/known.txt" "$RUNNER_TEMP/failing.txt")
+          if [ -n "$fixed" ]; then
+            echo "These now parse; take them off test/p4c-known-failures.txt:"
+            printf '%s\n' "$fixed"
+            exit 1
+          fi
+
+      # p4c's error tests that it rejects with a syntax error should not
+      # parse either, but for those listed, with the reason, in
+      # test/p4c-known-accepted.txt. A listed file that stops parsing fails
+      # the step too.
+      - name: reject p4c's syntax errors
+        run: |
+          sed -e '/^#/d' -e '/^$/d' -e 's|^|.real-world/p4c/|' \
+            test/p4c-known-accepted.txt | sort > "$RUNNER_TEMP/accepted.txt"
+          grep -l "syntax error" .real-world/p4c/testdata/p4_16_errors_outputs/*.p4-stderr |
+            sed -e 's|_outputs/|/|' -e 's|-stderr$||' | sort > "$RUNNER_TEMP/syntax-errors.txt"
+          echo "parsing $(wc -l < "$RUNNER_TEMP/syntax-errors.txt") files"
+          tree-sitter parse -q --paths "$RUNNER_TEMP/syntax-errors.txt" 2>&1 |
+            grep -E "ERROR|MISSING" | awk '{print $1}' | sort > "$RUNNER_TEMP/rejected.txt" || true
+          parsed=$(comm -23 "$RUNNER_TEMP/syntax-errors.txt" "$RUNNER_TEMP/rejected.txt")
+          unlisted=$(comm -23 <(printf '%s\n' "$parsed") "$RUNNER_TEMP/accepted.txt" | sed '/^$/d')
+          rejected=$(comm -12 "$RUNNER_TEMP/accepted.txt" "$RUNNER_TEMP/rejected.txt")
+          if [ -n "$unlisted" ]; then
+            echo "These parse, though p4c reports a syntax error in each:"
+            printf '%s\n' "$unlisted"
+          fi
+          if [ -n "$rejected" ]; then
+            echo "These no longer parse; take them off test/p4c-known-accepted.txt:"
+            printf '%s\n' "$rejected"
+          fi
+          [ -z "$unlisted" ] && [ -z "$rejected" ]
+
+      # The bindings declare the language function by name, and nothing else
+      # here links them: a misspelled symbol or a source file missing from a
+      # build script surfaces only in a consumer's build.
+      - name: test Rust binding
+        run: cargo test
+
+      - name: test Go binding
+        run: go test ./bindings/go
+
       # A query naming a node type the grammar no longer has fails to compile
       # outright rather than degrading, and `parse` stays green either way.
       - name: check queries compile
         run: |
-          tree-sitter query queries/highlights.scm examples/parser.p4 >/dev/null
-          tree-sitter query topiary/p4.scm examples/parser.p4 >/dev/null
+          for query in queries/*.scm queries/*/*.scm topiary/p4.scm; do
+            [ -f "$query" ] || continue
+            tree-sitter query "$query" examples/parser.p4 >/dev/null
+          done
+
+      # Neovim's highlights are derived from Helix's and committed, so that
+      # they can be installed straight from the repository.
+      - name: check Neovim highlights are up to date
+        run: |
+          make -B queries/nvim/highlights.scm
+          git diff --exit-code queries/nvim/highlights.scm
 
       # The formatting queries name a couple of dozen node types, so a change
       # to the grammar can degrade the formatter without breaking a parse.
@@ -86,12 +203,19 @@ jobs:
 
           # The fixture pins the layout: changing it has to be deliberate, by
           # updating expected.p4. The loop below is weaker, and only checks
-          # that real programs come through with their text intact.
+          # that real programs come through with their text and syntax tree
+          # intact. The tree catches tokens that formatting joins, such as a
+          # macro name and the field that follows it, which the text alone
+          # does not.
           cp topiary/tests/input.p4 "$RUNNER_TEMP/fixture.p4"
           TOPIARY_LANGUAGE_DIR=topiary topiary format \
             -C topiary/languages.ncl "$RUNNER_TEMP/fixture.p4"
           diff -u topiary/tests/expected.p4 "$RUNNER_TEMP/fixture.p4"
 
+          tree() {
+            tree-sitter parse "$1" |
+              sed -E 's/ \[[0-9]+, [0-9]+\] - \[[0-9]+, [0-9]+\]//'
+          }
           for f in examples/*.p4; do
             staged="$RUNNER_TEMP/$(basename "$f")"
             cp "$f" "$staged"
@@ -102,6 +226,11 @@ jobs:
             if [ "$before" != "$after" ]; then
               echo "$f: formatting changed more than whitespace"
               diff -u "$f" "$staged" || true
+              exit 1
+            fi
+            if [ "$(tree "$f")" != "$(tree "$staged")" ]; then
+              echo "$f: formatting changed the syntax tree"
+              diff -u <(tree "$f") <(tree "$staged") || true
               exit 1
             fi
           done

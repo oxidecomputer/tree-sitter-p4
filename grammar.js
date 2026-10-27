@@ -1,326 +1,812 @@
 // Copyright 2026 Oxide Computer Company
 
+// Binding strength, from loosest to tightest, after the P4-16 grammar.
+// Binding strength, loosest first, following the precedence declarations
+// of the P4-16 grammar in p4c. A keyset's mask and range bind looser than any
+// operator.
+const PREC = {
+  keyset: 1,
+  logical_or: 2,
+  logical_and: 3,
+  equality: 4,
+  relational: 5,
+  bit_or: 6,
+  bit_xor: 7,
+  bit_and: 8,
+  shift: 9,
+  additive: 10,
+  multiplicative: 11,
+  unary: 12,
+  postfix: 13,
+};
+
 module.exports = grammar({
   name: "p4",
 
   extras: ($) => [/\s|\\\r?\n/, $.comment, $.preproc],
 
+  // See src/scanner.c.
+  externals: ($) => [
+    $._define_end,
+    $._macro_body,
+    $._macro_statements,
+    $._error_sentinel,
+  ],
+
   word: ($) => $.identifier,
 
+  // P4-16 reserves its keywords, so a keyword never begins a name. Without
+  // this, a keyword where the parser expects no keyword is lexed as a name,
+  // and after a syntax error the parser cannot resume at the next `state` or
+  // `table`: one half-typed line could leave the rest of the file unparsed.
+  // Left out are `error`, since `error.NoMatch` is written as a member
+  // access, and `apply` and `state`, which P4-16 also allows as names, as in
+  // `void apply(...)` or `t.apply()`.
+  reserved: {
+    global: (_) => [
+      "action",
+      "bit",
+      "bool",
+      "break",
+      "const",
+      "continue",
+      "control",
+      "default",
+      "else",
+      "enum",
+      "exit",
+      "extern",
+      "false",
+      "for",
+      "header",
+      "header_union",
+      "if",
+      "in",
+      "inout",
+      "int",
+      "match_kind",
+      "out",
+      "package",
+      "parser",
+      "return",
+      "select",
+      "struct",
+      "switch",
+      "table",
+      "this",
+      "transition",
+      "true",
+      "tuple",
+      "typedef",
+      "varbit",
+    ],
+  },
+
+  // Spliced into each rule that uses them, so that they add no step of
+  // their own for the parser to choose.
+  inline: ($) => [$._prefixable_type_identifier],
+
+  // Hidden rules that queries may still name, as in `(_declaration)`.
+  supertypes: ($) => [
+    $._declaration,
+    $._statement,
+    $._parser_statement,
+    $._expression,
+  ],
+
   precedences: ($) => [
-    [$.expr, $.method_identifier],
     [$.bit_type, $._type],
+    [$.int_type, $._type],
     [$.varbit_type, $._type],
   ],
 
   // `a.b.c` is a prefix of both a member reference and a method call; the
-  // parser cannot tell them apart until it reaches the `(` or the end.
-  conflicts: ($) => [[$.fval, $.lval], [$.lval]],
+  // parser cannot tell them apart until it reaches the `(` or the end. The
+  // same holds after `a.b <`, which opens either a comparison or the type
+  // arguments of a call such as `pkt.lookahead<bit<16>>()`.
+  //
+  // `(t)` is a cast when `t` names a type and an expression follows, and a
+  // parenthesized expression otherwise. Without a symbol table the parser keeps
+  // both readings until the next token settles it.
+  conflicts: ($) => [
+    [$.type_parameters, $._type_ref],
+    [$.call_expression, $._expression, $._type_identifier],
+    [$._macro_declaration, $._type_identifier],
+    [$._expression, $._type_identifier],
+    [$._lvalue, $._type_identifier],
+    [$._expression, $.call_expression],
+    [$.preproc, $._macro_name],
+  ],
 
   rules: {
-    source_file: ($) => repeat($.top),
+    // A stray semicolon is an empty declaration, as after `struct S { };`.
+    source_file: ($) => repeat(choice($._declaration, ";")),
 
-    top: ($) => $._definition,
-
-    _definition: ($) =>
+    _declaration: ($) =>
       choice(
         $.function_declaration,
-        $.header_definition,
-        $.struct_definition,
-        $.typedef_definition,
-        $.const_definition,
-        $.extern_definition,
-        $.parser_definition,
-        $.control_definition,
+        $.match_kind_declaration,
+        $.error_declaration,
+        $.header_declaration,
+        $.header_union_declaration,
+        $.struct_declaration,
+        $.enum_declaration,
+        $.typedef_declaration,
+        $.constant_declaration,
+        $.extern_declaration,
+        $.extern_function_declaration,
+        $.parser_declaration,
+        $.control_declaration,
         $.package,
+        // A package instance, as in `V1Switch(p(), c()) main;`.
+        $.instantiation,
         $.action,
         $.table,
+        alias($._macro_declaration, $.macro_invocation),
+      ),
+
+    // An object-like macro standing for declarations, key elements, or
+    // actions, as in `key = { MAC_ACL_KEY }`. Only the token after the name
+    // tells it apart from the start of what it stands for.
+    _macro_use: ($) => alias(prec(-1, $.identifier), $.macro_invocation),
+
+    // A macro expanding to declarations, invoked without a trailing
+    // semicolon, as in `ROTATE_BY_N(1)`. The grammar does not expand macros,
+    // so this is the closest it gets to the expansion. It shares its prefix
+    // with an instantiation, `T(args) name;`, and is told apart only by the
+    // missing name. Annotations may precede it, as they may when it expands
+    // to more annotations for the declaration that follows.
+    _macro_declaration: ($) =>
+      prec(
+        1,
+        seq(
+          repeat($.annotation),
+          field("name", alias($.identifier, $.method_identifier)),
+          field("arguments", $.argument_list),
+        ),
       ),
 
     package: ($) =>
-      choice(
-        seq(
-          repeat($.annotation),
-          "package",
-          choice(
-            $.method_identifier,
-            seq($.method_identifier, "<", $.type_identifier, ">"),
-          ),
-          "(",
-          repeat($.method_field),
-          ")",
-          ";",
-        ),
-        seq(
-          $.method_identifier,
-          "(",
-          choice(seq($.method_identifier, "(", ")"), $.identifier),
-          repeat(seq(",", $.method_identifier, "(", ")")),
-          optional(","),
-          ")",
-          $.identifier,
-          ";",
-        ),
+      seq(
+        repeat($.annotation),
+        "package",
+        field("name", $._method_identifier),
+        optional($.type_parameters),
+        field("parameters", $.parameter_list),
+        ";",
       ),
 
-    function_declaration: ($) =>
+    // The match kinds an architecture adds, as in
+    // `match_kind { selector, dleft_hash }`.
+    match_kind_declaration: ($) =>
       seq(
-        choice($._type, $.type_identifier),
-        $.method_identifier,
-        "(",
-        repeat($.parameter),
-        ")",
+        "match_kind",
         "{",
-        repeat($.stmt),
+        $.identifier,
+        repeat(seq(",", $.identifier)),
+        optional(","),
         "}",
       ),
 
-    header_definition: ($) =>
+    // The errors a program adds, as in `error { InvalidIPv4Header }`. Unlike
+    // the lists of match kinds and enum members, this one takes no trailing
+    // comma in P4-16.
+    error_declaration: ($) =>
+      seq("error", "{", $.identifier, repeat(seq(",", $.identifier)), "}"),
+
+    function_declaration: ($) =>
+      seq(
+        repeat($.annotation),
+        field("type", $._type_ref),
+        field("name", $._method_identifier),
+        optional($.type_parameters),
+        field("parameters", $.parameter_list),
+        field("body", $.block),
+      ),
+
+    header_declaration: ($) =>
       choice(
-        seq("header", $.type_identifier, $.identifier_preproc),
+        seq("header", field("name", $._type_identifier), $.identifier_preproc),
         seq(
           repeat($.annotation),
           "header",
-          $.type_identifier,
+          field("name", $._type_identifier),
+          optional($.type_parameters),
           "{",
           repeat($.field),
           "}",
         ),
       ),
 
-    struct_definition: ($) =>
+    // A header union holds at most one valid header of its members.
+    header_union_declaration: ($) =>
       seq(
         repeat($.annotation),
-        "struct",
-        $.type_identifier,
+        "header_union",
+        field("name", $._type_identifier),
+        optional($.type_parameters),
         "{",
         repeat($.field),
         "}",
       ),
 
-    typedef_definition: ($) =>
+    struct_declaration: ($) =>
       seq(
         repeat($.annotation),
-        "typedef",
-        choice($._type, $.type_identifier),
-        $.type_identifier,
+        "struct",
+        field("name", $._type_identifier),
+        // Generic, as in `struct Pair<T> { T first; T second; }`.
+        optional($.type_parameters),
+        "{",
+        repeat($.field),
+        "}",
+      ),
+
+    // `enum Color { Red, Green }`, or one whose members are values of a
+    // type, as in `enum bit<16> EtherType { IPv4 = 0x0800, IPv6 = 0x86dd }`.
+    // P4-16 requires a value for each member of the second form and allows
+    // none in the first.
+    enum_declaration: ($) =>
+      seq(
+        repeat($.annotation),
+        "enum",
+        choice(
+          seq(
+            field("name", $._type_identifier),
+            "{",
+            commaSep1(alias($._enum_name, $.enum_member)),
+            optional(","),
+            "}",
+          ),
+          seq(
+            field("type", $._type_ref),
+            field("name", $._type_identifier),
+            "{",
+            commaSep1($.enum_member),
+            optional(","),
+            "}",
+          ),
+        ),
+      ),
+
+    _enum_name: ($) => field("name", $.identifier),
+
+    enum_member: ($) =>
+      seq(field("name", $.identifier), "=", field("value", $._expression)),
+
+    // `typedef` names a type; `type` makes a new type from it, which P4Runtime
+    // treats as distinct, as in `type bit<9> PortId_t;`.
+    // A typedef may also declare the type it names, as in
+    // `typedef struct Point { int<32> x; int<32> y; } Pt;`.
+    typedef_declaration: ($) =>
+      seq(
+        repeat($.annotation),
+        choice(
+          seq(choice("typedef", "type"), field("type", $._type_ref)),
+          seq(
+            "typedef",
+            field(
+              "type",
+              choice(
+                $.header_declaration,
+                $.header_union_declaration,
+                $.struct_declaration,
+                $.enum_declaration,
+              ),
+            ),
+          ),
+        ),
+        field("name", $._type_identifier),
         ";",
       ),
 
-    const_definition: ($) =>
+    constant_declaration: ($) =>
       seq(
         repeat($.annotation),
         "const",
-        choice($._type, $.type_identifier),
-        $.identifier,
+        field("type", $._type_ref),
+        field("name", $.identifier),
         "=",
-        $.expr,
+        field("value", $._expression),
         ";",
       ),
 
-    extern_definition: ($) =>
+    extern_declaration: ($) =>
       seq(
         repeat($.annotation),
         "extern",
-        $.type_identifier,
+        field("name", $._type_identifier),
+        optional($.type_parameters),
         "{",
         repeat($.method),
         "}",
       ),
 
-    parser_definition: ($) =>
+    // A function the target provides, as in `extern void drop();`.
+    extern_function_declaration: ($) =>
+      seq(
+        repeat($.annotation),
+        "extern",
+        // Any type but the packet types, which are lexed as keywords here
+        // and would then claim `extern packet_in { ... }`.
+        field(
+          "type",
+          choice(
+            "bool",
+            "error",
+            "bit",
+            "int",
+            "varbit",
+            $.bit_type,
+            $.int_type,
+            $.varbit_type,
+            $.tuple_type,
+            $.list_type,
+            $.generic_type,
+            $._type_identifier,
+          ),
+        ),
+        field("name", $._method_identifier),
+        optional($.type_parameters),
+        field("parameters", $.parameter_list),
+        ";",
+      ),
+
+    parser_declaration: ($) =>
       choice(
         seq(
           repeat($.annotation),
           "parser",
-          choice(
-            seq($.method_identifier, "<", $.type_identifier, ">"),
-            $.method_identifier,
-          ),
-          "(",
-          repeat($.parameter),
-          ")",
+          field("name", $._method_identifier),
+          optional($.type_parameters),
+          field("parameters", $.parameter_list),
           ";",
         ),
         seq(
           repeat($.annotation),
           "parser",
-          choice(
-            seq($.method_identifier, "<", $.type_identifier, ">"),
-            $.method_identifier,
-          ),
-          "(",
-          repeat($.parameter),
-          ")",
+          field("name", $._method_identifier),
+          optional($.type_parameters),
+          field("parameters", $.parameter_list),
+          // Constructor parameters, as for a control.
+          optional(field("constructor_parameters", $.parameter_list)),
           "{",
-          repeat1($.state),
+          repeat1(choice($.parser_local_element, $.parser_state)),
           "}",
         ),
       ),
 
-    control_definition: ($) =>
+    // parserLocalElement in the P4-16 grammar: declarations that precede or
+    // sit between the states.
+    parser_local_element: ($) =>
+      choice(
+        $.constant_declaration,
+        $.variable_declaration,
+        $.instantiation,
+        alias($._macro_declaration, $.macro_invocation),
+      ),
+
+    control_declaration: ($) =>
       choice(
         seq(
           repeat($.annotation),
           "control",
-          choice(
-            seq($.method_identifier, "<", $.type_identifier, ">"),
-            $.method_identifier,
-          ),
-          "(",
-          repeat($.parameter),
-          ")",
+          field("name", $._method_identifier),
+          optional($.type_parameters),
+          field("parameters", $.parameter_list),
           ";",
         ),
         seq(
           repeat($.annotation),
           "control",
-          choice(
-            seq($.method_identifier, "<", $.type_identifier, ">"),
-            $.method_identifier,
-          ),
-          "(",
-          repeat($.parameter),
-          ")",
+          field("name", $._method_identifier),
+          optional($.type_parameters),
+          field("parameters", $.parameter_list),
+          // Constructor parameters, as in `control C(...)(bit<32> size)`.
+          optional(field("constructor_parameters", $.parameter_list)),
           "{",
-          optional($.control_body),
+          optional(field("body", $.control_body)),
           "}",
         ),
       ),
 
+    // P4-16 allows exactly one apply block, but the preprocessor directives
+    // are extras, so `#if ... apply {...} #else apply {...} #endif` reaches the
+    // parser as two of them.
     control_body: ($) =>
-      choice(
-        seq(
-          repeat($.control_body_element),
-          seq("apply", "{", repeat($.stmt), "}"),
-          repeat($.control_body_element),
-        ),
-        repeat1($.control_body_element),
-      ),
+      repeat1(choice($.control_body_element, seq("apply", $.block))),
 
     control_body_element: ($) =>
       choice(
-        seq(repeat($.annotation), $.control_var),
+        $.variable_declaration,
+        $.instantiation,
         seq(repeat($.annotation), $.table),
-        seq(repeat($.annotation), $.action),
+        $.action,
+        $.constant_declaration,
+        alias($._macro_declaration, $.macro_invocation),
+        $._macro_use,
       ),
 
     table: ($) =>
-      seq("table", $.type_identifier, "{", repeat($.table_element), "}"),
+      seq(
+        "table",
+        field("name", $._type_identifier),
+        "{",
+        repeat($.table_property),
+        "}",
+      ),
 
-    table_element: ($) =>
+    table_property: ($) =>
       choice(
         seq(
           "key",
           "=",
           "{",
-          repeat1(seq($.expr, ":", $.key_type, repeat($.annotation), ";")),
+          // Either list may be empty in P4-16.
+          repeat(choice($.key_element, $._macro_use)),
           "}",
         ),
         seq(
           "actions",
           "=",
           "{",
-          repeat1(seq(repeat($.annotation), $.action_item, ";")),
+          repeat(
+            choice(seq(repeat($.annotation), $.action_item, ";"), $._macro_use),
+          ),
           "}",
         ),
         seq(
+          repeat($.annotation),
           optional("const"),
           $.identifier,
           "=",
           "{",
-          repeat1(
-            seq(
-              $.keyset_expression,
-              ":",
-              repeat($.annotation),
-              $.action_item,
-              ";",
-            ),
-          ),
+          // Possibly empty, as when the entries come from an `#include`.
+          repeat($.entry),
           "}",
         ),
         seq(optional("const"), "default_action", "=", $.action_item, ";"),
-        seq("const", $.identifier, "=", $.expr, ";"),
-        seq("size", "=", $.expr, ";"),
+        seq("size", "=", $._expression, ";"),
         seq("meters", "=", $.identifier, ";"),
         seq("counters", "=", $.identifier, ";"),
+        // Any other property, as P4-16 allows: an architecture's own, such
+        // as `implementation = profile;` or `idle_timeout = true;`, with an
+        // optional annotation and `const`.
+        seq(
+          repeat($.annotation),
+          optional("const"),
+          $.identifier,
+          "=",
+          $._expression,
+          ";",
+        ),
       ),
 
-    action_item: ($) => choice($.method_identifier, $.call, "NoAction"),
-
-    key_type: (_) => choice("range", "exact", "ternary", "lpm", "optional"),
-
-    state: ($) =>
-      choice(
-        seq($.method_identifier, "()", $.type_identifier, ";"),
-        seq("state", $.method_identifier, "{", repeat($.stmt), "}"),
-      ),
-
-    stmt: ($) =>
-      choice(
-        $.conditional,
-        $.action,
-        $.var_decl,
-        $.type_decl,
-        $.transition,
-        seq($.call, ";"),
-        seq("return", ";"),
-      ),
-
-    type_decl: ($) =>
+    // `hdr.ipv4.dst : lpm @name("dst");`.
+    key_element: ($) =>
       seq(
-        optional("("),
-        choice($._type, $.type_identifier),
-        optional(")"),
-        $.identifier,
+        field("value", $._expression),
+        ":",
+        field("match_kind", $.match_kind),
+        repeat($.annotation),
         ";",
       ),
 
-    var_choice: ($) =>
-      choice(
-        // Cast: the parenthesised type has to be matched as a unit, or the
-        // optional parens swallow the opening paren of a call instead.
-        seq("(", choice($._type, $.type_identifier), ")", $.expr),
-        seq("(", $.expr, ")"),
-        $.expr,
-      ),
-
-    var_decl: ($) =>
+    // `NoAction` is an ordinary action, which core.p4 declares.
+    // An entry of a table, which may be marked `const` in a mutable list,
+    // and given a priority, as in `priority=10: 0x0800 : forward();`.
+    entry: ($) =>
       seq(
-        optional(choice($._type, $.type_identifier)),
-        $.lval,
-        "=",
-        $.var_choice,
+        optional("const"),
+        optional(
+          seq(
+            "priority",
+            "=",
+            field("priority", choice($.number, $.parenthesized_expression)),
+            ":",
+          ),
+        ),
+        $.keyset_expression,
+        ":",
+        repeat($.annotation),
+        $.action_item,
+        repeat($.annotation),
         ";",
       ),
 
-    action: ($) =>
+    action_item: ($) =>
+      choice(
+        $._method_identifier,
+        alias($._prefixed_method_identifier, $.prefixed_identifier),
+        $.call_expression,
+      ),
+
+    // The standard match kinds, or one an architecture declares with
+    // `match_kind`, such as `selector` or `atcam_partition_index`.
+    match_kind: ($) =>
+      choice("range", "exact", "ternary", "lpm", "optional", $.identifier),
+
+    // A state's statements are those of parserStatement in the P4-16
+    // grammar, and only the last may be a transition: not a `return` or
+    // `switch` at the top of the state, and not a transition inside an `if`,
+    // which p4c rejects too. The body is a `block`, as other bodies are.
+    parser_state: ($) =>
       seq(
-        "action",
-        $.method_identifier,
-        "(",
-        repeat($.parameter),
-        ")",
+        repeat($.annotation),
+        "state",
+        field("name", $._method_identifier),
+        field("body", alias($._state_body, $.block)),
+      ),
+
+    _state_body: ($) =>
+      seq(
         "{",
-        repeat($.stmt),
+        repeat($._parser_statement),
+        // One, but the directives are extras, so `#if ... transition a;
+        // #else transition b; #endif` reaches the parser as two.
+        repeat($.transition_statement),
         "}",
       ),
 
-    // The select form takes no trailing semicolon in the P4-16 grammar,
-    // where selectExpression ends at the closing brace. One is accepted
-    // anyway since it is common in existing code.
-    transition: ($) =>
+    _parser_statement: ($) =>
       choice(
-        seq("transition", $.identifier, ";"),
-        seq("transition", $.select_expr, optional(";")),
+        alias($._parser_block, $.block),
+        $.if_statement,
+        $.variable_declaration,
+        $.constant_declaration,
+        $.assignment_statement,
+        $.call_statement,
+        prec(-1, alias($._statement_call, $.macro_invocation)),
+        $.empty_statement,
       ),
 
-    select_expr: ($) =>
+    // A block among a state's statements, which takes the same statements
+    // but a transition.
+    _parser_block: ($) =>
+      seq(repeat($.annotation), "{", repeat($._parser_statement), "}"),
+
+    _statement: ($) =>
+      choice(
+        $.block,
+        $.if_statement,
+        $.switch_statement,
+        $.variable_declaration,
+        $.assignment_statement,
+        $.call_statement,
+        // A macro invocation: a call without its semicolon. Yields to a call
+        // statement, which the semicolon makes the longer match.
+        prec(-1, alias($._statement_call, $.macro_invocation)),
+        // A constant local to a block, as in `const bit<8> n = 4;`.
+        $.constant_declaration,
+        $.for_statement,
+        $.break_statement,
+        $.continue_statement,
+        $.return_statement,
+        $.exit_statement,
+        $.empty_statement,
+      ),
+
+    // Annotated as in `@in_hash { h.x = h.y; }`.
+    block: ($) => seq(repeat($.annotation), "{", repeat($._statement), "}"),
+
+    // Preferred to a macro invocation followed by an empty statement.
+    call_statement: ($) =>
+      prec(
+        1,
+        seq(
+          choice(
+            alias($._statement_call, $.call_expression),
+            alias($._specialized_call, $.call_expression),
+          ),
+          ";",
+        ),
+      ),
+
+    // A call standing as a statement, whose callee is an lvalue, as in
+    // `pkt.extract(hdr.eth)` or `pkt.lookahead<bit<8>>()`, and not the result
+    // of another call.
+    _statement_call: ($) =>
+      seq(
+        field("function", $._lvalue),
+        optional(field("type_arguments", $.type_arguments)),
+        field("arguments", $.argument_list),
+      ),
+
+    // A method of a generic type given its arguments, as in
+    // `MyParser<bit>.apply(1);`, which applies an instance the call makes.
+    // Only a statement may begin this way: in an expression, `a<b>.c` would
+    // be a comparison with `.c`.
+    _specialized_call: ($) =>
+      seq(
+        field("function", alias($._specialized_member, $.member_expression)),
+        field("arguments", $.argument_list),
+      ),
+
+    _specialized_member: ($) =>
+      seq(field("object", $.generic_type), ".", field("member", $.identifier)),
+
+    return_statement: ($) =>
+      seq("return", optional(field("value", $._expression)), ";"),
+
+    exit_statement: (_) => seq("exit", ";"),
+
+    break_statement: (_) => seq("break", ";"),
+
+    continue_statement: (_) => seq("continue", ";"),
+
+    // `for (bit<8> i = 0; i < 4; i = i + 1) ...`, whose initializer and
+    // update are comma-separated statements without their semicolons, or
+    // `for (bit<8> i in 0 .. 3) ...`.
+    for_statement: ($) =>
+      seq(
+        // As in `@unroll for (...)`.
+        repeat($.annotation),
+        "for",
+        "(",
+        choice(
+          seq(
+            optional(
+              commaSep1(
+                field(
+                  "initializer",
+                  choice(
+                    alias($._variable, $.variable_declaration),
+                    alias($._assignment, $.assignment_statement),
+                    alias($._statement_call, $.call_expression),
+                  ),
+                ),
+              ),
+            ),
+            ";",
+            field("condition", $._expression),
+            ";",
+            optional(
+              commaSep1(
+                field(
+                  "update",
+                  choice(
+                    alias($._assignment, $.assignment_statement),
+                    alias($._statement_call, $.call_expression),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          seq(
+            field("type", $._type_ref),
+            field("name", $.identifier),
+            "in",
+            field("collection", choice($._expression, $.range)),
+          ),
+        ),
+        ")",
+        field("body", $._statement),
+      ),
+
+    empty_statement: (_) => ";",
+
+    switch_statement: ($) =>
+      seq(
+        "switch",
+        "(",
+        field("value", $._expression),
+        ")",
+        "{",
+        repeat($.switch_case),
+        "}",
+      ),
+
+    // A label with no block falls through to the next one. A `{` after the
+    // colon always opens the block: P4-16 forbids a label that begins with a
+    // brace, so it cannot be the next label's tuple.
+    switch_case: ($) =>
+      prec.right(seq(choice("default", $._expression), ":", optional($.block))),
+
+    // `bit<8> x;` or `bit<8> x = 0;`.
+    // Annotated as in `@pa_no_overlay("ingress") bit<8> x;`.
+    variable_declaration: ($) => seq(repeat($.annotation), $._variable, ";"),
+
+    // Without its semicolon, as a for loop's initializer takes it.
+    _variable: ($) =>
+      seq(
+        field("type", $._type_ref),
+        field("name", $.identifier),
+        optional(seq("=", field("value", $._expression))),
+      ),
+
+    // What may be assigned to or called as a statement: lvalue in the P4-16
+    // grammar, a name followed by members, indexes, and slices, as in
+    // `hdr.vlan[0].vid` or `x[15:8]`, but not a call's result or any other
+    // expression. The nodes are those of the same expressions.
+    _lvalue: ($) =>
+      choice(
+        // Level with a type name: `a[1]` and `a<T>` may begin either an
+        // assignment or call, or a declaration, as in `a[1] x;`.
+        prec(1, $.identifier),
+        $.prefixed_identifier,
+        $.this,
+        alias($._lvalue_member, $.member_expression),
+        alias($._lvalue_index, $.index_expression),
+        alias($._lvalue_slice, $.slice_expression),
+        // As in `(x) = 1;`.
+        alias($._parenthesized_lvalue, $.parenthesized_expression),
+      ),
+
+    _lvalue_member: ($) =>
+      prec(
+        PREC.postfix,
+        seq(field("object", $._lvalue), ".", field("member", $.identifier)),
+      ),
+
+    _lvalue_index: ($) =>
+      prec(
+        PREC.postfix,
+        seq(
+          field("object", $._lvalue),
+          "[",
+          field("index", $._expression),
+          "]",
+        ),
+      ),
+
+    _lvalue_slice: ($) =>
+      prec(
+        PREC.postfix,
+        seq(field("value", $._lvalue), "[", $._slice_bounds, "]"),
+      ),
+
+    _parenthesized_lvalue: ($) => seq("(", $._lvalue, ")"),
+
+    // A slice may be assigned to, as in `x[15:8] = y;`.
+    assignment_statement: ($) => seq($._assignment, ";"),
+
+    // Without its semicolon, as a for loop's initializer and update take it.
+    _assignment: ($) =>
+      seq(
+        field("left", $._lvalue),
+        field(
+          "operator",
+          choice(
+            "=",
+            "+=",
+            "-=",
+            "*=",
+            "/=",
+            "%=",
+            "<<=",
+            ">>=",
+            "&=",
+            "|=",
+            "^=",
+            "|+|=",
+            "|-|=",
+          ),
+        ),
+        field("right", $._expression),
+      ),
+
+    // Annotated as in `@name("forward") action forward(...)`, which may also
+    // stand among the declarations at the top level.
+    action: ($) =>
+      seq(
+        repeat($.annotation),
+        "action",
+        field("name", $._method_identifier),
+        field("parameters", $.parameter_list),
+        field("body", $.block),
+      ),
+
+    // The select form takes no semicolon, as selectExpression ends at its
+    // closing brace in the P4-16 grammar.
+    transition_statement: ($) =>
+      seq("transition", choice(seq($.identifier, ";"), $.select_expression)),
+
+    select_expression: ($) =>
       seq(
         "select",
         "(",
-        $.expression_list,
+        // Possibly empty, as in `select() { default: accept; }`.
+        optional($.expression_list),
         ")",
         "{",
         repeat($.select_case),
@@ -329,20 +815,118 @@ module.exports = grammar({
 
     select_case: ($) => seq($.keyset_expression, ":", $.identifier, ";"),
 
-    expression_list: ($) =>
-      seq($.expr, repeat(seq(",", $.expr)), optional(",")),
+    expression_list: ($) => seq($._expression, repeat(seq(",", $._expression))),
 
-    call: ($) =>
-      seq(
-        $.fval,
-        "(",
-        optional(seq($.expr, repeat(seq(",", $.expr)), optional(","))),
-        ")",
+    // `f(x)`, `pkt.extract(hdr)`, or `pkt.lookahead<bit<16>>()`. Type
+    // arguments follow only a name, and carry no precedence, so that after
+    // `a.b <` the parser keeps both a comparison and type arguments until a
+    // later token rules one out.
+    call_expression: ($) =>
+      choice(
+        // Loses to a cast when both read the whole input: `(T)(x)` casts
+        // `(x)` rather than calling `(T)`.
+        prec.dynamic(
+          -1,
+          prec(
+            PREC.postfix,
+            seq(
+              field("function", $._expression),
+              field("arguments", $.argument_list),
+            ),
+          ),
+        ),
+        // At the level of a name used as an expression; see `_expression`.
+        prec(
+          1,
+          seq(
+            field("function", $.identifier),
+            field("type_arguments", $.type_arguments),
+            field("arguments", $.argument_list),
+          ),
+        ),
+        seq(
+          field("function", $.member_expression),
+          field("type_arguments", $.type_arguments),
+          field("arguments", $.argument_list),
+        ),
       ),
 
-    slice: ($) => seq($.lval, "[", $.number, ":", $.number, "]"),
+    argument_list: ($) => seq("(", optional(commaSep1($._argument)), ")"),
+
+    // An argument may be left out with `_`, as in `f(_)` or `f(x = _)`.
+    _argument: ($) =>
+      choice(
+        $._expression,
+        $.named_expression,
+        "_",
+        alias($._named_dont_care, $.named_expression),
+      ),
+
+    _named_dont_care: ($) => seq(field("name", $.identifier), "=", "_"),
+
+    // A named argument, `f(x = 1)`, or a member of a structure-valued
+    // expression, `{ a = 1, b = 2 }`.
+    named_expression: ($) =>
+      seq(field("name", $.identifier), "=", field("value", $._expression)),
+
+    type_arguments: ($) => seq("<", $.type_argument_list, ">"),
+
+    // `hdr.ipv4.ttl`, `t.apply().hit`.
+    member_expression: ($) =>
+      prec(
+        PREC.postfix,
+        seq(field("object", $._expression), ".", field("member", $.identifier)),
+      ),
+
+    // `hdr.vlan[0]`.
+    index_expression: ($) =>
+      prec(
+        PREC.postfix,
+        seq(
+          field("object", $._expression),
+          "[",
+          field("index", $._expression),
+          "]",
+        ),
+      ),
+
+    // `x[7:0]`, `x[W - 1:0]`, or `pkt.lookahead<bit<8>>()[7:0]`. Whether `[`
+    // opens an index or a slice is known only at the `]` or `:`. `x[i +: 8]`
+    // takes 8 bits upward from bit `i`.
+    slice_expression: ($) =>
+      prec(
+        PREC.postfix,
+        seq(field("value", $._expression), "[", $._slice_bounds, "]"),
+      ),
+
+    _slice_bounds: ($) =>
+      choice(
+        seq(field("high", $._expression), ":", field("low", $._expression)),
+        seq(field("low", $._expression), "+:", field("width", $._expression)),
+      ),
+
+    // A list, `{ a, b }`, or a structure, `{ x = a, y = b }`, whose last
+    // member may be `...` to leave the rest at their defaults. One may not
+    // mix the two kinds of member.
     tuple: ($) =>
-      seq("{", $.expr, repeat(seq(",", $.expr)), optional(","), "}"),
+      seq(
+        "{",
+        optional(
+          seq(
+            choice(
+              commaSep1($._expression),
+              seq(commaSep1($.named_expression), optional(seq(",", "..."))),
+            ),
+            optional(","),
+          ),
+        ),
+        "}",
+      ),
+
+    // An invalid header or header union.
+    invalid_header: (_) => "{#}",
+
+    this: (_) => "this",
 
     // Parenthesized keysets use the tupleKeysetExpression production in the
     // P4-16 grammar. A single element remains valid for existing table keys.
@@ -351,30 +935,111 @@ module.exports = grammar({
         "(",
         $.simple_keyset_expression,
         repeat(seq(",", $.simple_keyset_expression)),
-        optional(","),
         ")",
       ),
 
     keyset_expression: ($) =>
       choice($.tuple_keyset, $.simple_keyset_expression),
 
-    simple_keyset_expression: ($) => choice($.range, "default", "_", $.expr),
+    simple_keyset_expression: ($) =>
+      choice($.range, $.mask, "default", "_", $._expression),
 
-    expr: ($) =>
+    _expression: ($) =>
       choice(
-        prec.right(-1, seq($.expr, "?", $.expr, ":", $.expr)),
-        prec.left(2, seq(optional($.expr), $.binop, $.expr)),
-        prec(3, $.call),
-        $.slice,
-        $.lval,
+        $.conditional_expression,
+        $.binary_expression,
+        $.unary_expression,
+        // Level with a type name, so that `f(a);` and `T(a) t;` stay
+        // ambiguous until a later token tells them apart.
+        prec(1, $.identifier),
+        $.prefixed_identifier,
+        $.call_expression,
+        $.member_expression,
+        $.index_expression,
+        $.slice_expression,
+        $.cast_expression,
+        $.parenthesized_expression,
         prec(1, $.tuple),
+        $.invalid_header,
+        $.this,
+        // A default, as in `const int c = ...;` or `{ x = 1, ... }`.
+        "...",
         prec(1, $.identifier_preproc),
         prec(1, $.string_literal),
         $.number,
-        $.bool,
+        $.boolean_literal,
       ),
 
-    range: ($) => prec.left(1, seq($.expr, "..", $.expr)),
+    conditional_expression: ($) =>
+      prec.right(
+        -1,
+        seq(
+          field("condition", $._expression),
+          "?",
+          field("consequence", $._expression),
+          ":",
+          field("alternative", $._expression),
+        ),
+      ),
+
+    binary_expression: ($) =>
+      choice(
+        ...[
+          [PREC.logical_or, "||"],
+          [PREC.logical_and, "&&"],
+          [PREC.equality, choice("==", "!=")],
+          [PREC.relational, choice("<", ">", "<=", ">=")],
+          [PREC.bit_or, "|"],
+          [PREC.bit_xor, "^"],
+          [PREC.bit_and, "&"],
+          [PREC.shift, choice("<<", ">>")],
+          // Saturating addition and subtraction, and concatenation.
+          [PREC.additive, choice("+", "-", "|+|", "|-|", "++")],
+          [PREC.multiplicative, choice("*", "/", "%")],
+        ].map(([p, operator]) =>
+          prec.left(
+            p,
+            seq(
+              field("left", $._expression),
+              field("operator", operator),
+              field("right", $._expression),
+            ),
+          ),
+        ),
+      ),
+
+    unary_expression: ($) =>
+      prec(
+        PREC.unary,
+        seq(
+          field("operator", choice("!", "~", "-", "+")),
+          field("argument", $._expression),
+        ),
+      ),
+
+    // A cast binds tighter than any binary operator. When the operand could
+    // also begin a binary operation, as in `(x) - y`, the parenthesized
+    // reading wins.
+    cast_expression: ($) =>
+      prec(PREC.unary, seq($._cast_type, field("value", $._expression))),
+
+    parenthesized_expression: ($) =>
+      prec.dynamic(1, prec(-1, seq("(", $._expression, ")"))),
+
+    // Kept free of precedence so that `(x)` stays ambiguous between a cast
+    // and a parenthesized expression until the next token.
+    _cast_type: ($) => seq("(", $._type_ref, ")"),
+
+    range: ($) =>
+      prec.left(PREC.keyset, seq($._expression, "..", $._expression)),
+
+    // A value and the bits of it that matter, as in `0x0800 &&& 0x0f00`
+    // or, equivalently, `0x0800 mask 0x0f00`.
+    mask: ($) =>
+      prec.left(
+        PREC.keyset,
+        seq($._expression, choice("&&&", "mask"), $._expression),
+      ),
 
     string_literal: (_) =>
       token(
@@ -390,123 +1055,86 @@ module.exports = grammar({
         ),
       ),
 
-    binop: (_) =>
-      choice(
-        "==",
-        "!=",
-        ">=",
-        "<=",
-        ">",
-        "<",
-        "=",
-        "+",
-        "-",
-        "*",
-        "/",
-        "%",
-        "|",
-        "||",
-        "&",
-        "&&",
-        "&&&",
-        "<<",
-        ">>",
-        "!",
-        "^",
-        "~",
-      ),
-
-    conditional: ($) => seq($._if, optional($._elseif), optional($._else)),
-
-    _if: ($) => seq("if", "(", repeat($.expr), ")", "{", repeat($.stmt), "}"),
-    _elseif: ($) =>
-      seq("else", "if", "(", repeat($.expr), ")", "{", repeat($.stmt), "}"),
-    _else: ($) => seq("else", "{", repeat($.stmt), "}"),
-
-    control_var: ($) =>
-      choice(
+    // As in P4-16, each branch is any statement, so `else if` is an
+    // if_statement nested in the else branch, and a branch need not be a
+    // block. An `else` belongs to the nearest `if`.
+    if_statement: ($) =>
+      prec.right(
         seq(
-          $.type_identifier,
-          optional(seq("<", $.type_argument_list, ">")),
+          "if",
           "(",
-          repeat(seq($.expr, optional(","))),
+          field("condition", $._expression),
           ")",
-          $.identifier,
-          ";",
-        ),
-        seq(
-          choice($.stack_type, $._type, $.type_identifier),
-          $.identifier,
-          ";",
+          field("consequence", $._statement),
+          optional(seq("else", field("alternative", $._statement))),
         ),
       ),
 
-    lval: ($) =>
+    // `Checksum() csum;`, or with type arguments and an initializer,
+    // `RegisterAction<...>(reg) ra = { ... };`.
+    instantiation: ($) =>
       seq(
-        $.identifier,
-        optional(seq("[", $.expr, "]")),
-        repeat(seq(".", $.identifier, optional(seq("[", $.expr, "]")))),
-      ),
-
-    fval: ($) =>
-      choice(
-        seq(
-          $.identifier,
-          repeat(seq(".", $.identifier)),
-          seq(".", $.method_identifier),
-        ),
-        $.method_identifier,
-      ),
-
-    method: ($) =>
-      seq(
-        choice($._type, $.type_identifier),
-        $.method_identifier,
-        optional(seq("<", $.type_identifier, ">")),
-        "(",
-        repeat($.parameter),
-        ")",
+        repeat($.annotation),
+        field("type", $._type_ref),
+        field("arguments", $.argument_list),
+        field("name", $.identifier),
+        optional(seq("=", field("initializer", $.object_initializer))),
         ";",
       ),
 
+    // The methods an instance defines, as in
+    // `RegisterAction<...>(reg) ra = { void apply(...) { ... } };`.
+    object_initializer: ($) =>
+      seq(
+        "{",
+        repeat(
+          choice(
+            $.function_declaration,
+            $.instantiation,
+            $.variable_declaration,
+          ),
+        ),
+        "}",
+      ),
+
+    // A method of an extern. A constructor has no return type, as in
+    // `Register(bit<32> size);`.
+    method: ($) =>
+      seq(
+        repeat($.annotation),
+        // A method an instance must define, in its initializer.
+        optional("abstract"),
+        optional(field("type", $._type_ref)),
+        field("name", $._method_identifier),
+        optional($.type_parameters),
+        field("parameters", $.parameter_list),
+        ";",
+      ),
+
+    // `(in bit<8> x, out bool y)`. Unlike an argument list, it takes no
+    // trailing comma.
+    parameter_list: ($) => seq("(", optional(commaSep1($.parameter)), ")"),
+
+    // Annotated as in `@optional in bool zeros`, and with a default value
+    // as a constructor parameter may be, as in `bit<32> size = 1024`.
     parameter: ($) =>
-      choice(
-        seq($.direction, $.identifier, optional(",")),
-        seq(
-          $.direction,
-          optional("("),
-          choice($.stack_type, $._type, $.type_identifier),
-          optional(")"),
-          $.identifier,
-          optional(","),
-        ),
-        seq(
-          optional("("),
-          choice($.stack_type, $._type, $.type_identifier),
-          optional(")"),
-          $.identifier,
-          optional(","),
-        ),
+      seq(
+        repeat($.annotation),
+        optional($.direction),
+        field("type", $._type_ref),
+        field("name", $.identifier),
+        optional(seq("=", field("value", $._expression))),
       ),
 
     direction: (_) => choice("in", "out", "inout"),
 
     field: ($) =>
       seq(
-        choice($.stack_type, $._type, $.type_identifier),
-        $.identifier,
+        repeat($.annotation),
+        field("type", $._type_ref),
+        field("name", $.identifier),
         ";",
         optional($.line_continuation),
-      ),
-
-    method_field: ($) =>
-      seq(
-        choice(
-          $.method_identifier,
-          seq($.method_identifier, "<", $.type_identifier, ">"),
-        ),
-        $.identifier,
-        ",",
       ),
 
     _type: ($) =>
@@ -516,59 +1144,157 @@ module.exports = grammar({
         "int",
         "bit",
         "varbit",
+        "match_kind",
         "packet_in",
         "packet_out",
         $.bit_type,
+        $.int_type,
         $.varbit_type,
         $.tuple_type,
+        $.list_type,
+        $.generic_type,
       ),
 
-    bit_type: ($) => seq("bit", "<", $.number, ">"),
-    varbit_type: ($) => seq("varbit", "<", $.number, ">"),
-    tuple_type: ($) => seq("tuple", "<", $.type_argument_list, ">"),
-
-    type_argument_list: ($) =>
+    // A generic type given its arguments, as in `Register<bit<32>, _>` or
+    // `register<bit<8>> r`.
+    generic_type: ($) =>
       seq(
-        choice($._type, $.type_identifier),
-        repeat(seq(",", choice($._type, $.type_identifier))),
+        field("type", $._prefixable_type_identifier),
+        field("type_arguments", $.type_arguments),
       ),
 
-    type_identifier: ($) => prec(1, $.identifier),
+    bit_type: ($) => seq("bit", "<", $._width, ">"),
+    int_type: ($) => seq("int", "<", $._width, ">"),
+    varbit_type: ($) => seq("varbit", "<", $._width, ">"),
 
-    // A header stack: `h_t[4]`. P4-16 allows any compile-time-known size
-    // expression, not just a literal.
-    stack_type: ($) =>
-      seq(choice($._type, $.type_identifier), "[", $.expr, "]"),
+    // A width is a number, a name such as a macro, or, per P4-16, any
+    // expression in parentheses, as in `bit<(4 * 8)>`.
+    _width: ($) => choice($.number, $.identifier, seq("(", $._expression, ")")),
+    // Possibly empty: `tuple<>`.
+    tuple_type: ($) => seq("tuple", "<", optional($.type_argument_list), ">"),
 
-    method_identifier: ($) => $.identifier,
+    // A list of compile-time values of one type, as in
+    // `list<bit<8>> l = { 1, 2 };`.
+    list_type: ($) => seq("list", "<", $.type_argument_list, ">"),
 
-    identifier: (_) => /[a-zA-Z_][a-zA-Z0-9_]*/,
+    // The type parameters of a generic declaration, as in
+    // `control C<H, M>(...)` or `extern Register<T, I> { ... }`.
+    type_parameters: ($) =>
+      seq("<", $._type_identifier, repeat(seq(",", $._type_identifier)), ">"),
+
+    // `_` leaves a type argument to be inferred, as in `Register<bit<8>, _>`.
+    type_argument_list: ($) => commaSep1(choice($._type_ref, "_")),
+
+    _type_identifier: ($) => prec(1, alias($.identifier, $.type_identifier)),
+
+    // typeRef in the P4-16 grammar: any type that may be written where a
+    // type is expected.
+    _type_ref: ($) =>
+      choice($._type, $._prefixable_type_identifier, $.array_type),
+
+    // A name with a leading dot refers to the declaration at the top level,
+    // past any local of the same name, as in `.x` or `.T.c`.
+    prefixed_identifier: ($) => seq(".", $.identifier),
+
+    _prefixed_method_identifier: ($) => seq(".", $._method_identifier),
+
+    _prefixable_type_identifier: ($) =>
+      choice(
+        $._type_identifier,
+        alias($._prefixed_type_identifier, $.prefixed_identifier),
+      ),
+
+    _prefixed_type_identifier: ($) => seq(".", $._type_identifier),
+
+    // An array, or header stack, as in `h_t[4]`, sized by any expression
+    // known at compile time. An element may itself be an array, as in
+    // `bit<8>[2][4]`.
+    array_type: ($) =>
+      seq(
+        field("element", $._type_ref),
+        "[",
+        field("size", $._expression),
+        "]",
+      ),
+
+    _method_identifier: ($) => alias($.identifier, $.method_identifier),
+
+    // A lone `_` is not a name but the don't-care token, which P4-16 allows
+    // only as a keyset, an argument, or a type argument.
+    identifier: (_) => /[a-zA-Z][a-zA-Z0-9_]*|_[a-zA-Z0-9_]+/,
     identifier_preproc: (_) => /[A-Z][A-Z0-9_]*/,
 
-    bool: (_) => choice("true", "false"),
+    boolean_literal: (_) => choice("true", "false"),
 
-    number: ($) => choice($.decimal, $.hex, $.whex, $.wdecimal),
-
-    decimal: (_) => /\d+/,
-
-    hex: (_) => /0x(\d|[a-fA-F])+/,
-
-    whex: (_) => /\d+w0x(\d|[a-fA-F])+/,
-
-    wdecimal: (_) => /\d+w\d+/,
-
-    annotation: ($) => seq("@", $.identifier, optional($.annotation_body)),
-
-    annotation_body: ($) =>
-      seq(
-        "(",
-        optional($.annotation_content),
-        repeat(seq(",", $.annotation_content)),
-        optional(","),
-        ")",
+    number: ($) =>
+      choice(
+        $.decimal,
+        $.hex,
+        $.binary,
+        $.octal,
+        $.whex,
+        $.wbinary,
+        $.woctal,
+        $.wdecimal,
       ),
 
-    annotation_content: ($) => choice($.expr, /["][^"]*["]/, $.annotation),
+    // P4-16 integer literals: a base prefix, digits that may be separated by
+    // underscores, and optionally a width with `w` (unsigned) or `s` (signed).
+    // As in p4c, an underscore may follow the prefix, as in `0x_FF`.
+    decimal: (_) => /\d[\d_]*|0[dD][\d_]+/,
+
+    hex: (_) => /0[xX][0-9a-fA-F_]+/,
+
+    binary: (_) => /0[bB][01_]+/,
+
+    octal: (_) => /0[oO][0-7_]+/,
+
+    whex: (_) => /\d+[ws]0[xX][0-9a-fA-F_]+/,
+
+    wbinary: (_) => /\d+[ws]0[bB][01_]+/,
+
+    woctal: (_) => /\d+[ws]0[oO][0-7_]+/,
+
+    wdecimal: (_) => /\d+[ws]([\d_]+|0[dD][\d_]+)/,
+
+    // A following `(` always opens the body, as in the spec's grammar.
+    annotation: ($) =>
+      choice(
+        prec.right(seq("@", $.identifier, optional($.annotation_body))),
+        // A P4-14 style pragma, whose body runs to the end of the line, as in
+        // `@pragma deprecated "Use verify_checksum instead."`. As in p4c, a
+        // string in it may span lines.
+        seq(
+          alias(/@pragma[ \t]+/, "@pragma"),
+          $.identifier,
+          optional(
+            alias(
+              token.immediate(/[ \t]([^\n"]|"([^"\\]|\\(.|\n))*")*/),
+              $.annotation_text,
+            ),
+          ),
+        ),
+      ),
+
+    // `@name("x")`, `@p4runtime_translation("t", bit<32>)`, or, structured,
+    // `@size[16]`.
+    annotation_body: ($) =>
+      choice(
+        seq("(", optional($._annotation_contents), ")"),
+        seq("[", optional($._annotation_contents), "]"),
+      ),
+
+    _annotation_contents: ($) =>
+      seq(commaSep1($.annotation_content), optional(",")),
+
+    annotation_content: ($) =>
+      choice(
+        $._expression,
+        $.named_expression,
+        $._type,
+        /["][^"]*["]/,
+        $.annotation,
+      ),
 
     comment: (_) =>
       token(
@@ -583,14 +1309,28 @@ module.exports = grammar({
     // whitespace part of the following token rather than an extra, and
     // leaves node boundaries carrying the preceding indentation.
     line_continuation: (_) => /\\\s*/,
-    method_not_constant: (_) => /[a-zA-Z_]*[a-z][a-zA-Z]*/,
+    method_not_constant: (_) => /[a-zA-Z0-9_]*[a-z][a-zA-Z0-9_]*/,
 
     preproc: ($) =>
       choice(
         seq(
           "#define",
           choice(
-            seq($.identifier_preproc, $.number),
+            // An object-like macro whose value, if any, is an expression or a
+            // list of them on the rest of the logical line, as in
+            // `#define SIZE (1 << WIDTH)` or `#define FIELDS hdr.a, hdr.b`, or text
+            // holding declarations, statements, or key elements, which the
+            // grammar cannot parse out of context; see src/scanner.c.
+            seq(
+              $._macro_name,
+              choice(
+                seq(
+                  optional(seq($._expression, repeat(seq(",", $._expression)))),
+                  $._define_end,
+                ),
+                alias($._macro_statements, $.preproc_arg),
+              ),
+            ),
             seq(
               $.identifier_preproc,
               "{",
@@ -598,42 +1338,57 @@ module.exports = grammar({
               repeat($.field),
               "}",
             ),
+            // A function-like macro, whose parameter list opens directly
+            // after the name, as in C. The body is an arbitrary token sequence
+            // (statements, annotations, `#` and `##`), so it is kept as text
+            // to the end of the logical line; see src/scanner.c.
             seq(
-              $.method_not_constant,
-              "(",
+              choice(
+                $.method_not_constant,
+                $.identifier_preproc,
+                // As in `#define _STR(x) #x`.
+                alias(/_[A-Za-z0-9_]*/, $.identifier_preproc),
+              ),
+              token.immediate("("),
               repeat(seq($.identifier, optional(","))),
               ")",
-              "(",
-              $.expr,
-              ")",
-            ),
-            seq(
-              $.identifier_preproc,
-              $.line_continuation,
-              repeat(
-                seq(
-                  optional("("),
-                  optional(choice($._type, $.type_identifier)),
-                  optional(")"),
-                  $.lval,
-                  ",",
-                  $.line_continuation,
-                ),
-              ),
-              seq(
-                optional("("),
-                optional(choice($._type, $.type_identifier)),
-                optional(")"),
-                $.lval,
-              ),
-              /\s/,
+              choice(alias($._macro_body, $.preproc_arg), $._define_end),
             ),
           ),
         ),
-        seq("#include", choice("<", '"'), /[^">]*/, choice(">", '"')),
-        seq("#if", /.*/),
-        seq("#else", /.*/),
+        seq("#include", $.include_path),
+        seq(choice("#ifdef", "#ifndef", "#undef"), $._macro_name),
+        // A condition or message, kept as text to the end of the logical
+        // line, which a backslash continues.
+        seq(
+          choice("#if", "#elif", "#error", "#warning", "#pragma", "#line"),
+          alias(/([^\\\r\n]|\\(.|\r?\n))*/, $.preproc_arg),
+        ),
+        // Only a comment may follow these, and it is lexed as one.
+        "#else",
         "#endif",
+      ),
+
+    include_path: (_) =>
+      token(choice(seq("<", /[^>\n]*/, ">"), seq('"', /[^"\n]*/, '"'))),
+
+    // Include guards such as `_P4_METER_` begin with an underscore, and some
+    // names are lowercase, neither of which `identifier_preproc` allows.
+    _macro_name: ($) =>
+      choice(
+        $.identifier_preproc,
+        alias(/_[A-Za-z0-9_]*/, $.identifier_preproc),
+        alias($.method_not_constant, $.identifier_preproc),
       ),
   },
 });
+
+/**
+ * One or more of a rule, separated by commas.
+ *
+ * @param {RuleOrLiteral} rule
+ * @returns {SeqRule}
+ */
+function commaSep1(rule) {
+  return seq(rule, repeat(seq(",", rule)));
+}

@@ -17,17 +17,15 @@ struct headers_t {
 parser parse(
     packet_in pkt,
     out headers_t hdr,
-    inout ingress_metadata_t ingress,
+    inout ingress_metadata_t ingress
 ){
     state start {
         pkt.extract(hdr.ethernet);
-        if (hdr.ethernet.ether_type == 16w0x0800) {
-            transition ipv4;
+        transition select(hdr.ethernet.ether_type) {
+            16w0x0800: ipv4;
+            16w0x86dd: ipv6;
+            default: reject;
         }
-        if (hdr.ethernet.ether_type == 16w0x86dd) {
-            transition ipv6;
-        }
-        transition reject;
     }
 
     state ipv4 {
@@ -44,7 +42,7 @@ parser parse(
 control ingress(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
     action forward(bit<16> port) {
         egress.port = port;
@@ -70,6 +68,6 @@ control ingress(
 control egress(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
 }

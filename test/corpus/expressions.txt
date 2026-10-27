@@ -1,0 +1,580 @@
+================================================================================
+Casts and parenthesized expressions
+================================================================================
+
+control c() {
+    apply {
+        x = (a) == b;
+        x = (a) - b;
+        x = (T)a << 8;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
+      (block
+        (assignment_statement
+          left: (identifier)
+          right: (binary_expression
+            left: (parenthesized_expression
+              (identifier))
+            right: (identifier)))
+        (assignment_statement
+          left: (identifier)
+          right: (binary_expression
+            left: (parenthesized_expression
+              (identifier))
+            right: (identifier)))
+        (assignment_statement
+          left: (identifier)
+          right: (binary_expression
+            left: (cast_expression
+              (type_identifier)
+              value: (identifier))
+            right: (number
+              (decimal))))))))
+
+================================================================================
+Index within a member chain, and a slice
+================================================================================
+
+control c() {
+    apply {
+        x = hdr.s[0].f[7:0];
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
+      (block
+        (assignment_statement
+          left: (identifier)
+          right: (slice_expression
+            value: (member_expression
+              object: (index_expression
+                object: (member_expression
+                  object: (identifier)
+                  member: (identifier))
+                index: (number
+                  (decimal)))
+              member: (identifier))
+            high: (number
+              (decimal))
+            low: (number
+              (decimal))))))))
+
+================================================================================
+Unary operators bind tighter than binary ones
+================================================================================
+
+control c() {
+    apply {
+        x = !a && b;
+        x = a - -b;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
+      (block
+        (assignment_statement
+          left: (identifier)
+          right: (binary_expression
+            left: (unary_expression
+              argument: (identifier))
+            right: (identifier)))
+        (assignment_statement
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (unary_expression
+              argument: (identifier))))))))
+
+================================================================================
+Field names on declarations, statements, and expressions
+================================================================================
+
+control c(in bit<8> x = 1) {
+    action a() {
+        if (x == 1) h.y = -x; else h.y = x > 1 ? (bit<8>)x : 2;
+    }
+    apply { a(); }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (bit_type
+          (number
+            (decimal)))
+        name: (identifier)
+        value: (number
+          (decimal))))
+    body: (control_body
+      (control_body_element
+        (action
+          name: (method_identifier)
+          parameters: (parameter_list)
+          body: (block
+            (if_statement
+              condition: (binary_expression
+                left: (identifier)
+                right: (number
+                  (decimal)))
+              consequence: (assignment_statement
+                left: (member_expression
+                  object: (identifier)
+                  member: (identifier))
+                right: (unary_expression
+                  argument: (identifier)))
+              alternative: (assignment_statement
+                left: (member_expression
+                  object: (identifier)
+                  member: (identifier))
+                right: (conditional_expression
+                  condition: (binary_expression
+                    left: (identifier)
+                    right: (number
+                      (decimal)))
+                  consequence: (cast_expression
+                    (bit_type
+                      (number
+                        (decimal)))
+                    value: (identifier))
+                  alternative: (number
+                    (decimal))))))))
+      (block
+        (call_statement
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list)))))))
+
+================================================================================
+Binary operators bind as in P4-16
+================================================================================
+
+control C() {
+    apply {
+        x = a || b && c == d < e | f ^ g & h << i + j * k;
+        x = k * j + i << h & g ^ f | e < d == c && b || a;
+        x = a - b - c;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
+      (block
+        (assignment_statement
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (binary_expression
+              left: (identifier)
+              right: (binary_expression
+                left: (identifier)
+                right: (binary_expression
+                  left: (identifier)
+                  right: (binary_expression
+                    left: (identifier)
+                    right: (binary_expression
+                      left: (identifier)
+                      right: (binary_expression
+                        left: (identifier)
+                        right: (binary_expression
+                          left: (identifier)
+                          right: (binary_expression
+                            left: (identifier)
+                            right: (binary_expression
+                              left: (identifier)
+                              right: (identifier))))))))))))
+        (assignment_statement
+          left: (identifier)
+          right: (binary_expression
+            left: (binary_expression
+              left: (binary_expression
+                left: (binary_expression
+                  left: (binary_expression
+                    left: (binary_expression
+                      left: (binary_expression
+                        left: (binary_expression
+                          left: (binary_expression
+                            left: (binary_expression
+                              left: (identifier)
+                              right: (identifier))
+                            right: (identifier))
+                          right: (identifier))
+                        right: (identifier))
+                      right: (identifier))
+                    right: (identifier))
+                  right: (identifier))
+                right: (identifier))
+              right: (identifier))
+            right: (identifier)))
+        (assignment_statement
+          left: (identifier)
+          right: (binary_expression
+            left: (binary_expression
+              left: (identifier)
+              right: (identifier))
+            right: (identifier)))))))
+
+================================================================================
+Named arguments and structure members
+================================================================================
+
+Alpm(number_partitions = 1024, 2) alpm;
+control C() {
+    apply {
+        f(x = 1, y);
+        s = { a = 1, b = 2 };
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (instantiation
+    type: (type_identifier)
+    arguments: (argument_list
+      (named_expression
+        name: (identifier)
+        value: (number
+          (decimal)))
+      (number
+        (decimal)))
+    name: (identifier))
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
+      (block
+        (call_statement
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (named_expression
+                name: (identifier)
+                value: (number
+                  (decimal)))
+              (identifier))))
+        (assignment_statement
+          left: (identifier)
+          right: (tuple
+            (named_expression
+              name: (identifier)
+              value: (number
+                (decimal)))
+            (named_expression
+              name: (identifier)
+              value: (number
+                (decimal)))))))))
+
+================================================================================
+A mask binds looser than any operator
+================================================================================
+
+parser P() {
+    state start {
+        transition select(x) {
+            0x800 &&& 0xf00 + 1: s;
+            default: accept;
+        }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (parser_declaration
+    name: (method_identifier)
+    parameters: (parameter_list)
+    (parser_state
+      name: (method_identifier)
+      body: (block
+        (transition_statement
+          (select_expression
+            (expression_list
+              (identifier))
+            (select_case
+              (keyset_expression
+                (simple_keyset_expression
+                  (mask
+                    (number
+                      (hex))
+                    (binary_expression
+                      left: (number
+                        (hex))
+                      right: (number
+                        (decimal))))))
+              (identifier))
+            (select_case
+              (keyset_expression
+                (simple_keyset_expression))
+              (identifier))))))))
+
+================================================================================
+This, invalid headers, structures with defaults, and plus slices
+================================================================================
+
+control C(inout H h) {
+    E() e = {
+        void f() { this.g(); }
+    };
+    apply {
+        h.a = {#};
+        h.b = { x = 1, ... };
+        h.c[i +: 8] = h.d[7:0];
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
+    body: (control_body
+      (control_body_element
+        (instantiation
+          type: (type_identifier)
+          arguments: (argument_list)
+          name: (identifier)
+          initializer: (object_initializer
+            (function_declaration
+              type: (type_identifier)
+              name: (method_identifier)
+              parameters: (parameter_list)
+              body: (block
+                (call_statement
+                  (call_expression
+                    function: (member_expression
+                      object: (this)
+                      member: (identifier))
+                    arguments: (argument_list))))))))
+      (block
+        (assignment_statement
+          left: (member_expression
+            object: (identifier)
+            member: (identifier))
+          right: (invalid_header))
+        (assignment_statement
+          left: (member_expression
+            object: (identifier)
+            member: (identifier))
+          right: (tuple
+            (named_expression
+              name: (identifier)
+              value: (number
+                (decimal)))))
+        (assignment_statement
+          left: (slice_expression
+            value: (member_expression
+              object: (identifier)
+              member: (identifier))
+            low: (identifier)
+            width: (number
+              (decimal)))
+          right: (slice_expression
+            value: (member_expression
+              object: (identifier)
+              member: (identifier))
+            high: (number
+              (decimal))
+            low: (number
+              (decimal))))))))
+
+================================================================================
+Calls with type arguments, beside comparisons
+================================================================================
+
+control C(inout H h) {
+    apply {
+        h.x = pkt.lookahead<bit<16>>()[7:0];
+        f<bit<8>>(1);
+        h.y = a < b;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
+    body: (control_body
+      (block
+        (assignment_statement
+          left: (member_expression
+            object: (identifier)
+            member: (identifier))
+          right: (slice_expression
+            value: (call_expression
+              function: (member_expression
+                object: (identifier)
+                member: (identifier))
+              type_arguments: (type_arguments
+                (type_argument_list
+                  (bit_type
+                    (number
+                      (decimal)))))
+              arguments: (argument_list))
+            high: (number
+              (decimal))
+            low: (number
+              (decimal))))
+        (call_statement
+          (call_expression
+            function: (identifier)
+            type_arguments: (type_arguments
+              (type_argument_list
+                (bit_type
+                  (number
+                    (decimal)))))
+            arguments: (argument_list
+              (number
+                (decimal)))))
+        (assignment_statement
+          left: (member_expression
+            object: (identifier)
+            member: (identifier))
+          right: (binary_expression
+            left: (identifier)
+            right: (identifier)))))))
+
+================================================================================
+Names with a leading dot, which refer to the top level
+================================================================================
+
+const .Version v = .Version.V1;
+.m(.p()) main;
+control c(in .e a) {
+    table t {
+        actions = { .b; }
+        default_action = .b();
+    }
+    apply {
+        .x = .f(8w3);
+        .T<bit<8>> w;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (constant_declaration
+    type: (prefixed_identifier
+      (type_identifier))
+    name: (identifier)
+    value: (member_expression
+      object: (prefixed_identifier
+        (identifier))
+      member: (identifier)))
+  (instantiation
+    type: (prefixed_identifier
+      (type_identifier))
+    arguments: (argument_list
+      (call_expression
+        function: (prefixed_identifier
+          (identifier))
+        arguments: (argument_list)))
+    name: (identifier))
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (prefixed_identifier
+          (type_identifier))
+        name: (identifier)))
+    body: (control_body
+      (control_body_element
+        (table
+          name: (type_identifier)
+          (table_property
+            (action_item
+              (prefixed_identifier
+                (method_identifier))))
+          (table_property
+            (action_item
+              (call_expression
+                function: (prefixed_identifier
+                  (identifier))
+                arguments: (argument_list))))))
+      (block
+        (assignment_statement
+          left: (prefixed_identifier
+            (identifier))
+          right: (call_expression
+            function: (prefixed_identifier
+              (identifier))
+            arguments: (argument_list
+              (number
+                (wdecimal)))))
+        (variable_declaration
+          type: (generic_type
+            type: (prefixed_identifier
+              (type_identifier))
+            type_arguments: (type_arguments
+              (type_argument_list
+                (bit_type
+                  (number
+                    (decimal))))))
+          name: (identifier))))))
+
+================================================================================
+Arguments left out with an underscore
+================================================================================
+
+control C() {
+    apply {
+        f(_, x = _);
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
+      (block
+        (call_statement
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (named_expression
+                name: (identifier)))))))))

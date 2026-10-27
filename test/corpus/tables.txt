@@ -1,0 +1,203 @@
+================================================================================
+A table with keys, actions, a default action, and other properties
+================================================================================
+
+control C(inout H h) {
+    action set(bit<9> port) { h.port = port; }
+    action drop() { }
+    table route {
+        key = {
+            h.ipv4.dst : lpm;
+            h.vlan.vid : exact @name("vid");
+        }
+        actions = {
+            set;
+            @defaultonly drop;
+        }
+        const default_action = drop();
+        size = 1024;
+        implementation = profile;
+    }
+    apply { route.apply(); }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
+    body: (control_body
+      (control_body_element
+        (action
+          name: (method_identifier)
+          parameters: (parameter_list
+            (parameter
+              type: (bit_type
+                (number
+                  (decimal)))
+              name: (identifier)))
+          body: (block
+            (assignment_statement
+              left: (member_expression
+                object: (identifier)
+                member: (identifier))
+              right: (identifier)))))
+      (control_body_element
+        (action
+          name: (method_identifier)
+          parameters: (parameter_list)
+          body: (block)))
+      (control_body_element
+        (table
+          name: (type_identifier)
+          (table_property
+            (key_element
+              value: (member_expression
+                object: (member_expression
+                  object: (identifier)
+                  member: (identifier))
+                member: (identifier))
+              match_kind: (match_kind))
+            (key_element
+              value: (member_expression
+                object: (member_expression
+                  object: (identifier)
+                  member: (identifier))
+                member: (identifier))
+              match_kind: (match_kind)
+              (annotation
+                (identifier)
+                (annotation_body
+                  (annotation_content
+                    (string_literal))))))
+          (table_property
+            (action_item
+              (method_identifier))
+            (annotation
+              (identifier))
+            (action_item
+              (method_identifier)))
+          (table_property
+            (action_item
+              (call_expression
+                function: (identifier)
+                arguments: (argument_list))))
+          (table_property
+            (number
+              (decimal)))
+          (table_property
+            (identifier)
+            (identifier))))
+      (block
+        (call_statement
+          (call_expression
+            function: (member_expression
+              object: (identifier)
+              member: (identifier))
+            arguments: (argument_list)))))))
+
+================================================================================
+Constant entries with tuple keysets and priorities
+================================================================================
+
+control C(inout H h) {
+    table t {
+        key = {
+            h.a : ternary;
+            h.b : range;
+        }
+        actions = { set; }
+        const entries = {
+            (0x01 &&& 0x0f, 1 .. 5) : set(1);
+            priority=10: (_, default) : set(2);
+            const (0x02, 6) : set(3);
+        }
+    }
+    apply { }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
+    body: (control_body
+      (control_body_element
+        (table
+          name: (type_identifier)
+          (table_property
+            (key_element
+              value: (member_expression
+                object: (identifier)
+                member: (identifier))
+              match_kind: (match_kind))
+            (key_element
+              value: (member_expression
+                object: (identifier)
+                member: (identifier))
+              match_kind: (match_kind)))
+          (table_property
+            (action_item
+              (method_identifier)))
+          (table_property
+            (identifier)
+            (entry
+              (keyset_expression
+                (tuple_keyset
+                  (simple_keyset_expression
+                    (mask
+                      (number
+                        (hex))
+                      (number
+                        (hex))))
+                  (simple_keyset_expression
+                    (range
+                      (number
+                        (decimal))
+                      (number
+                        (decimal))))))
+              (action_item
+                (call_expression
+                  function: (identifier)
+                  arguments: (argument_list
+                    (number
+                      (decimal))))))
+            (entry
+              priority: (number
+                (decimal))
+              (keyset_expression
+                (tuple_keyset
+                  (simple_keyset_expression)
+                  (simple_keyset_expression)))
+              (action_item
+                (call_expression
+                  function: (identifier)
+                  arguments: (argument_list
+                    (number
+                      (decimal))))))
+            (entry
+              (keyset_expression
+                (tuple_keyset
+                  (simple_keyset_expression
+                    (number
+                      (hex)))
+                  (simple_keyset_expression
+                    (number
+                      (decimal)))))
+              (action_item
+                (call_expression
+                  function: (identifier)
+                  arguments: (argument_list
+                    (number
+                      (decimal)))))))))
+      (block))))

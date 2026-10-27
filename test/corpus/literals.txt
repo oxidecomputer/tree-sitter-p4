@@ -1,0 +1,74 @@
+================================================================================
+Integer literals in every base, with and without a width
+================================================================================
+
+const int a = 0x_FF;
+const int b = 0d12_3;
+const int c = 8w0o17;
+const int d = 8s0d5;
+const int e = 32w0xFF_FF;
+const int f = 0b_1010;
+const int g = 8w255;
+const int h = 0o7;
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (constant_declaration
+    (identifier)
+    (number
+      (hex)))
+  (constant_declaration
+    (identifier)
+    (number
+      (decimal)))
+  (constant_declaration
+    (identifier)
+    (number
+      (woctal)))
+  (constant_declaration
+    (identifier)
+    (number
+      (wdecimal)))
+  (constant_declaration
+    (identifier)
+    (number
+      (whex)))
+  (constant_declaration
+    (identifier)
+    (number
+      (binary)))
+  (constant_declaration
+    (identifier)
+    (number
+      (wdecimal)))
+  (constant_declaration
+    (identifier)
+    (number
+      (octal))))
+
+================================================================================
+Booleans, strings, and binary literals with a width
+================================================================================
+
+const bool t = false;
+const bit<4> m = 4w0b1010;
+const string s = "a \"quoted\" word";
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (constant_declaration
+    name: (identifier)
+    value: (boolean_literal))
+  (constant_declaration
+    type: (bit_type
+      (number
+        (decimal)))
+    name: (identifier)
+    value: (number
+      (wbinary)))
+  (constant_declaration
+    type: (type_identifier)
+    name: (identifier)
+    value: (string_literal)))

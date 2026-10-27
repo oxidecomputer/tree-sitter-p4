@@ -6,7 +6,7 @@
     "type": "git",
     "url": "git+https://github.com/oxidecomputer/tree-sitter-p4.git"
   },
-  "main": "index.js",
+  "main": "bindings/node",
   "types": "bindings/node",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -39,6 +39,7 @@
     "prebuilds/**",
     "bindings/node/*",
     "queries/*",
-    "src/**"
+    "src/**",
+    "tree-sitter.json"
   ]
 }

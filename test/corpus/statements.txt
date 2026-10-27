@@ -1,0 +1,407 @@
+================================================================================
+Compound assignments
+================================================================================
+
+control C() {
+    apply {
+        x += 1;
+        y <<= 2;
+        h.f[7:0] |+|= 1;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
+      (block
+        (assignment_statement
+          left: (identifier)
+          right: (number
+            (decimal)))
+        (assignment_statement
+          left: (identifier)
+          right: (number
+            (decimal)))
+        (assignment_statement
+          left: (slice_expression
+            value: (member_expression
+              object: (identifier)
+              member: (identifier))
+            high: (number
+              (decimal))
+            low: (number
+              (decimal)))
+          right: (number
+            (decimal)))))))
+
+================================================================================
+For loops, with break and continue
+================================================================================
+
+control C() {
+    apply {
+        for (bit<8> i = 0, j = 1; i < 4; i = i + 1, f(i)) {
+            continue;
+        }
+        for (; i < 4; ) { break; }
+        for (bit<8> x in 0 .. 3) f(x);
+        for (H h in hs) { }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
+      (block
+        (for_statement
+          initializer: (variable_declaration
+            type: (bit_type
+              (number
+                (decimal)))
+            name: (identifier)
+            value: (number
+              (decimal)))
+          initializer: (assignment_statement
+            left: (identifier)
+            right: (number
+              (decimal)))
+          condition: (binary_expression
+            left: (identifier)
+            right: (number
+              (decimal)))
+          update: (assignment_statement
+            left: (identifier)
+            right: (binary_expression
+              left: (identifier)
+              right: (number
+                (decimal))))
+          update: (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (identifier)))
+          body: (block
+            (continue_statement)))
+        (for_statement
+          condition: (binary_expression
+            left: (identifier)
+            right: (number
+              (decimal)))
+          body: (block
+            (break_statement)))
+        (for_statement
+          type: (bit_type
+            (number
+              (decimal)))
+          name: (identifier)
+          collection: (range
+            (number
+              (decimal))
+            (number
+              (decimal)))
+          body: (call_statement
+            (call_expression
+              function: (identifier)
+              arguments: (argument_list
+                (identifier)))))
+        (for_statement
+          type: (type_identifier)
+          name: (identifier)
+          collection: (identifier)
+          body: (block))))))
+
+================================================================================
+Switches on an applied table's action, returns, and exits
+================================================================================
+
+control C(inout H h) {
+    apply {
+        switch (t.apply().action_run) {
+            a:
+            b: { h.x = 1; }
+            default: { exit; }
+        }
+        if (true) { return; } else ;
+        log_msg("done");
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
+    body: (control_body
+      (block
+        (switch_statement
+          value: (member_expression
+            object: (call_expression
+              function: (member_expression
+                object: (identifier)
+                member: (identifier))
+              arguments: (argument_list))
+            member: (identifier))
+          (switch_case
+            (identifier))
+          (switch_case
+            (identifier)
+            (block
+              (assignment_statement
+                left: (member_expression
+                  object: (identifier)
+                  member: (identifier))
+                right: (number
+                  (decimal)))))
+          (switch_case
+            (block
+              (exit_statement))))
+        (if_statement
+          condition: (boolean_literal)
+          consequence: (block
+            (return_statement))
+          alternative: (empty_statement))
+        (call_statement
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (string_literal))))))))
+
+================================================================================
+A parenthesized assignment target, and a method of a specialized type
+================================================================================
+
+control C() {
+    apply {
+        (x) = 1;
+        (h.f[0]) = 2;
+        MyParser<bit<8>>.apply(1);
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
+      (block
+        (assignment_statement
+          left: (parenthesized_expression
+            (identifier))
+          right: (number
+            (decimal)))
+        (assignment_statement
+          left: (parenthesized_expression
+            (index_expression
+              object: (member_expression
+                object: (identifier)
+                member: (identifier))
+              index: (number
+                (decimal))))
+          right: (number
+            (decimal)))
+        (call_statement
+          (call_expression
+            function: (member_expression
+              object: (generic_type
+                type: (type_identifier)
+                type_arguments: (type_arguments
+                  (type_argument_list
+                    (bit_type
+                      (number
+                        (decimal))))))
+              member: (identifier))
+            arguments: (argument_list
+              (number
+                (decimal)))))))))
+
+================================================================================
+A parser state's statements, and a transition in each branch of an #if
+================================================================================
+
+parser P(packet_in pkt, out H h) {
+    state start {
+        bit<8> n = 0;
+        {
+            pkt.extract(h.a);
+        }
+        if (h.a.isValid()) {
+            n = 1;
+        } else {
+            exit;
+        }
+#ifdef FAST
+        transition accept;
+#else
+        transition select(n) {
+            1: next;
+            default: reject;
+        }
+#endif
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (parser_declaration
+    name: (method_identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (identifier))
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
+    (parser_state
+      name: (method_identifier)
+      body: (block
+        (variable_declaration
+          type: (bit_type
+            (number
+              (decimal)))
+          name: (identifier)
+          value: (number
+            (decimal)))
+        (block
+          (call_statement
+            (call_expression
+              function: (member_expression
+                object: (identifier)
+                member: (identifier))
+              arguments: (argument_list
+                (member_expression
+                  object: (identifier)
+                  member: (identifier))))))
+        (if_statement
+          condition: (call_expression
+            function: (member_expression
+              object: (member_expression
+                object: (identifier)
+                member: (identifier))
+              member: (identifier))
+            arguments: (argument_list))
+          consequence: (block
+            (assignment_statement
+              left: (identifier)
+              right: (number
+                (decimal))))
+          alternative: (block
+            (exit_statement)))
+        (preproc
+          (identifier_preproc))
+        (transition_statement
+          (identifier))
+        (preproc)
+        (transition_statement
+          (select_expression
+            (expression_list
+              (identifier))
+            (select_case
+              (keyset_expression
+                (simple_keyset_expression
+                  (number
+                    (decimal))))
+              (identifier))
+            (select_case
+              (keyset_expression
+                (simple_keyset_expression))
+              (identifier))))
+        (preproc)))))
+
+================================================================================
+Assignment targets and called methods that begin like declarations
+================================================================================
+
+control C() {
+    apply {
+        s[a].z = 1;
+        n[7:4][3:0] = 4w0;
+        h[f(2)].setValid();
+        f<bit<32>>(32w0);
+        T[2] x;
+        G<bit<8>> y;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
+      (block
+        (assignment_statement
+          left: (member_expression
+            object: (index_expression
+              object: (identifier)
+              index: (identifier))
+            member: (identifier))
+          right: (number
+            (decimal)))
+        (assignment_statement
+          left: (slice_expression
+            value: (slice_expression
+              value: (identifier)
+              high: (number
+                (decimal))
+              low: (number
+                (decimal)))
+            high: (number
+              (decimal))
+            low: (number
+              (decimal)))
+          right: (number
+            (wdecimal)))
+        (call_statement
+          (call_expression
+            function: (member_expression
+              object: (index_expression
+                object: (identifier)
+                index: (call_expression
+                  function: (identifier)
+                  arguments: (argument_list
+                    (number
+                      (decimal)))))
+              member: (identifier))
+            arguments: (argument_list)))
+        (call_statement
+          (call_expression
+            function: (identifier)
+            type_arguments: (type_arguments
+              (type_argument_list
+                (bit_type
+                  (number
+                    (decimal)))))
+            arguments: (argument_list
+              (number
+                (wdecimal)))))
+        (variable_declaration
+          type: (array_type
+            element: (type_identifier)
+            size: (number
+              (decimal)))
+          name: (identifier))
+        (variable_declaration
+          type: (generic_type
+            type: (type_identifier)
+            type_arguments: (type_arguments
+              (type_argument_list
+                (bit_type
+                  (number
+                    (decimal))))))
+          name: (identifier))))))

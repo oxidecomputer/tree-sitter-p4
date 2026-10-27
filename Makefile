@@ -92,6 +92,21 @@ $(PARSER): $(SRC_DIR)/grammar.json
 topiary/grammar.so: $(PARSER) $(EXTRAS)
 	$(CC) $(CFLAGS) -shared $^ -o $@
 
+# Neovim names some captures differently from Helix, so its highlights are
+# derived from Helix's. CI checks that the derived file is up to date.
+queries/nvim/highlights.scm: queries/highlights.scm
+	{ echo '; Generated from ../highlights.scm by `make $@`. Do not edit.'; \
+	  echo; \
+	  sed -e 's/@variable\.other\.member/@variable.member/g' \
+	      -e 's/@constant\.builtin\.boolean/@boolean/g' \
+	      -e 's/@constant\.numeric/@number/g' \
+	      -e 's/@keyword\.control\.conditional/@keyword.conditional/g' \
+	      -e 's/@keyword\.control\.repeat/@keyword.repeat/g' \
+	      -e 's/@keyword\.control\.return/@keyword.return/g' \
+	      -e 's/@keyword\.control/@keyword/g' \
+	      -e 's/@keyword\.storage\.modifier/@keyword.modifier/g' \
+	      -e 's/@keyword\.storage\.type/@keyword.type/g' $<; } > $@
+
 install: all
 	install -d '$(DESTDIR)$(INCLUDEDIR)'/tree_sitter '$(DESTDIR)$(PCLIBDIR)' '$(DESTDIR)$(LIBDIR)'
 	install -m644 bindings/c/$(LANGUAGE_NAME).h '$(DESTDIR)$(INCLUDEDIR)'/tree_sitter/$(LANGUAGE_NAME).h

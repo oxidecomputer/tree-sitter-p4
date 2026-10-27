@@ -12,7 +12,6 @@ node_modules/
 .build/
 
 # Go artifacts
-go.sum
 _obj/
 
 # C artifacts
@@ -30,3 +29,6 @@ _obj/
 *.wasm
 *.obj
 *.o
+
+# Upstream programs that CI checks out to parse
+/.real-world/

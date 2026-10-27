@@ -1,0 +1,20 @@
+# Error tests from p4c's testdata/p4_16_errors, at the commit pinned in
+# .github/workflows/tree_sitter.yaml, that p4c rejects with a syntax error but
+# the grammar parses. CI checks that every other such test fails to parse,
+# and fails if one of these stops parsing, so that it can be taken off here.
+
+# Telling these apart needs to know which names are types, which p4c's lexer
+# tracks and a tree-sitter grammar cannot: `ctrl(H > 3)` and `buf > H`, where
+# `H` is a type, and a method without a return type whose name is not its
+# extern's, so not a constructor.
+testdata/p4_16_errors/constructor2_e.p4
+testdata/p4_16_errors/type-in-expr-lex0.p4
+testdata/p4_16_errors/type-in-expr-lex1.p4
+
+# A call without its semicolon, as in `c.c(_)` before a `}`, which the
+# grammar takes for a macro invocation that expands to a statement.
+testdata/p4_16_errors/expr-call-on-type-with-arguments.p4
+
+# An annotation P4-16 allows, `@pkginfo` without a body, which p4c rejects
+# when it checks the bodies of the annotations it knows.
+testdata/p4_16_errors/annotation.p4

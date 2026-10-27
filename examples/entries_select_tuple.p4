@@ -21,7 +21,7 @@ parser Top(packet_in b, out headers_t hdr) {
         transition select(hdr.eth.ether_type, hdr.eth.src) {
             (0x86dd, 0): with_semi;
             default: reject;
-        };
+        }
     }
     state with_semi {
         transition select(hdr.eth.ether_type, hdr.eth.src) {
@@ -33,6 +33,7 @@ parser Top(packet_in b, out headers_t hdr) {
         transition select(hdr.eth.ether_type) {
             0x86dd: accept;
             0x0800 &&& 0xFF00: with_semi;
+            0x0806 mask 0xFF00: with_semi;
             default: reject;
         }
     }

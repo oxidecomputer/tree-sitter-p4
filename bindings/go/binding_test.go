@@ -1,14 +1,14 @@
-package tree_sitter_P4_test
+package tree_sitter_p4_test
 
 import (
 	"testing"
 
-	tree_sitter "github.com/smacker/go-tree-sitter"
-	"github.com/tree-sitter/tree-sitter-P4"
+	tree_sitter_p4 "github.com/oxidecomputer/tree-sitter-p4/bindings/go"
+	tree_sitter "github.com/tree-sitter/go-tree-sitter"
 )
 
 func TestCanLoadGrammar(t *testing.T) {
-	language := tree_sitter.NewLanguage(tree_sitter_P4.Language())
+	language := tree_sitter.NewLanguage(tree_sitter_p4.Language())
 	if language == nil {
 		t.Errorf("Error loading P4 grammar")
 	}

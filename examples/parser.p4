@@ -23,8 +23,7 @@ struct Parsed_headers {
     IPv4_options_h    ipv4options;
 }
 
-// TODO parse error decls
-//error { InvalidIPv4Header }
+error { InvalidIPv4Header }
 
 parser Top(packet_in b, out Parsed_headers headers) {
    // Some states omitted
@@ -38,6 +37,7 @@ parser Top(packet_in b, out Parsed_headers headers) {
        }
    }
 
+   @critical
    state parse_ipv4_options {
        // use information in the ipv4 header to compute the number
        // of bits to extract
@@ -52,5 +52,27 @@ parser Top(packet_in b, out Parsed_headers headers) {
             6 .. 15 : parse_overlay_ipv4_options;
             default : reject; // invalid IHL value
         }
+    }
+}
+
+// Declarations among the states (parserLocalElement).
+parser Locals(packet_in pkt, out Parsed_headers hdr) {
+    Checksum() csum;
+    bridge_h bridge_hdr;
+    bit<16> zero = 0;
+    const bit<8> ONE = 1;
+    @name(".udp_port_vxlan")
+    value_set<bit<16>>(1) udp_port_vxlan;
+
+    state start {
+        bit<16> curr = pkt.lookahead<bit<16>>();
+        transition accept;
+    }
+}
+
+// Constructor parameters on a parser.
+parser Sized(packet_in pkt, out Parsed_headers hdr)(bit<8> depth = 4) {
+    state start {
+        transition accept;
     }
 }

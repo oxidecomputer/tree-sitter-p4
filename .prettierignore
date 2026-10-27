@@ -3,3 +3,6 @@ bindings/
 prebuilds/
 examples/
 package-lock.json
+
+# Upstream programs that CI checks out to parse.
+.real-world/
