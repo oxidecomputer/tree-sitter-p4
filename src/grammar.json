@@ -4448,16 +4448,22 @@
                       "value": ")"
                     },
                     {
-                      "type": "ALIAS",
-                      "content": {
-                        "type": "IMMEDIATE_TOKEN",
-                        "content": {
-                          "type": "PATTERN",
-                          "value": "([^\\\\\\n/]|\\/[^*\\n]|\\\\(.|\\r?\\n))*"
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "ALIAS",
+                          "content": {
+                            "type": "SYMBOL",
+                            "name": "_macro_body"
+                          },
+                          "named": true,
+                          "value": "preproc_arg"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_define_end"
                         }
-                      },
-                      "named": true,
-                      "value": "preproc_arg"
+                      ]
                     }
                   ]
                 },
@@ -4852,6 +4858,10 @@
     {
       "type": "SYMBOL",
       "name": "_define_end"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_macro_body"
     },
     {
       "type": "SYMBOL",

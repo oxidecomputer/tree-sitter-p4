@@ -82,3 +82,42 @@ const bit<8> X = 1;
     (number
       (decimal)))
   (preproc))
+
+================================================================================
+A function-like macro body keeps its comments to the end of the line
+================================================================================
+
+#define F(n) a = n; \
+    /* check it */ \
+    b = n##1;
+#define G(x) x /* trailing */
+#define H(x)
+#define K(x) /* leading */ x
+const bit<8> X = 1;
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (identifier_preproc)
+    (identifier)
+    (preproc_arg))
+  (preproc
+    (identifier_preproc)
+    (identifier)
+    (preproc_arg))
+  (comment)
+  (preproc
+    (identifier_preproc)
+    (identifier))
+  (preproc
+    (identifier_preproc)
+    (identifier)
+    (preproc_arg))
+  (const_definition
+    (bit_type
+      (number
+        (decimal)))
+    (identifier)
+    (number
+      (decimal))))

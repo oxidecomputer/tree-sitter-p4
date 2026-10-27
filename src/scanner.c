@@ -1,16 +1,21 @@
 // Copyright 2026 Oxide Computer Company
 
 // The grammar parses preprocessor directives as extras, where a newline is
-// ordinary whitespace. That leaves a `#define` with no value, such as an
-// include guard, without an end the grammar can see: the next token may be
-// on the following line. This scanner supplies that end as a zero-width
-// token, emitted only when nothing but horizontal whitespace or a comment
-// follows on the line.
+// ordinary whitespace. Two tokens need to know where a directive's logical
+// line ends, which the grammar cannot see, so this scanner supplies them:
+//
+// - The end of a `#define` with no value, such as an include guard: a
+//   zero-width token, emitted only when nothing but horizontal whitespace or a
+//   comment follows on the line.
+// - The body of a function-like macro: text up to the end of the logical line,
+//   which a backslash continues. A block comment inside the body is part of
+//   the text, while a comment that ends the line is left to be lexed as one.
 
 #include "tree_sitter/parser.h"
 
 enum TokenType {
   DEFINE_END,
+  MACRO_BODY,
   // Never used in the grammar. Every external token is marked valid during
   // error recovery, so this one being valid means the parser is recovering.
   ERROR_SENTINEL,
@@ -35,27 +40,113 @@ void tree_sitter_p4_external_scanner_deserialize(void *payload,
   (void)length;
 }
 
+static void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
+
+static bool at_line_end(TSLexer *lexer) {
+  return lexer->eof(lexer) || lexer->lookahead == '\n' ||
+         lexer->lookahead == '\r';
+}
+
+// Scans to the end of the logical line, marking the token's end after the last
+// character that is not whitespace, a line continuation, or a trailing
+// comment. Returns whether there was any such character.
+static bool scan_body(TSLexer *lexer) {
+  bool has_text = false;
+  while (!at_line_end(lexer)) {
+    int32_t c = lexer->lookahead;
+    if (c == ' ' || c == '\t') {
+      advance(lexer);
+    } else if (c == '\\') {
+      advance(lexer);
+      if (lexer->lookahead == '\r') {
+        advance(lexer);
+      }
+      if (lexer->lookahead == '\n') {
+        advance(lexer);
+      } else if (!lexer->eof(lexer)) {
+        advance(lexer);
+        lexer->mark_end(lexer);
+        has_text = true;
+      }
+    } else if (c == '/') {
+      advance(lexer);
+      if (lexer->lookahead == '/') {
+        // A line comment ends the body.
+        break;
+      }
+      if (lexer->lookahead == '*') {
+        // A block comment counts as text only if text follows it, which then
+        // marks the end past it.
+        advance(lexer);
+        bool star = false;
+        while (!lexer->eof(lexer) && !(star && lexer->lookahead == '/')) {
+          star = lexer->lookahead == '*';
+          advance(lexer);
+        }
+        if (!lexer->eof(lexer)) {
+          advance(lexer);
+        }
+      } else {
+        lexer->mark_end(lexer);
+        has_text = true;
+      }
+    } else if (c == '"') {
+      // A string may hold `//` or `/*`.
+      advance(lexer);
+      while (!at_line_end(lexer) && lexer->lookahead != '"') {
+        if (lexer->lookahead == '\\') {
+          advance(lexer);
+        }
+        if (!lexer->eof(lexer)) {
+          advance(lexer);
+        }
+      }
+      if (lexer->lookahead == '"') {
+        advance(lexer);
+      }
+      lexer->mark_end(lexer);
+      has_text = true;
+    } else {
+      advance(lexer);
+      lexer->mark_end(lexer);
+      has_text = true;
+    }
+  }
+  return has_text;
+}
+
 bool tree_sitter_p4_external_scanner_scan(void *payload, TSLexer *lexer,
                                           const bool *valid_symbols) {
   (void)payload;
-  if (valid_symbols[ERROR_SENTINEL] || !valid_symbols[DEFINE_END]) {
+  if (valid_symbols[ERROR_SENTINEL]) {
+    return false;
+  }
+  if (!valid_symbols[DEFINE_END] && !valid_symbols[MACRO_BODY]) {
     return false;
   }
 
-  // Mark the end before looking ahead, so that the token spans no input and
-  // the directive does not take in trailing whitespace.
+  // Mark the end before looking ahead, so that the end of a define spans no
+  // input and the directive does not take in trailing whitespace.
   lexer->mark_end(lexer);
-  lexer->result_symbol = DEFINE_END;
   while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
-    lexer->advance(lexer, false);
+    advance(lexer);
   }
 
-  if (lexer->eof(lexer) || lexer->lookahead == '\n' ||
-      lexer->lookahead == '\r') {
+  if (valid_symbols[MACRO_BODY] && scan_body(lexer)) {
+    lexer->result_symbol = MACRO_BODY;
+    return true;
+  }
+  if (!valid_symbols[DEFINE_END]) {
+    return false;
+  }
+  // The end of a define is valid where only whitespace or comments remain.
+  // A scanned body without text has left the token's end at the start.
+  lexer->result_symbol = DEFINE_END;
+  if (valid_symbols[MACRO_BODY] || at_line_end(lexer)) {
     return true;
   }
   if (lexer->lookahead == '/') {
-    lexer->advance(lexer, false);
+    advance(lexer);
     return lexer->lookahead == '/' || lexer->lookahead == '*';
   }
   return false;

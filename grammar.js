@@ -6,7 +6,7 @@ module.exports = grammar({
   extras: ($) => [/\s|\\\r?\n/, $.comment, $.preproc],
 
   // See src/scanner.c.
-  externals: ($) => [$._define_end, $._error_sentinel],
+  externals: ($) => [$._define_end, $._macro_body, $._error_sentinel],
 
   word: ($) => $.identifier,
 
@@ -950,17 +950,13 @@ module.exports = grammar({
             // A function-like macro, whose parameter list opens directly
             // after the name, as in C. The body is an arbitrary token sequence
             // (statements, annotations, `#` and `##`), so it is kept as text
-            // up to the end of the logical line or the start of a block
-            // comment, which is then lexed as a comment.
+            // to the end of the logical line; see src/scanner.c.
             seq(
               choice($.method_not_constant, $.identifier_preproc),
               token.immediate("("),
               repeat(seq($.identifier, optional(","))),
               ")",
-              alias(
-                token.immediate(/([^\\\n/]|\/[^*\n]|\\(.|\r?\n))*/),
-                $.preproc_arg,
-              ),
+              choice(alias($._macro_body, $.preproc_arg), $._define_end),
             ),
             seq(
               $.identifier_preproc,
