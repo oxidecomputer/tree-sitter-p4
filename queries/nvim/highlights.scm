@@ -172,6 +172,7 @@
 
 [
   "control"
+  "enum"
   "extern"
   "match_kind"
   "header"
@@ -235,6 +236,9 @@
 ; Errors, which are referred to as `error.Name`.
 (error_declaration
   (identifier) @constant)
+
+(enum_member
+  name: (identifier) @constant)
 
 [
   "exact"

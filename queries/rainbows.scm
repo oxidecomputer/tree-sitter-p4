@@ -13,6 +13,7 @@
   (block)
   (cast_expression)
   (control_declaration)
+  (enum_declaration)
   (error_declaration)
   (extern_declaration)
   (extern_function_declaration)

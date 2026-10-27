@@ -7,6 +7,10 @@ const bit<8> LIMIT = 4;
 typedef bit<48> mac_t;
 //              ^ definition.type
 
+enum Color_t { Red }
+//   ^ definition.type
+//             ^ definition.constant
+
 header eth_h { mac_t dst; }
 //     ^ definition.struct
 

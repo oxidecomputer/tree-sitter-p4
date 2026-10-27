@@ -16,6 +16,10 @@
         "named": true
       },
       {
+        "type": "enum_declaration",
+        "named": true
+      },
+      {
         "type": "error_declaration",
         "named": true
       },
@@ -1036,6 +1040,132 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "enum_declaration",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "type_identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "bit",
+            "named": false
+          },
+          {
+            "type": "bit_type",
+            "named": true
+          },
+          {
+            "type": "bool",
+            "named": false
+          },
+          {
+            "type": "error",
+            "named": false
+          },
+          {
+            "type": "generic_type",
+            "named": true
+          },
+          {
+            "type": "int",
+            "named": false
+          },
+          {
+            "type": "int_type",
+            "named": true
+          },
+          {
+            "type": "list_type",
+            "named": true
+          },
+          {
+            "type": "match_kind",
+            "named": false
+          },
+          {
+            "type": "packet_in",
+            "named": false
+          },
+          {
+            "type": "packet_out",
+            "named": false
+          },
+          {
+            "type": "stack_type",
+            "named": true
+          },
+          {
+            "type": "tuple_type",
+            "named": true
+          },
+          {
+            "type": "type_identifier",
+            "named": true
+          },
+          {
+            "type": "varbit",
+            "named": false
+          },
+          {
+            "type": "varbit_type",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "annotation",
+          "named": true
+        },
+        {
+          "type": "enum_member",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "enum_member",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -3509,6 +3639,10 @@
   },
   {
     "type": "else",
+    "named": false
+  },
+  {
+    "type": "enum",
     "named": false
   },
   {

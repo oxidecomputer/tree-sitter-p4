@@ -132,6 +132,7 @@
   (extern_declaration "{" @prepend_space)
   (header_declaration "{" @prepend_space)
   (header_union_declaration "{" @prepend_space)
+  (enum_declaration "{" @prepend_space)
   (error_declaration "{" @prepend_space)
   (match_kind_declaration "{" @prepend_space)
   (object_initializer "{" @prepend_space)
@@ -149,6 +150,7 @@
   (extern_declaration "{" @append_spaced_softline @append_indent_start)
   (header_declaration "{" @append_spaced_softline @append_indent_start)
   (header_union_declaration "{" @append_spaced_softline @append_indent_start)
+  (enum_declaration "{" @append_spaced_softline @append_indent_start)
   (error_declaration "{" @append_spaced_softline @append_indent_start)
   (match_kind_declaration "{" @append_spaced_softline @append_indent_start)
   (object_initializer "{" @append_spaced_softline @append_indent_start)
@@ -167,6 +169,7 @@
   (extern_declaration "}" @prepend_spaced_softline @prepend_indent_end)
   (header_declaration "}" @prepend_spaced_softline @prepend_indent_end)
   (header_union_declaration "}" @prepend_spaced_softline @prepend_indent_end)
+  (enum_declaration "}" @prepend_spaced_softline @prepend_indent_end)
   (error_declaration "}" @prepend_spaced_softline @prepend_indent_end)
   (match_kind_declaration "}" @prepend_spaced_softline @prepend_indent_end)
   (object_initializer "}" @prepend_spaced_softline @prepend_indent_end)
@@ -215,6 +218,17 @@
   (macro_invocation) @append_spaced_softline
   .
   (comment)* @do_nothing
+)
+
+; Members of an enum, one to a line when the enum spans several.
+(enum_declaration
+  "," @append_spaced_softline
+  .
+  (comment)* @do_nothing
+)
+
+(enum_member
+  "=" @prepend_space @append_space
 )
 
 ; Elements of a tuple literal.
@@ -293,6 +307,7 @@
   "control"
   "default"
   "else"
+  "enum"
   "extern"
   "for"
   "header"

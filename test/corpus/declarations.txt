@@ -107,6 +107,54 @@ match_kind { selector, dleft_hash }
     (identifier)))
 
 ================================================================================
+Enums, plain and with an underlying type
+================================================================================
+
+enum Color { Red, Green, }
+@name("et")
+enum bit<16> EtherType {
+    IPv4 = 0x0800,
+    IPv6 = 0x86dd
+}
+enum Base_t Derived_t { A = Base_t.X }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enum_declaration
+    name: (type_identifier)
+    (enum_member
+      name: (identifier))
+    (enum_member
+      name: (identifier)))
+  (enum_declaration
+    (annotation
+      (identifier)
+      (annotation_body
+        (annotation_content
+          (string_literal))))
+    type: (bit_type
+      (number
+        (decimal)))
+    name: (type_identifier)
+    (enum_member
+      name: (identifier)
+      value: (number
+        (hex)))
+    (enum_member
+      name: (identifier)
+      value: (number
+        (hex))))
+  (enum_declaration
+    type: (type_identifier)
+    name: (type_identifier)
+    (enum_member
+      name: (identifier)
+      value: (member_expression
+        object: (identifier)
+        member: (identifier)))))
+
+================================================================================
 Constants, functions, and extern functions
 ================================================================================
 

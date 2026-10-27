@@ -20,6 +20,11 @@ const bit<8> LIMIT = 0x0F;
 //           ^ constant
 //                   ^ constant.numeric
 
+enum bit<8> Kind_t { A = 1 }
+// <- keyword.storage.type
+//          ^ type
+//                   ^ constant
+
 header ipv4_h {
 // <- keyword.storage.type
 //     ^ type

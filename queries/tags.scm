@@ -46,6 +46,12 @@
 (struct_declaration
   name: (type_identifier) @name @definition.struct)
 
+(enum_declaration
+  name: (type_identifier) @name @definition.type)
+
+(enum_member
+  name: (identifier) @name @definition.constant)
+
 (typedef_declaration
   name: (type_identifier) @name @definition.type)
 

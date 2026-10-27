@@ -53,6 +53,7 @@ module.exports = grammar({
       "control",
       "default",
       "else",
+      "enum",
       "exit",
       "extern",
       "false",
@@ -120,6 +121,7 @@ module.exports = grammar({
         $.header_declaration,
         $.header_union_declaration,
         $.struct_declaration,
+        $.enum_declaration,
         $.typedef_declaration,
         $.constant_declaration,
         $.extern_declaration,
@@ -237,6 +239,38 @@ module.exports = grammar({
         repeat($.field),
         "}",
       ),
+
+    // `enum Color { Red, Green }`, or one whose members are values of a
+    // type, as in `enum bit<16> EtherType { IPv4 = 0x0800, IPv6 = 0x86dd }`.
+    // P4-16 requires a value for each member of the second form and allows
+    // none in the first.
+    enum_declaration: ($) =>
+      seq(
+        repeat($.annotation),
+        "enum",
+        choice(
+          seq(
+            field("name", $._type_identifier),
+            "{",
+            commaSep1(alias($._enum_name, $.enum_member)),
+            optional(","),
+            "}",
+          ),
+          seq(
+            field("type", choice($.stack_type, $._type, $._type_identifier)),
+            field("name", $._type_identifier),
+            "{",
+            commaSep1($.enum_member),
+            optional(","),
+            "}",
+          ),
+        ),
+      ),
+
+    _enum_name: ($) => field("name", $.identifier),
+
+    enum_member: ($) =>
+      seq(field("name", $.identifier), "=", field("value", $._expression)),
 
     // `typedef` names a type; `type` makes a new type from it, which P4Runtime
     // treats as distinct, as in `type bit<9> PortId_t;`.
