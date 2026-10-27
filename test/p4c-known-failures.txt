@@ -15,12 +15,10 @@ testdata/p4_16_samples/struct.p4
 testdata/p4_16_samples/struct1.p4
 testdata/p4_16_samples/version.p4
 
-# p4c extensions: C-style and nested arrays, and arrays of instances.
+# A p4c extension: arrays declared in the style of C, as in `bit<8> a[16];`.
 testdata/p4_16_samples/array2.p4
-testdata/p4_16_samples/array5.p4
 testdata/p4_16_samples/externArray1.p4
 testdata/p4_16_samples/generic-extern-inference.p4
-testdata/p4_16_samples/issue5335_default_initialized_non_header_stack_nested.p4
 testdata/p4_16_samples/unreach1.p4
 
 # Preprocessor features: `#line`, stringizing with `#`, and a define whose
@@ -30,16 +28,13 @@ testdata/p4_16_samples/psa-example-register2-bmv2.p4
 testdata/p4_16_samples/spec-issue1297-string-cat.p4
 
 # Rarely used: a parenthesized assignment target, a method of a generic
-# parser's type, a struct declared inside a typedef, a list given its type,
-# as in `(H[3]){ ... }`, and annotations whose bodies are free text or span
-# lines.
+# parser's type, a struct declared inside a typedef, and annotations
+# whose bodies are free text or span lines.
 testdata/p4_16_samples/free-form-annotation.p4
 testdata/p4_16_samples/lvalue-parens.p4
 testdata/p4_16_samples/pragma-string.p4
 testdata/p4_16_samples/spec-ex12.p4
 testdata/p4_16_samples/spec-issue1068.p4
-testdata/p4_16_samples/stack-init.p4
-testdata/p4_16_samples/default-initializer.p4
 
 # Not P4 until preprocessed: the branches of an `#if` each hold part of one
 # declaration, as in `#if ... extern register<T, I> #else extern register<T>

@@ -33,7 +33,7 @@
   (parser_declaration)
   (select_expression)
   (slice_expression)
-  (stack_type)
+  (array_type)
   (struct_declaration)
   (switch_statement)
   (table)

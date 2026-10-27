@@ -55,9 +55,9 @@ struct headers_t {
       type: (type_identifier)
       name: (identifier))
     (field
-      type: (stack_type
-        (type_identifier)
-        (number
+      type: (array_type
+        element: (type_identifier)
+        size: (number
           (decimal)))
       name: (identifier))))
 
@@ -905,7 +905,7 @@ type bit<9> PortId_t;
     name: (type_identifier)))
 
 ================================================================================
-Bare bit returns, match_kind and stack types, and empty selects
+Bare bit returns, match_kind and array types, and empty selects
 ================================================================================
 
 extern bit f(inout bit x, in bit y);
@@ -938,15 +938,15 @@ parser P() {
   (typedef_declaration
     type: (tuple_type
       (type_argument_list
-        (stack_type
-          (type_identifier)
-          (number
+        (array_type
+          element: (type_identifier)
+          size: (number
             (decimal)))))
     name: (type_identifier))
   (function_declaration
-    type: (stack_type
-      (type_identifier)
-      (number
+    type: (array_type
+      element: (type_identifier)
+      size: (number
         (decimal)))
     name: (method_identifier)
     body: (block
@@ -966,3 +966,84 @@ parser P() {
               (keyset_expression
                 (simple_keyset_expression))
               (identifier))))))))
+
+================================================================================
+Nested arrays, and arrays as constants, casts, and instances
+================================================================================
+
+const bit<8>[2][4] grid = { { 1, 2 }, { 3, 4 } };
+bit<32>() main;
+control C() {
+    apply {
+        s = (H<bit<8>>[2]) { (H<bit<8>>) {#}, ... };
+        y = (a[i]) - 1;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (constant_declaration
+    type: (array_type
+      element: (array_type
+        element: (bit_type
+          (number
+            (decimal)))
+        size: (number
+          (decimal)))
+      size: (number
+        (decimal)))
+    name: (identifier)
+    value: (tuple
+      (tuple
+        (number
+          (decimal))
+        (number
+          (decimal)))
+      (tuple
+        (number
+          (decimal))
+        (number
+          (decimal)))))
+  (instantiation
+    type: (bit_type
+      (number
+        (decimal)))
+    arguments: (argument_list)
+    name: (identifier))
+  (control_declaration
+    name: (method_identifier)
+    body: (control_body
+      (block
+        (assignment_statement
+          left: (identifier)
+          right: (cast_expression
+            (array_type
+              element: (generic_type
+                type: (type_identifier)
+                type_arguments: (type_arguments
+                  (type_argument_list
+                    (bit_type
+                      (number
+                        (decimal))))))
+              size: (number
+                (decimal)))
+            value: (tuple
+              (cast_expression
+                (generic_type
+                  type: (type_identifier)
+                  type_arguments: (type_arguments
+                    (type_argument_list
+                      (bit_type
+                        (number
+                          (decimal))))))
+                value: (invalid_header)))))
+        (assignment_statement
+          left: (identifier)
+          right: (binary_expression
+            left: (parenthesized_expression
+              (index_expression
+                object: (identifier)
+                index: (identifier)))
+            right: (number
+              (decimal))))))))

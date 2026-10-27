@@ -101,7 +101,7 @@ module.exports = grammar({
   // both readings until the next token settles it.
   conflicts: ($) => [
     [$.block, $.tuple],
-    [$.type_parameters, $.type_argument_list],
+    [$.type_parameters, $._type_ref],
     [$.call_expression, $._expression, $._type_identifier],
     [$._macro_declaration, $._type_identifier],
     [$._expression, $._type_identifier],
@@ -193,7 +193,7 @@ module.exports = grammar({
     function_declaration: ($) =>
       seq(
         repeat($.annotation),
-        field("type", choice($.stack_type, $._type, $._type_identifier)),
+        field("type", $._type_ref),
         field("name", $._method_identifier),
         optional($.type_parameters),
         "(",
@@ -257,7 +257,7 @@ module.exports = grammar({
             "}",
           ),
           seq(
-            field("type", choice($.stack_type, $._type, $._type_identifier)),
+            field("type", $._type_ref),
             field("name", $._type_identifier),
             "{",
             commaSep1($.enum_member),
@@ -278,7 +278,7 @@ module.exports = grammar({
       seq(
         repeat($.annotation),
         choice("typedef", "type"),
-        field("type", choice($.stack_type, $._type, $._type_identifier)),
+        field("type", $._type_ref),
         field("name", $._type_identifier),
         ";",
       ),
@@ -287,7 +287,7 @@ module.exports = grammar({
       seq(
         repeat($.annotation),
         "const",
-        field("type", choice($._type, $._type_identifier)),
+        field("type", $._type_ref),
         field("name", $.identifier),
         "=",
         field("value", $._expression),
@@ -599,7 +599,7 @@ module.exports = grammar({
             ),
           ),
           seq(
-            field("type", choice($._type, $._type_identifier)),
+            field("type", $._type_ref),
             field("name", $.identifier),
             "in",
             field("collection", choice($._expression, $.range)),
@@ -635,7 +635,7 @@ module.exports = grammar({
     // Without its semicolon, as a for loop's initializer takes it.
     _variable: ($) =>
       seq(
-        field("type", choice($.stack_type, $._type, $._type_identifier)),
+        field("type", $._type_ref),
         field("name", $.identifier),
         optional(seq("=", field("value", $._expression))),
       ),
@@ -934,7 +934,7 @@ module.exports = grammar({
 
     // Kept free of precedence so that `(x)` stays ambiguous between a cast
     // and a parenthesized expression until the next token.
-    _cast_type: ($) => seq("(", choice($._type, $._type_identifier), ")"),
+    _cast_type: ($) => seq("(", $._type_ref, ")"),
 
     range: ($) =>
       prec.left(PREC.keyset, seq($._expression, "..", $._expression)),
@@ -981,7 +981,7 @@ module.exports = grammar({
     instantiation: ($) =>
       seq(
         repeat($.annotation),
-        field("type", choice($._type_identifier, $.generic_type)),
+        field("type", $._type_ref),
         field("arguments", $.argument_list),
         field("name", $.identifier),
         optional(seq("=", field("initializer", $.object_initializer))),
@@ -1010,7 +1010,7 @@ module.exports = grammar({
         repeat($.annotation),
         // A method an instance must define, in its initializer.
         optional("abstract"),
-        optional(field("type", choice($._type, $._type_identifier))),
+        optional(field("type", $._type_ref)),
         field("name", $._method_identifier),
         optional($.type_parameters),
         "(",
@@ -1032,7 +1032,7 @@ module.exports = grammar({
           repeat($.annotation),
           $.direction,
           optional("("),
-          field("type", choice($.stack_type, $._type, $._type_identifier)),
+          field("type", $._type_ref),
           optional(")"),
           field("name", $.identifier),
           // A default value, as for a constructor parameter.
@@ -1042,7 +1042,7 @@ module.exports = grammar({
         seq(
           repeat($.annotation),
           optional("("),
-          field("type", choice($.stack_type, $._type, $._type_identifier)),
+          field("type", $._type_ref),
           optional(")"),
           field("name", $.identifier),
           optional(seq("=", field("value", $._expression))),
@@ -1055,7 +1055,7 @@ module.exports = grammar({
     field: ($) =>
       seq(
         repeat($.annotation),
-        field("type", choice($.stack_type, $._type, $._type_identifier)),
+        field("type", $._type_ref),
         field("name", $.identifier),
         ";",
         optional($.line_continuation),
@@ -1106,15 +1106,24 @@ module.exports = grammar({
     type_parameters: ($) =>
       seq("<", $._type_identifier, repeat(seq(",", $._type_identifier)), ">"),
 
-    type_argument_list: ($) =>
-      commaSep1(choice($.stack_type, $._type, $._type_identifier)),
+    type_argument_list: ($) => commaSep1($._type_ref),
 
     _type_identifier: ($) => prec(1, alias($.identifier, $.type_identifier)),
 
-    // A header stack: `h_t[4]`. P4-16 allows any compile-time-known size
-    // expression, not just a literal.
-    stack_type: ($) =>
-      seq(choice($._type, $._type_identifier), "[", $._expression, "]"),
+    // typeRef in the P4-16 grammar: any type that may be written where a
+    // type is expected.
+    _type_ref: ($) => choice($._type, $._type_identifier, $.array_type),
+
+    // An array, or header stack, as in `h_t[4]`, sized by any expression
+    // known at compile time. An element may itself be an array, as in
+    // `bit<8>[2][4]`.
+    array_type: ($) =>
+      seq(
+        field("element", $._type_ref),
+        "[",
+        field("size", $._expression),
+        "]",
+      ),
 
     _method_identifier: ($) => alias($.identifier, $.method_identifier),
 
