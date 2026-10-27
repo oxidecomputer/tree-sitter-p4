@@ -1,0 +1,31 @@
+name: Fuzz scanner
+
+# The external scanner is the only hand-written C in the parser, and a crash
+# in it takes down the editor hosting the parser. The fuzzer builds the parser
+# with AddressSanitizer and UndefinedBehaviorSanitizer and feeds it inputs
+# mutated with the grammar's own tokens.
+on:
+  push:
+    branches: [main]
+    paths:
+      - src/scanner.c
+  pull_request:
+    paths:
+      - src/scanner.c
+
+permissions:
+  contents: read
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: run fuzzer
+        uses: tree-sitter/fuzz-action@v4
+        with:
+          corpus: examples
+          max-time: 300
+          # The library the CLI in tree_sitter.yaml is pinned to.
+          tree-sitter-version: v0.26.8
