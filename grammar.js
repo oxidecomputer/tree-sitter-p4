@@ -796,14 +796,10 @@ module.exports = grammar({
         field("body", $.block),
       ),
 
-    // The select form takes no trailing semicolon in the P4-16 grammar,
-    // where selectExpression ends at the closing brace. One is accepted
-    // anyway since it is common in existing code.
+    // The select form takes no semicolon, as selectExpression ends at its
+    // closing brace in the P4-16 grammar.
     transition_statement: ($) =>
-      choice(
-        seq("transition", $.identifier, ";"),
-        prec.right(seq("transition", $.select_expression, optional(";"))),
-      ),
+      seq("transition", choice(seq($.identifier, ";"), $.select_expression)),
 
     select_expression: ($) =>
       seq(
@@ -819,8 +815,7 @@ module.exports = grammar({
 
     select_case: ($) => seq($.keyset_expression, ":", $.identifier, ";"),
 
-    expression_list: ($) =>
-      seq($._expression, repeat(seq(",", $._expression)), optional(",")),
+    expression_list: ($) => seq($._expression, repeat(seq(",", $._expression))),
 
     // `f(x)`, `pkt.extract(hdr)`, or `pkt.lookahead<bit<16>>()`. Type
     // arguments follow only a name, and carry no precedence, so that after
@@ -856,8 +851,7 @@ module.exports = grammar({
         ),
       ),
 
-    argument_list: ($) =>
-      seq("(", optional(seq(commaSep1($._argument), optional(","))), ")"),
+    argument_list: ($) => seq("(", optional(commaSep1($._argument)), ")"),
 
     // An argument may be left out with `_`, as in `f(_)` or `f(x = _)`.
     _argument: ($) =>
@@ -941,7 +935,6 @@ module.exports = grammar({
         "(",
         $.simple_keyset_expression,
         repeat(seq(",", $.simple_keyset_expression)),
-        optional(","),
         ")",
       ),
 

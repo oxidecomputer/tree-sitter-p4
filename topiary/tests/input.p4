@@ -84,7 +84,7 @@ control MyIngress(inout headers hdr,inout metadata meta){
         meta.ecmp_select=hdr.ipv4.dstAddr[13:0];
         csum.run(
 		hdr.ipv4.srcAddr,
-		hdr.ipv4.dstAddr,
+		hdr.ipv4.dstAddr
 	);
         csum.run({hdr.ipv4.srcAddr,hdr.ipv4.dstAddr});
         csum.run({hdr.ipv4.srcAddr, // source first
@@ -103,7 +103,7 @@ control MyIngress(inout headers hdr,inout metadata meta){
         const entries={
             (
               0xC0A80000,
-              1..64,
+              1..64
             ):ipv4_forward(0x001122334455,1);
         }
     }
