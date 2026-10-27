@@ -535,3 +535,91 @@ control C(Checksum<bit<16>> c) {
               (decimal)))
           name: (identifier)))
       (block))))
+
+================================================================================
+Annotations on parameters, loops, and entry lists
+================================================================================
+
+control C(@optional in bool zeros, @name("h") inout H h) {
+    table t {
+        key = { h.a : exact; }
+        actions = { a; }
+        @noWarn("duplicate-priorities")
+        entries = { 1 : a(); }
+    }
+    apply {
+        @unroll
+        for (bit<8> i = 0; i < 4; i = i + 1) { }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    (parameter
+      (annotation
+        (identifier))
+      (direction)
+      name: (identifier))
+    (parameter
+      (annotation
+        (identifier)
+        (annotation_body
+          (annotation_content
+            (string_literal))))
+      (direction)
+      type: (type_identifier)
+      name: (identifier))
+    body: (control_body
+      (control_body_element
+        (table
+          name: (type_identifier)
+          (table_property
+            (key_element
+              value: (member_expression
+                object: (identifier)
+                member: (identifier))
+              match_kind: (match_kind)))
+          (table_property
+            (action_item
+              (method_identifier)))
+          (table_property
+            (annotation
+              (identifier)
+              (annotation_body
+                (annotation_content
+                  (string_literal))))
+            (identifier)
+            (entry
+              (keyset_expression
+                (simple_keyset_expression
+                  (number
+                    (decimal))))
+              (action_item
+                (call_expression
+                  function: (identifier)
+                  arguments: (argument_list)))))))
+      (block
+        (for_statement
+          (annotation
+            (identifier))
+          initializer: (variable_declaration
+            type: (bit_type
+              (number
+                (decimal)))
+            name: (identifier)
+            value: (number
+              (decimal)))
+          condition: (binary_expression
+            left: (identifier)
+            right: (number
+              (decimal)))
+          update: (assignment_statement
+            left: (identifier)
+            right: (binary_expression
+              left: (identifier)
+              right: (number
+                (decimal))))
+          body: (block))))))

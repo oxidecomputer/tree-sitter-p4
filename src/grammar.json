@@ -1376,6 +1376,13 @@
           "type": "SEQ",
           "members": [
             {
+              "type": "REPEAT",
+              "content": {
+                "type": "SYMBOL",
+                "name": "annotation"
+              }
+            },
+            {
               "type": "CHOICE",
               "members": [
                 {
@@ -1938,6 +1945,13 @@
     "for_statement": {
       "type": "SEQ",
       "members": [
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "annotation"
+          }
+        },
         {
           "type": "STRING",
           "value": "for"
@@ -4176,6 +4190,13 @@
           "type": "SEQ",
           "members": [
             {
+              "type": "REPEAT",
+              "content": {
+                "type": "SYMBOL",
+                "name": "annotation"
+              }
+            },
+            {
               "type": "SYMBOL",
               "name": "direction"
             },
@@ -4204,6 +4225,13 @@
         {
           "type": "SEQ",
           "members": [
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SYMBOL",
+                "name": "annotation"
+              }
+            },
             {
               "type": "SYMBOL",
               "name": "direction"
@@ -4303,6 +4331,13 @@
         {
           "type": "SEQ",
           "members": [
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SYMBOL",
+                "name": "annotation"
+              }
+            },
             {
               "type": "CHOICE",
               "members": [

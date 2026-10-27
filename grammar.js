@@ -411,6 +411,7 @@ module.exports = grammar({
           "}",
         ),
         seq(
+          repeat($.annotation),
           optional("const"),
           $.identifier,
           "=",
@@ -524,6 +525,8 @@ module.exports = grammar({
     // `for (bit<8> i in 0 .. 3) ...`.
     for_statement: ($) =>
       seq(
+        // As in `@unroll for (...)`.
+        repeat($.annotation),
         "for",
         "(",
         choice(
@@ -964,10 +967,17 @@ module.exports = grammar({
         ";",
       ),
 
+    // Annotated as in `@optional in bool zeros`.
     parameter: ($) =>
       choice(
-        seq($.direction, field("name", $.identifier), optional(",")),
         seq(
+          repeat($.annotation),
+          $.direction,
+          field("name", $.identifier),
+          optional(","),
+        ),
+        seq(
+          repeat($.annotation),
           $.direction,
           optional("("),
           field("type", choice($.stack_type, $._type, $._type_identifier)),
@@ -978,6 +988,7 @@ module.exports = grammar({
           optional(","),
         ),
         seq(
+          repeat($.annotation),
           optional("("),
           field("type", choice($.stack_type, $._type, $._type_identifier)),
           optional(")"),
