@@ -273,14 +273,16 @@ Pipeline(MyParser(), MyIngress()) main;
     body: (control_body
       (control_body_element
         (instantiation
-          type: (type_identifier)
-          (type_argument_list
-            (bit_type
-              (number
-                (decimal)))
-            (bit_type
-              (number
-                (decimal))))
+          type: (generic_type
+            type: (type_identifier)
+            type_arguments: (type_arguments
+              (type_argument_list
+                (bit_type
+                  (number
+                    (decimal)))
+                (bit_type
+                  (number
+                    (decimal))))))
           arguments: (argument_list
             (number
               (decimal)))
@@ -453,3 +455,83 @@ package Single(Parser p);
     (method_field
       (method_identifier)
       (identifier))))
+
+================================================================================
+Specialized generic types
+================================================================================
+
+typedef Counter<bit<32>> counter_t;
+extern void observe(register<bit<32>> r);
+extern widget<T> create<T, U>(U a, T b);
+control C(Checksum<bit<16>> c) {
+    Register<bit<32>, _>(1024) reg;
+    apply { }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (typedef_declaration
+    type: (generic_type
+      type: (type_identifier)
+      type_arguments: (type_arguments
+        (type_argument_list
+          (bit_type
+            (number
+              (decimal))))))
+    name: (type_identifier))
+  (extern_function_declaration
+    type: (type_identifier)
+    name: (method_identifier)
+    (parameter
+      type: (generic_type
+        type: (type_identifier)
+        type_arguments: (type_arguments
+          (type_argument_list
+            (bit_type
+              (number
+                (decimal))))))
+      name: (identifier)))
+  (extern_function_declaration
+    type: (generic_type
+      type: (type_identifier)
+      type_arguments: (type_arguments
+        (type_argument_list
+          (type_identifier))))
+    name: (method_identifier)
+    (type_parameters
+      (type_identifier)
+      (type_identifier))
+    (parameter
+      type: (type_identifier)
+      name: (identifier))
+    (parameter
+      type: (type_identifier)
+      name: (identifier)))
+  (control_declaration
+    name: (method_identifier)
+    (parameter
+      type: (generic_type
+        type: (type_identifier)
+        type_arguments: (type_arguments
+          (type_argument_list
+            (bit_type
+              (number
+                (decimal))))))
+      name: (identifier))
+    body: (control_body
+      (control_body_element
+        (instantiation
+          type: (generic_type
+            type: (type_identifier)
+            type_arguments: (type_arguments
+              (type_argument_list
+                (bit_type
+                  (number
+                    (decimal)))
+                (type_identifier))))
+          arguments: (argument_list
+            (number
+              (decimal)))
+          name: (identifier)))
+      (block))))

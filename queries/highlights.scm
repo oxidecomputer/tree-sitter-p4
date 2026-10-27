@@ -360,12 +360,6 @@
     ">"
   ] @punctuation.bracket)
 
-(instantiation
-  [
-    "<"
-    ">"
-  ] @punctuation.bracket)
-
 (method_field
   [
     "<"

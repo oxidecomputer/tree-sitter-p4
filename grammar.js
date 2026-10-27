@@ -99,6 +99,8 @@ module.exports = grammar({
   // parenthesized expression otherwise. Without a symbol table the parser keeps
   // both readings until the next token settles it.
   conflicts: ($) => [
+    [$.type_parameters, $.type_argument_list],
+    [$.call_expression, $._expression, $._type_identifier],
     [$._macro_declaration, $._type_identifier],
     [$._expression, $._type_identifier],
     [$._expression, $.call_expression],
@@ -280,6 +282,8 @@ module.exports = grammar({
             $.int_type,
             $.varbit_type,
             $.tuple_type,
+            $.list_type,
+            $.generic_type,
             $._type_identifier,
           ),
         ),
@@ -922,8 +926,7 @@ module.exports = grammar({
     // `RegisterAction<...>(reg) ra = { ... };`.
     instantiation: ($) =>
       seq(
-        field("type", $._type_identifier),
-        optional(seq("<", $.type_argument_list, ">")),
+        field("type", choice($._type_identifier, $.generic_type)),
         field("arguments", $.argument_list),
         field("name", $.identifier),
         optional(seq("=", field("initializer", $.object_initializer))),
@@ -1019,6 +1022,15 @@ module.exports = grammar({
         $.varbit_type,
         $.tuple_type,
         $.list_type,
+        $.generic_type,
+      ),
+
+    // A generic type given its arguments, as in `Register<bit<32>, _>` or
+    // `register<bit<8>> r`.
+    generic_type: ($) =>
+      seq(
+        field("type", $._type_identifier),
+        field("type_arguments", $.type_arguments),
       ),
 
     bit_type: ($) => seq("bit", "<", $._width, ">"),

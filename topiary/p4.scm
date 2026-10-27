@@ -345,6 +345,7 @@
   "varbit"
   (bit_type)
   (direction)
+  (generic_type)
   (int_type)
   (list_type)
   (tuple_type)
@@ -451,7 +452,6 @@
   (int_type "<" @prepend_antispace @append_antispace)
   (method_field "<" @prepend_antispace @append_antispace)
   (type_arguments "<" @prepend_antispace @append_antispace)
-  (instantiation "<" @prepend_antispace @append_antispace)
   (list_type "<" @prepend_antispace @append_antispace)
   (tuple_type "<" @prepend_antispace @append_antispace)
   (type_parameters "<" @prepend_antispace @append_antispace)
@@ -463,7 +463,6 @@
   (int_type ">" @prepend_antispace)
   (method_field ">" @prepend_antispace)
   (type_arguments ">" @prepend_antispace)
-  (instantiation ">" @prepend_antispace)
   (list_type ">" @prepend_antispace)
   (tuple_type ">" @prepend_antispace)
   (type_parameters ">" @prepend_antispace)
