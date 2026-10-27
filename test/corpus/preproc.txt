@@ -44,11 +44,10 @@ const bit<8> A = 1;
         (number
           (decimal))
         (binop)
-        (lval
-          (identifier)))))
+        (identifier))))
   (preproc
     (identifier_preproc)
-    (lval
+    (member_expression
       (identifier)
       (identifier)))
   (comment)
@@ -149,12 +148,10 @@ An object-like macro holding declarations or key elements is text
     (preproc_arg))
   (preproc
     (identifier_preproc)
-    (line_continuation)
-    (lval
+    (member_expression
       (identifier)
       (identifier))
-    (line_continuation)
-    (lval
+    (member_expression
       (identifier)
       (identifier)))
   (preproc

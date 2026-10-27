@@ -34,21 +34,21 @@ V1Switch(c()) main;
           (identifier)))
       (block
         (macro_invocation
-          (fval
-            (method_identifier))
-          (number
-            (decimal)))
-        (call_statement
-          (call
-            (fval
-              (method_identifier))
+          (identifier)
+          (argument_list
             (number
-              (decimal)))))))
+              (decimal))))
+        (call_statement
+          (call_expression
+            (identifier)
+            (argument_list
+              (number
+                (decimal))))))))
   (package
     (method_identifier)
-    (call
-      (fval
-        (method_identifier)))
+    (call_expression
+      (identifier)
+      (argument_list))
     (identifier)))
 
 ================================================================================
@@ -81,9 +81,9 @@ control c(inout H h) {
           name: (type_identifier)
           (table_element
             (macro_invocation)
-            (lval
-              (identifier)
-              (identifier))
+            (member_expression
+              object: (identifier)
+              member: (identifier))
             (key_type))
           (table_element
             (macro_invocation)

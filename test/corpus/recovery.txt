@@ -31,8 +31,7 @@ control C(inout H h) {
               type: (bit_type
                 (number
                   (decimal)))
-              left: (lval
-                (identifier))
+              left: (identifier)
               right: (number
                 (decimal))))))
       (control_body_element
@@ -43,7 +42,8 @@ control C(inout H h) {
               (method_identifier)))))
       (block
         (call_statement
-          (call
-            function: (fval
-              (identifier)
-              (method_identifier))))))))
+          (call_expression
+            function: (member_expression
+              object: (identifier)
+              member: (identifier))
+            arguments: (argument_list)))))))

@@ -51,12 +51,14 @@
 
 (method_field) @parameter.inside @parameter.around
 
-(call
+(argument_list
   ((_expression) @parameter.inside
     .
     ","? @parameter.around) @parameter.around)
 
+; A macro invocation among declarations lists its arguments directly.
 (macro_invocation
+  !function
   ((_expression) @parameter.inside
     .
     ","? @parameter.around) @parameter.around)

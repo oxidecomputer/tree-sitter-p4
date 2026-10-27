@@ -24,9 +24,7 @@
 ; A declaration names its variable, an assignment does not.
 (var_decl
   type: (_)
-  left: (lval
-    .
-    (identifier) @local.definition.variable))
+  left: (identifier) @local.definition.variable)
 
 (control_var
   name: (identifier) @local.definition.variable)
@@ -34,11 +32,10 @@
 (const_definition
   name: (identifier) @local.definition.constant)
 
-; Only the head of a member chain refers to a variable; `hdr` in `hdr.ipv4.ttl`.
-(lval
-  .
-  (identifier) @local.reference)
+; A name used as a value refers to a variable; a member's name does not, so
+; `hdr` in `hdr.ipv4.ttl` is a reference and `ipv4` is not.
+(_expression/identifier) @local.reference
 
-(fval
-  .
-  (identifier) @local.reference)
+(var_decl
+  !type
+  left: (identifier) @local.reference)

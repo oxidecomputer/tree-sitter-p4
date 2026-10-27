@@ -8,8 +8,8 @@
 
 [
   (action)
+  (argument_list)
   (block)
-  (call)
   (control_definition)
   (error_declaration)
   (extern_definition)

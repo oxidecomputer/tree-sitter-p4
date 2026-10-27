@@ -8,9 +8,9 @@
 [
   (action)
   (annotation_body)
+  (argument_list)
   (bit_type)
   (block)
-  (call)
   (cast_expression)
   (conditional)
   (control_definition)
@@ -20,8 +20,8 @@
   (function_declaration)
   (header_definition)
   (header_union_definition)
+  (index_expression)
   (int_type)
-  (lval)
   (macro_invocation)
   (match_kind_declaration)
   (method)
@@ -30,7 +30,7 @@
   (parenthesized_expression)
   (parser_definition)
   (select_expr)
-  (slice)
+  (slice_expression)
   (stack_type)
   (struct_definition)
   (switch_statement)
@@ -38,6 +38,7 @@
   (table_element)
   (tuple)
   (tuple_keyset)
+  (type_arguments)
   (varbit_type)
 ] @rainbow.scope
 

@@ -35,14 +35,21 @@
 (method_field
   (method_identifier) @type)
 
-; Calls through a member, such as `pkt.extract(...)`, and method declarations.
-;
-; These patterns are not anchored to the dot. A pattern anchored to it matches
-; only after the first dot, which would miss `isValid` in `hdr.ipv4.isValid()`.
-; Only the head of a chain has no dot before it.
-(fval
-  "."
-  (method_identifier) @function.method)
+; Members of a value, and the fields that declare them.
+(member_expression
+  member: (identifier) @variable.other.member)
+
+(field
+  (identifier) @variable.other.member)
+
+; Calls, such as `f(x)`, calls through a member, such as `pkt.extract(...)`,
+; and method declarations. These follow the members, which they refine.
+(call_expression
+  function: (identifier) @function)
+
+(call_expression
+  function: (member_expression
+    member: (identifier) @function.method))
 
 (method
   (method_identifier) @function.method)
@@ -51,29 +58,12 @@
   (method_identifier) @function.macro)
 
 (macro_invocation
-  (fval
-    (method_identifier) @function.macro))
+  function: (identifier) @function.macro)
 
 ; A macro standing for declarations, key elements, or actions, as in
 ; `key = { MAC_KEY }`, which is a bare name.
 ((macro_invocation) @constant
   (#match? @constant "^[A-Za-z_][A-Za-z0-9_]*$"))
-
-; Members of a value, and the fields that declare them.
-(lval
-  "."
-  (identifier) @variable.other.member)
-
-(fval
-  "."
-  (identifier) @variable.other.member)
-
-(member_expression
-  "."
-  (identifier) @variable.other.member)
-
-(field
-  (identifier) @variable.other.member)
 
 (parameter
   (identifier) @variable.parameter)
@@ -250,34 +240,28 @@
 ; The methods P4-16 gives headers, header stacks, packets, and tables, and its
 ; built-in functions. The properties of a header stack, such as `next`, are
 ; left out, since they are common field names too.
-(fval
-  "."
-  (method_identifier) @function.builtin
+(call_expression
+  function: (member_expression
+    member: (identifier) @function.builtin)
   (#any-of? @function.builtin
     "advance" "apply" "emit" "extract" "isValid" "length" "lookahead"
     "maxSizeInBits" "maxSizeInBytes" "minSizeInBits" "minSizeInBytes"
     "pop_front" "push_front" "setInvalid" "setValid"))
 
-(call
-  function: (fval
-    .
-    (method_identifier) @function.builtin
-    .)
+(call_expression
+  function: (identifier) @function.builtin
   (#any-of? @function.builtin "static_assert" "verify"))
 
 ; What applying a table tells: `t.apply().hit`.
 (member_expression
-  (identifier) @variable.builtin
+  object: (call_expression)
+  member: (identifier) @variable.builtin
   (#any-of? @variable.builtin "action_run" "hit" "miss"))
 
 ; Errors, as in `error.NoMatch`.
-((lval
-  .
-  (identifier) @type.builtin
-  .
-  "."
-  .
-  (identifier) @constant)
+(member_expression
+  object: (identifier) @type.builtin
+  member: (identifier) @constant
   (#eq? @type.builtin "error"))
 
 ; Operators and punctuation
@@ -346,7 +330,7 @@
     ">"
   ] @punctuation.bracket)
 
-(call
+(type_arguments
   [
     "<"
     ">"

@@ -18,33 +18,25 @@ control c() {
     (control_body
       (block
         (var_decl
-          (lval
-            (identifier))
+          (identifier)
           (binary_expression
             (parenthesized_expression
-              (lval
-                (identifier)))
+              (identifier))
             (binop)
-            (lval
-              (identifier))))
+            (identifier)))
         (var_decl
-          (lval
-            (identifier))
+          (identifier)
           (binary_expression
             (parenthesized_expression
-              (lval
-                (identifier)))
+              (identifier))
             (binop)
-            (lval
-              (identifier))))
+            (identifier)))
         (var_decl
-          (lval
-            (identifier))
+          (identifier)
           (binary_expression
             (cast_expression
               (type_identifier)
-              (lval
-                (identifier)))
+              (identifier))
             (binop)
             (number
               (decimal))))))))
@@ -67,14 +59,15 @@ control c() {
     (control_body
       (block
         (var_decl
-          (lval
-            (identifier))
-          (slice
-            (lval
-              (identifier)
-              (identifier)
-              (number
-                (decimal))
+          (identifier)
+          (slice_expression
+            (member_expression
+              (index_expression
+                (member_expression
+                  (identifier)
+                  (identifier))
+                (number
+                  (decimal)))
               (identifier))
             (number
               (decimal))
@@ -100,27 +93,21 @@ control c() {
     (control_body
       (block
         (var_decl
-          (lval
-            (identifier))
+          (identifier)
           (binary_expression
             (unary_expression
               (unop)
-              (lval
-                (identifier)))
-            (binop)
-            (lval
-              (identifier))))
-        (var_decl
-          (lval
-            (identifier))
-          (binary_expression
-            (lval
               (identifier))
             (binop)
+            (identifier)))
+        (var_decl
+          (identifier)
+          (binary_expression
+            (identifier)
+            (binop)
             (unary_expression
               (unop)
-              (lval
-                (identifier)))))))))
+              (identifier))))))))
 
 ================================================================================
 Field names on declarations, statements, and expressions
@@ -153,27 +140,24 @@ control c(in bit<8> x = 1) {
           body: (block
             (conditional
               condition: (binary_expression
-                left: (lval
-                  (identifier))
+                left: (identifier)
                 operator: (binop)
                 right: (number
                   (decimal)))
               consequence: (var_decl
-                left: (lval
-                  (identifier)
-                  (identifier))
+                left: (member_expression
+                  object: (identifier)
+                  member: (identifier))
                 right: (unary_expression
                   operator: (unop)
-                  argument: (lval
-                    (identifier))))
+                  argument: (identifier)))
               alternative: (var_decl
-                left: (lval
-                  (identifier)
-                  (identifier))
+                left: (member_expression
+                  object: (identifier)
+                  member: (identifier))
                 right: (conditional_expression
                   condition: (binary_expression
-                    left: (lval
-                      (identifier))
+                    left: (identifier)
                     operator: (binop)
                     right: (number
                       (decimal)))
@@ -181,12 +165,11 @@ control c(in bit<8> x = 1) {
                     (bit_type
                       (number
                         (decimal)))
-                    value: (lval
-                      (identifier)))
+                    value: (identifier))
                   alternative: (number
                     (decimal))))))))
       (block
         (call_statement
-          (call
-            function: (fval
-              (method_identifier))))))))
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list)))))))

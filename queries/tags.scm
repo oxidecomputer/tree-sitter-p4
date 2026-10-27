@@ -66,6 +66,9 @@
     (method_not_constant)
   ] @name @definition.macro)
 
-(call
-  function: (fval
-    (method_identifier) @name)) @reference.call
+(call_expression
+  function: [
+    (identifier) @name
+    (member_expression
+      member: (identifier) @name)
+  ]) @reference.call

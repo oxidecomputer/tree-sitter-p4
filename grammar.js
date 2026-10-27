@@ -1,5 +1,10 @@
 // Copyright 2026 Oxide Computer Company
 
+// Binding strength, from loosest to tightest, after the P4-16 grammar.
+const PREC = {
+  postfix: 5,
+};
+
 module.exports = grammar({
   name: "p4",
 
@@ -61,7 +66,6 @@ module.exports = grammar({
   supertypes: ($) => [$._definition, $._statement, $._expression],
 
   precedences: ($) => [
-    [$._expression, $._method_identifier],
     [$.bit_type, $._type],
     [$.int_type, $._type],
     [$.varbit_type, $._type],
@@ -76,13 +80,14 @@ module.exports = grammar({
   // parenthesized expression otherwise. Without a symbol table the parser keeps
   // both readings until the next token settles it.
   conflicts: ($) => [
-    [$.fval, $.lval],
-    [$.lval],
-    [$.lval, $._method_identifier],
-    [$._member_or_index, $._method_identifier],
-    [$._cast_type, $.lval],
+    [$.call_expression, $._expression, $._type_identifier],
+    [$._cast_type, $.type_decl],
+    [$._expression, $._type_identifier],
+    [$._macro_use, $._expression, $._type_identifier],
+    [$._expression, $.call_expression],
     [$.macro_invocation, $.package],
-    [$._macro_declaration, $._type_identifier],
+    [$._macro_use, $._macro_declaration, $._expression, $._type_identifier],
+    [$._macro_declaration, $._expression, $._type_identifier],
     [$.preproc, $._macro_name],
   ],
 
@@ -467,7 +472,7 @@ module.exports = grammar({
         ";",
       ),
 
-    action_item: ($) => choice($._method_identifier, $.call),
+    action_item: ($) => choice($._method_identifier, $.call_expression),
 
     // The standard match kinds, or one an architecture declares with
     // `match_kind`, such as `selector` or `atcam_partition_index`.
@@ -492,8 +497,9 @@ module.exports = grammar({
         $.type_decl,
         $.transition,
         $.call_statement,
-        // A macro invocation: a call without its semicolon.
-        alias($.call, $.macro_invocation),
+        // A macro invocation: a call without its semicolon. Yields to a
+        // longer expression, as in `F(a)(b);`.
+        prec(-1, alias($.call_expression, $.macro_invocation)),
         $.return_statement,
         $.exit_statement,
         $.empty_statement,
@@ -503,7 +509,7 @@ module.exports = grammar({
     block: ($) => seq(repeat($.annotation), "{", repeat($._statement), "}"),
 
     // Preferred to a macro invocation followed by an empty statement.
-    call_statement: ($) => prec(1, seq($.call, ";")),
+    call_statement: ($) => prec(1, seq($.call_expression, ";")),
 
     return_statement: ($) =>
       seq("return", optional(field("value", $._expression)), ";"),
@@ -538,11 +544,24 @@ module.exports = grammar({
         ";",
       ),
 
+    // What may be assigned to. Preferred to an expression, which `=` may also
+    // continue, as in a named argument.
+    _lvalue: ($) =>
+      prec(
+        2,
+        choice(
+          $.identifier,
+          $.member_expression,
+          $.index_expression,
+          $.slice_expression,
+        ),
+      ),
+
     var_decl: ($) =>
       seq(
         optional(field("type", choice($._type, $._type_identifier))),
         // A slice may be assigned to, as in `x[15:8] = y;`.
-        field("left", choice($.lval, alias($._field_slice, $.slice))),
+        field("left", $._lvalue),
         "=",
         field("right", $._expression),
         ";",
@@ -583,10 +602,42 @@ module.exports = grammar({
     expression_list: ($) =>
       seq($._expression, repeat(seq(",", $._expression)), optional(",")),
 
-    call: ($) =>
+    // `f(x)`, `pkt.extract(hdr)`, or `pkt.lookahead<bit<16>>()`. Type
+    // arguments follow only a name, and carry no precedence, so that after
+    // `a.b <` the parser keeps both a comparison and type arguments until a
+    // later token rules one out.
+    call_expression: ($) =>
+      choice(
+        // Loses to a cast when both read the whole input: `(T)(x)` casts
+        // `(x)` rather than calling `(T)`.
+        prec.dynamic(
+          -1,
+          prec(
+            PREC.postfix,
+            seq(
+              field("function", $._expression),
+              field("arguments", $.argument_list),
+            ),
+          ),
+        ),
+        // At the level of a name used as an expression; see `_expression`.
+        prec(
+          1,
+          seq(
+            field("function", $.identifier),
+            field("type_arguments", $.type_arguments),
+            field("arguments", $.argument_list),
+          ),
+        ),
+        seq(
+          field("function", $.member_expression),
+          field("type_arguments", $.type_arguments),
+          field("arguments", $.argument_list),
+        ),
+      ),
+
+    argument_list: ($) =>
       seq(
-        field("function", $.fval),
-        optional(seq("<", $.type_argument_list, ">")),
         "(",
         optional(
           seq($._expression, repeat(seq(",", $._expression)), optional(",")),
@@ -594,26 +645,41 @@ module.exports = grammar({
         ")",
       ),
 
-    // `x[7:0]` and `x[W - 1:0]`. Whether `[` opens an index or a slice is
-    // known only at the `]` or `:`. A call's result or a parenthesized
-    // expression may be sliced too, as in `pkt.lookahead<bit<8>>()[7:0]` or
-    // `(count >> 20)[4:0]`.
-    slice: ($) =>
-      choice(
-        $._field_slice,
+    type_arguments: ($) => seq("<", $.type_argument_list, ">"),
+
+    // `hdr.ipv4.ttl`, `t.apply().hit`.
+    member_expression: ($) =>
+      prec(
+        PREC.postfix,
+        seq(field("object", $._expression), ".", field("member", $.identifier)),
+      ),
+
+    // `hdr.vlan[0]`.
+    index_expression: ($) =>
+      prec(
+        PREC.postfix,
         seq(
-          choice($.call, $.parenthesized_expression),
+          field("object", $._expression),
           "[",
-          $._expression,
-          ":",
-          $._expression,
+          field("index", $._expression),
           "]",
         ),
       ),
 
-    // The slices that may be assigned to.
-    _field_slice: ($) =>
-      seq($.lval, "[", $._expression, ":", $._expression, "]"),
+    // `x[7:0]`, `x[W - 1:0]`, or `pkt.lookahead<bit<8>>()[7:0]`. Whether `[`
+    // opens an index or a slice is known only at the `]` or `:`.
+    slice_expression: ($) =>
+      prec(
+        PREC.postfix,
+        seq(
+          field("value", $._expression),
+          "[",
+          field("high", $._expression),
+          ":",
+          field("low", $._expression),
+          "]",
+        ),
+      ),
 
     tuple: ($) =>
       seq(
@@ -646,12 +712,15 @@ module.exports = grammar({
         $.conditional_expression,
         $.binary_expression,
         $.unary_expression,
-        prec(3, $.call),
+        // Level with a type name, so that `f(a);` and `T(a) t;` stay
+        // ambiguous until a later token tells them apart.
+        prec(1, $.identifier),
+        $.call_expression,
         $.member_expression,
+        $.index_expression,
+        $.slice_expression,
         $.cast_expression,
         $.parenthesized_expression,
-        $.slice,
-        $.lval,
         prec(1, $.tuple),
         prec(1, $.identifier_preproc),
         prec(1, $.string_literal),
@@ -684,10 +753,6 @@ module.exports = grammar({
     unary_expression: ($) =>
       prec(4, seq(field("operator", $.unop), field("argument", $._expression))),
 
-    // Members of a call's result, as in `t.apply().hit`.
-    member_expression: ($) =>
-      prec(3, seq($.call, repeat1(seq(".", $.identifier)))),
-
     // A cast binds tighter than any binary operator. When the operand could
     // also begin a binary operation, as in `(x) - y`, the parenthesized
     // reading wins.
@@ -698,11 +763,8 @@ module.exports = grammar({
       prec.dynamic(1, prec(-1, seq("(", $._expression, ")"))),
 
     // Kept free of precedence so that `(x)` stays ambiguous between a cast
-    // and a parenthesized expression until the next token. For the same
-    // reason the name is an aliased identifier: `type_identifier` carries a
-    // static precedence that would always win over `lval`.
-    _cast_type: ($) =>
-      seq("(", choice($._type, alias($.identifier, $.type_identifier)), ")"),
+    // and a parenthesized expression until the next token.
+    _cast_type: ($) => seq("(", choice($._type, $._type_identifier), ")"),
 
     range: ($) => prec.left(1, seq($._expression, "..", $._expression)),
 
@@ -792,22 +854,6 @@ module.exports = grammar({
     // `RegisterAction<...>(reg) ra = { void apply(...) { ... } };`.
     obj_initializer: ($) =>
       seq("{", repeat(choice($.function_declaration, $.control_var)), "}"),
-
-    // A member and index chain such as `hdr.vlan_tag[0].vid`.
-    lval: ($) => seq($.identifier, repeat($._member_or_index)),
-
-    fval: ($) =>
-      choice(
-        seq(
-          $.identifier,
-          repeat($._member_or_index),
-          seq(".", $._method_identifier),
-        ),
-        $._method_identifier,
-      ),
-
-    _member_or_index: ($) =>
-      choice(seq(".", $.identifier), seq("[", $._expression, "]")),
 
     // A method of an extern. A constructor has no return type, as in
     // `Register(bit<32> size);`.
@@ -948,7 +994,9 @@ module.exports = grammar({
 
     wdecimal: (_) => /\d+[ws]\d[\d_]*/,
 
-    annotation: ($) => seq("@", $.identifier, optional($.annotation_body)),
+    // A following `(` always opens the body, as in the spec's grammar.
+    annotation: ($) =>
+      prec.right(seq("@", $.identifier, optional($.annotation_body))),
 
     annotation_body: ($) =>
       seq(
@@ -982,14 +1030,18 @@ module.exports = grammar({
         seq(
           "#define",
           choice(
-            // An object-like macro whose value, if any, is an expression on
-            // the rest of the line, as in `#define SIZE (1 << WIDTH)`, or text
+            // An object-like macro whose value, if any, is an expression or a
+            // list of them on the rest of the logical line, as in
+            // `#define SIZE (1 << WIDTH)` or `#define FIELDS hdr.a, hdr.b`, or text
             // holding declarations, statements, or key elements, which the
             // grammar cannot parse out of context; see src/scanner.c.
             seq(
               $._macro_name,
               choice(
-                seq(optional($._expression), $._define_end),
+                seq(
+                  optional(seq($._expression, repeat(seq(",", $._expression)))),
+                  $._define_end,
+                ),
                 alias($._macro_statements, $.preproc_arg),
               ),
             ),
@@ -1010,27 +1062,6 @@ module.exports = grammar({
               repeat(seq($.identifier, optional(","))),
               ")",
               choice(alias($._macro_body, $.preproc_arg), $._define_end),
-            ),
-            seq(
-              $.identifier_preproc,
-              $.line_continuation,
-              repeat(
-                seq(
-                  optional("("),
-                  optional(choice($._type, $._type_identifier)),
-                  optional(")"),
-                  $.lval,
-                  ",",
-                  $.line_continuation,
-                ),
-              ),
-              seq(
-                optional("("),
-                optional(choice($._type, $._type_identifier)),
-                optional(")"),
-                $.lval,
-              ),
-              /\s/,
             ),
           ),
         ),

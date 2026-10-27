@@ -240,7 +240,7 @@
 ; lists, but need a separate scope because they can occur inside parameters.
 (
   [
-    (call "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
+    (argument_list "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
     (macro_invocation "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
     (tuple_keyset "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
   ]
@@ -249,7 +249,7 @@
 
 (
   [
-    (call ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
+    (argument_list ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
     (macro_invocation ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
     (tuple_keyset ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
   ]
@@ -258,7 +258,7 @@
 
 (
   [
-    (call "," @append_spaced_scoped_softline)
+    (argument_list "," @append_spaced_scoped_softline)
     (macro_invocation "," @append_spaced_scoped_softline)
     (tuple_keyset "," @append_spaced_scoped_softline)
   ]
@@ -382,7 +382,7 @@
 ; parenthesis.
 [
   (action "(" @prepend_antispace)
-  (call "(" @prepend_antispace)
+  (argument_list "(" @prepend_antispace)
   (macro_invocation "(" @prepend_antispace)
   (control_definition "(" @prepend_antispace)
   (control_var "(" @prepend_antispace)
@@ -415,7 +415,7 @@
   (table_element ":" @prepend_antispace @append_space)
 ]
 
-(slice
+(slice_expression
   ":" @prepend_antispace @append_antispace
 )
 
@@ -426,7 +426,7 @@
   (int_type "<" @prepend_antispace @append_antispace)
   (method_field "<" @prepend_antispace @append_antispace)
   (package "<" @prepend_antispace @append_antispace)
-  (call "<" @prepend_antispace @append_antispace)
+  (type_arguments "<" @prepend_antispace @append_antispace)
   (control_var "<" @prepend_antispace @append_antispace)
   (list_type "<" @prepend_antispace @append_antispace)
   (tuple_type "<" @prepend_antispace @append_antispace)
@@ -439,7 +439,7 @@
   (int_type ">" @prepend_antispace)
   (method_field ">" @prepend_antispace)
   (package ">" @prepend_antispace)
-  (call ">" @prepend_antispace)
+  (type_arguments ">" @prepend_antispace)
   (control_var ">" @prepend_antispace)
   (list_type ">" @prepend_antispace)
   (tuple_type ">" @prepend_antispace)
