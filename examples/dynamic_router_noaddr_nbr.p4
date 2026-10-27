@@ -17,7 +17,7 @@ struct headers_t {
 parser parse(
     packet_in pkt,
     out headers_t headers,
-    inout ingress_metadata_t ingress,
+    inout ingress_metadata_t ingress
 ){
     state start {
         pkt.extract(headers.ethernet);
@@ -45,7 +45,7 @@ parser parse(
 
 control local(
     inout headers_t hdr,
-    out bool is_local,
+    out bool is_local
 ) {
 
     action nonlocal() {
@@ -81,7 +81,7 @@ control local(
 
 control resolver(
     inout headers_t hdr,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
     action rewrite_dst(bit<48> dst) {
         //TODO the following creates a code generation error that should get
@@ -114,7 +114,7 @@ control resolver(
 control router(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
 
     resolver() resolver;
@@ -149,7 +149,7 @@ control router(
 control ingress(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
     local() local;
     router() router;
@@ -219,7 +219,7 @@ control ingress(
 control egress(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
 
 }

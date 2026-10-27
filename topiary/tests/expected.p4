@@ -51,7 +51,7 @@ bit<8> ttl_of(in ipv4_t hdr) {
 parser MyParser(
     packet_in packet,
     out headers hdr,
-    inout metadata meta,
+    inout metadata meta
 ) {
     state start {
         packet.extract(hdr.ethernet);
@@ -124,7 +124,7 @@ control MyIngress(inout headers hdr, inout metadata meta) {
 package MySwitch(
     MyParser p,
     Generic<H, M> g,
-    MyIngress ig,
+    MyIngress ig
 );
 
 V1Switch(

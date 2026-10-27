@@ -16,14 +16,16 @@ control C(inout H h) {
 (source_file
   (control_declaration
     name: (method_identifier)
-    (parameter
-      (direction)
-      type: (type_identifier)
-      name: (identifier))
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
     body: (control_body
       (control_body_element
         (action
           name: (method_identifier)
+          parameters: (parameter_list)
           body: (block
             (ERROR
               (identifier))

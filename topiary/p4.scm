@@ -251,28 +251,12 @@
 ; A parameter list is its own line-breaking context: the parameters of a
 ; declaration that spans several lines are not themselves obliged to break.
 (
-  [
-    (action "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-    (control_declaration "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-    (extern_function_declaration "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-    (function_declaration "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-    (method "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-    (package "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-    (parser_declaration "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-  ]
+  (parameter_list "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
   (#scope_id! "parameter_list")
 )
 
 (
-  [
-    (action ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-    (control_declaration ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-    (extern_function_declaration ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-    (function_declaration ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-    (method ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-    (package ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-    (parser_declaration ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-  ]
+  (parameter_list ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
   (#scope_id! "parameter_list")
 )
 
@@ -302,9 +286,8 @@
   (#scope_id! "argument_list")
 )
 
-; A parameter carries its own trailing comma.
 (
-  (parameter "," @append_spaced_scoped_softline)
+  (parameter_list "," @append_spaced_scoped_softline)
   (#scope_id! "parameter_list")
 )
 
@@ -420,14 +403,8 @@
 ; `else if` are the exception, which is why this is not a rule on every
 ; parenthesis.
 [
-  (action "(" @prepend_antispace)
   (argument_list "(" @prepend_antispace)
-  (control_declaration "(" @prepend_antispace)
-  (extern_function_declaration "(" @prepend_antispace)
-  (function_declaration "(" @prepend_antispace)
-  (method "(" @prepend_antispace)
-  (package "(" @prepend_antispace)
-  (parser_declaration "(" @prepend_antispace)
+  (parameter_list "(" @prepend_antispace)
   (select_expression "(" @prepend_antispace)
 ]
 

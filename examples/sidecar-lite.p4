@@ -51,7 +51,7 @@ struct headers_t {
 parser parse(
     packet_in pkt,
     out headers_t hdr,
-    inout ingress_metadata_t ingress,
+    inout ingress_metadata_t ingress
 ){
     state start {
         pkt.extract(hdr.ethernet);
@@ -187,7 +187,7 @@ parser parse(
 control nat_ingress(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
 
     Checksum() csum;
@@ -336,7 +336,7 @@ control nat_ingress(
 
 control local(
     inout headers_t hdr,
-    out bool is_local,
+    out bool is_local
 ) {
 
     action nonlocal() {
@@ -386,7 +386,7 @@ control local(
 
 control resolver(
     inout headers_t hdr,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
     action rewrite_dst(bit<48> dst) {
         hdr.ethernet.dst = dst;
@@ -427,7 +427,7 @@ control resolver(
 control router(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
     action drop() { }
 
@@ -476,7 +476,7 @@ control router(
 
 control mac_rewrite(
     inout headers_t hdr,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
 
     action rewrite(bit<48> mac) {
@@ -498,7 +498,7 @@ control mac_rewrite(
 control proxy_arp(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
     action proxy_arp_reply(bit<48> mac) {
         egress.port = ingress.port;
@@ -531,7 +531,7 @@ control proxy_arp(
 control ingress(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
     local() local;
     router() router;
@@ -664,7 +664,7 @@ control ingress(
 control egress(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
 
 }

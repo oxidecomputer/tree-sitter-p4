@@ -184,18 +184,19 @@ extern void log_msg(string msg);
       (number
         (decimal)))
     name: (method_identifier)
-    (parameter
-      (direction)
-      type: (bit_type
-        (number
-          (decimal)))
-      name: (identifier))
-    (parameter
-      (direction)
-      type: (bit_type
-        (number
-          (decimal)))
-      name: (identifier))
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (bit_type
+          (number
+            (decimal)))
+        name: (identifier))
+      (parameter
+        (direction)
+        type: (bit_type
+          (number
+            (decimal)))
+        name: (identifier)))
     body: (block
       (return_statement
         value: (conditional_expression
@@ -209,19 +210,21 @@ extern void log_msg(string msg);
     name: (method_identifier)
     (type_parameters
       (type_identifier))
-    (parameter
-      (direction)
-      type: (type_identifier)
-      name: (identifier))
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
     body: (block
       (return_statement
         value: (identifier))))
   (extern_function_declaration
     type: (type_identifier)
     name: (method_identifier)
-    (parameter
-      type: (type_identifier)
-      name: (identifier))))
+    parameters: (parameter_list
+      (parameter
+        type: (type_identifier)
+        name: (identifier)))))
 
 ================================================================================
 Externs with constructors, methods, and abstract methods
@@ -245,18 +248,20 @@ extern Register<T, I> {
       (type_identifier))
     (method
       name: (method_identifier)
-      (parameter
-        type: (bit_type
-          (number
-            (decimal)))
-        name: (identifier)))
+      parameters: (parameter_list
+        (parameter
+          type: (bit_type
+            (number
+              (decimal)))
+          name: (identifier))))
     (method
       type: (type_identifier)
       name: (method_identifier)
-      (parameter
-        (direction)
-        type: (type_identifier)
-        name: (identifier)))
+      parameters: (parameter_list
+        (parameter
+          (direction)
+          type: (type_identifier)
+          name: (identifier))))
     (method
       (annotation
         (identifier)
@@ -265,21 +270,23 @@ extern Register<T, I> {
             (identifier))))
       type: (type_identifier)
       name: (method_identifier)
-      (parameter
-        (direction)
-        type: (type_identifier)
-        name: (identifier))
-      (parameter
-        (direction)
-        type: (type_identifier)
-        name: (identifier)))
+      parameters: (parameter_list
+        (parameter
+          (direction)
+          type: (type_identifier)
+          name: (identifier))
+        (parameter
+          (direction)
+          type: (type_identifier)
+          name: (identifier))))
     (method
       type: (type_identifier)
       name: (method_identifier)
-      (parameter
-        (direction)
-        type: (type_identifier)
-        name: (identifier)))))
+      parameters: (parameter_list
+        (parameter
+          (direction)
+          type: (type_identifier)
+          name: (identifier))))))
 
 ================================================================================
 Parsers, controls, and packages
@@ -301,23 +308,26 @@ Pipeline(MyParser(), MyIngress()) main;
     name: (method_identifier)
     (type_parameters
       (type_identifier))
-    (parameter
-      name: (identifier))
-    (parameter
-      (direction)
-      type: (type_identifier)
-      name: (identifier)))
+    parameters: (parameter_list
+      (parameter
+        name: (identifier))
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier))))
   (control_declaration
     name: (method_identifier)
-    (parameter
-      (direction)
-      type: (type_identifier)
-      name: (identifier))
-    (parameter
-      type: (bit_type
-        (number
-          (decimal)))
-      name: (identifier))
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
+    constructor_parameters: (parameter_list
+      (parameter
+        type: (bit_type
+          (number
+            (decimal)))
+        name: (identifier)))
     body: (control_body
       (control_body_element
         (instantiation
@@ -353,16 +363,17 @@ Pipeline(MyParser(), MyIngress()) main;
     name: (method_identifier)
     (type_parameters
       (type_identifier))
-    (parameter
-      type: (generic_type
+    parameters: (parameter_list
+      (parameter
+        type: (generic_type
+          type: (type_identifier)
+          type_arguments: (type_arguments
+            (type_argument_list
+              (type_identifier))))
+        name: (identifier))
+      (parameter
         type: (type_identifier)
-        type_arguments: (type_arguments
-          (type_argument_list
-            (type_identifier))))
-      name: (identifier))
-    (parameter
-      type: (type_identifier)
-      name: (identifier)))
+        name: (identifier))))
   (instantiation
     type: (type_identifier)
     arguments: (argument_list
@@ -399,12 +410,13 @@ parser MyParser(packet_in pkt, out headers_t hdr) {
 (source_file
   (parser_declaration
     name: (method_identifier)
-    (parameter
-      name: (identifier))
-    (parameter
-      (direction)
-      type: (type_identifier)
-      name: (identifier))
+    parameters: (parameter_list
+      (parameter
+        name: (identifier))
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
     (parser_local_element
       (instantiation
         type: (type_identifier)
@@ -492,21 +504,23 @@ package Single(Parser p);
     name: (method_identifier)
     (type_parameters
       (type_identifier))
-    (parameter
-      type: (generic_type
+    parameters: (parameter_list
+      (parameter
+        type: (generic_type
+          type: (type_identifier)
+          type_arguments: (type_arguments
+            (type_argument_list
+              (type_identifier))))
+        name: (identifier))
+      (parameter
         type: (type_identifier)
-        type_arguments: (type_arguments
-          (type_argument_list
-            (type_identifier))))
-      name: (identifier))
-    (parameter
-      type: (type_identifier)
-      name: (identifier)))
+        name: (identifier))))
   (package
     name: (method_identifier)
-    (parameter
-      type: (type_identifier)
-      name: (identifier))))
+    parameters: (parameter_list
+      (parameter
+        type: (type_identifier)
+        name: (identifier)))))
 
 ================================================================================
 Specialized generic types
@@ -535,15 +549,16 @@ control C(Checksum<bit<16>> c) {
   (extern_function_declaration
     type: (type_identifier)
     name: (method_identifier)
-    (parameter
-      type: (generic_type
-        type: (type_identifier)
-        type_arguments: (type_arguments
-          (type_argument_list
-            (bit_type
-              (number
-                (decimal))))))
-      name: (identifier)))
+    parameters: (parameter_list
+      (parameter
+        type: (generic_type
+          type: (type_identifier)
+          type_arguments: (type_arguments
+            (type_argument_list
+              (bit_type
+                (number
+                  (decimal))))))
+        name: (identifier))))
   (extern_function_declaration
     type: (generic_type
       type: (type_identifier)
@@ -554,23 +569,25 @@ control C(Checksum<bit<16>> c) {
     (type_parameters
       (type_identifier)
       (type_identifier))
-    (parameter
-      type: (type_identifier)
-      name: (identifier))
-    (parameter
-      type: (type_identifier)
-      name: (identifier)))
+    parameters: (parameter_list
+      (parameter
+        type: (type_identifier)
+        name: (identifier))
+      (parameter
+        type: (type_identifier)
+        name: (identifier))))
   (control_declaration
     name: (method_identifier)
-    (parameter
-      type: (generic_type
-        type: (type_identifier)
-        type_arguments: (type_arguments
-          (type_argument_list
-            (bit_type
-              (number
-                (decimal))))))
-      name: (identifier))
+    parameters: (parameter_list
+      (parameter
+        type: (generic_type
+          type: (type_identifier)
+          type_arguments: (type_arguments
+            (type_argument_list
+              (bit_type
+                (number
+                  (decimal))))))
+        name: (identifier)))
     body: (control_body
       (control_body_element
         (instantiation
@@ -609,20 +626,21 @@ control C(@optional in bool zeros, @name("h") inout H h) {
 (source_file
   (control_declaration
     name: (method_identifier)
-    (parameter
-      (annotation
-        (identifier))
-      (direction)
-      name: (identifier))
-    (parameter
-      (annotation
-        (identifier)
-        (annotation_body
-          (annotation_content
-            (string_literal))))
-      (direction)
-      type: (type_identifier)
-      name: (identifier))
+    parameters: (parameter_list
+      (parameter
+        (annotation
+          (identifier))
+        (direction)
+        name: (identifier))
+      (parameter
+        (annotation
+          (identifier)
+          (annotation_body
+            (annotation_content
+              (string_literal))))
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
     body: (control_body
       (control_body_element
         (table
@@ -721,6 +739,7 @@ control C() {
     name: (identifier))
   (control_declaration
     name: (method_identifier)
+    parameters: (parameter_list)
     body: (control_body
       (block
         (constant_declaration
@@ -763,9 +782,11 @@ control C() {
         (annotation_content
           (string_literal))))
     name: (method_identifier)
+    parameters: (parameter_list)
     body: (block))
   (control_declaration
     name: (method_identifier)
+    parameters: (parameter_list)
     body: (control_body
       (control_body_element
         (action
@@ -777,6 +798,7 @@ control C() {
           (annotation
             (identifier))
           name: (method_identifier)
+          parameters: (parameter_list)
           body: (block)))
       (block))))
 
@@ -794,37 +816,38 @@ package Switch<H>(Pipeline<H> p0, @optional Pipeline<H> p1, bool enable,
     name: (method_identifier)
     (type_parameters
       (type_identifier))
-    (parameter
-      type: (generic_type
-        type: (type_identifier)
-        type_arguments: (type_arguments
-          (type_argument_list
-            (type_identifier))))
-      name: (identifier))
-    (parameter
-      (annotation
-        (identifier))
-      type: (generic_type
-        type: (type_identifier)
-        type_arguments: (type_arguments
-          (type_argument_list
-            (type_identifier))))
-      name: (identifier))
-    (parameter
-      name: (identifier))
-    (parameter
-      type: (generic_type
-        type: (type_identifier)
-        type_arguments: (type_arguments
-          (type_argument_list
-            (type_identifier))))
-      name: (identifier)
-      value: (call_expression
-        function: (identifier)
-        type_arguments: (type_arguments
-          (type_argument_list
-            (type_identifier)))
-        arguments: (argument_list)))))
+    parameters: (parameter_list
+      (parameter
+        type: (generic_type
+          type: (type_identifier)
+          type_arguments: (type_arguments
+            (type_argument_list
+              (type_identifier))))
+        name: (identifier))
+      (parameter
+        (annotation
+          (identifier))
+        type: (generic_type
+          type: (type_identifier)
+          type_arguments: (type_arguments
+            (type_argument_list
+              (type_identifier))))
+        name: (identifier))
+      (parameter
+        name: (identifier))
+      (parameter
+        type: (generic_type
+          type: (type_identifier)
+          type_arguments: (type_arguments
+            (type_argument_list
+              (type_identifier))))
+        name: (identifier)
+        value: (call_expression
+          function: (identifier)
+          type_arguments: (type_arguments
+            (type_argument_list
+              (type_identifier)))
+          arguments: (argument_list))))))
 
 ================================================================================
 An annotated instantiation at the top level
@@ -929,12 +952,13 @@ parser P() {
 (source_file
   (extern_function_declaration
     name: (method_identifier)
-    (parameter
-      (direction)
-      name: (identifier))
-    (parameter
-      (direction)
-      name: (identifier)))
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        name: (identifier))
+      (parameter
+        (direction)
+        name: (identifier))))
   (typedef_declaration
     type: (tuple_type
       (type_argument_list))
@@ -953,6 +977,7 @@ parser P() {
       size: (number
         (decimal)))
     name: (method_identifier)
+    parameters: (parameter_list)
     body: (block
       (return_statement
         value: (tuple
@@ -961,6 +986,7 @@ parser P() {
               (decimal)))))))
   (parser_declaration
     name: (method_identifier)
+    parameters: (parameter_list)
     (parser_state
       name: (method_identifier)
       body: (block
@@ -1017,6 +1043,7 @@ control C() {
     name: (identifier))
   (control_declaration
     name: (method_identifier)
+    parameters: (parameter_list)
     body: (control_body
       (block
         (assignment_statement

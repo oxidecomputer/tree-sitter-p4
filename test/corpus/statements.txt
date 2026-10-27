@@ -14,27 +14,28 @@ control C() {
 
 (source_file
   (control_declaration
-    (method_identifier)
-    (control_body
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
       (block
         (assignment_statement
-          (identifier)
-          (number
+          left: (identifier)
+          right: (number
             (decimal)))
         (assignment_statement
-          (identifier)
-          (number
+          left: (identifier)
+          right: (number
             (decimal)))
         (assignment_statement
-          (slice_expression
-            (member_expression
-              (identifier)
-              (identifier))
-            (number
+          left: (slice_expression
+            value: (member_expression
+              object: (identifier)
+              member: (identifier))
+            high: (number
               (decimal))
-            (number
+            low: (number
               (decimal)))
-          (number
+          right: (number
             (decimal)))))))
 
 ================================================================================
@@ -57,6 +58,7 @@ control C() {
 (source_file
   (control_declaration
     name: (method_identifier)
+    parameters: (parameter_list)
     body: (control_body
       (block
         (for_statement
@@ -136,10 +138,11 @@ control C(inout H h) {
 (source_file
   (control_declaration
     name: (method_identifier)
-    (parameter
-      (direction)
-      type: (type_identifier)
-      name: (identifier))
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
     body: (control_body
       (block
         (switch_statement
@@ -192,6 +195,7 @@ control C() {
 (source_file
   (control_declaration
     name: (method_identifier)
+    parameters: (parameter_list)
     body: (control_body
       (block
         (assignment_statement
@@ -255,12 +259,13 @@ parser P(packet_in pkt, out H h) {
 (source_file
   (parser_declaration
     name: (method_identifier)
-    (parameter
-      name: (identifier))
-    (parameter
-      (direction)
-      type: (type_identifier)
-      name: (identifier))
+    parameters: (parameter_list
+      (parameter
+        name: (identifier))
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
     (parser_state
       name: (method_identifier)
       body: (block
@@ -337,6 +342,7 @@ control C() {
 (source_file
   (control_declaration
     name: (method_identifier)
+    parameters: (parameter_list)
     body: (control_body
       (block
         (assignment_statement

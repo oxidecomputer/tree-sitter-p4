@@ -14,28 +14,29 @@ control c() {
 
 (source_file
   (control_declaration
-    (method_identifier)
-    (control_body
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
       (block
         (assignment_statement
-          (identifier)
-          (binary_expression
-            (parenthesized_expression
+          left: (identifier)
+          right: (binary_expression
+            left: (parenthesized_expression
               (identifier))
-            (identifier)))
+            right: (identifier)))
         (assignment_statement
-          (identifier)
-          (binary_expression
-            (parenthesized_expression
+          left: (identifier)
+          right: (binary_expression
+            left: (parenthesized_expression
               (identifier))
-            (identifier)))
+            right: (identifier)))
         (assignment_statement
-          (identifier)
-          (binary_expression
-            (cast_expression
+          left: (identifier)
+          right: (binary_expression
+            left: (cast_expression
               (type_identifier)
-              (identifier))
-            (number
+              value: (identifier))
+            right: (number
               (decimal))))))))
 
 ================================================================================
@@ -52,23 +53,24 @@ control c() {
 
 (source_file
   (control_declaration
-    (method_identifier)
-    (control_body
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
       (block
         (assignment_statement
-          (identifier)
-          (slice_expression
-            (member_expression
-              (index_expression
-                (member_expression
-                  (identifier)
-                  (identifier))
-                (number
+          left: (identifier)
+          right: (slice_expression
+            value: (member_expression
+              object: (index_expression
+                object: (member_expression
+                  object: (identifier)
+                  member: (identifier))
+                index: (number
                   (decimal)))
-              (identifier))
-            (number
+              member: (identifier))
+            high: (number
               (decimal))
-            (number
+            low: (number
               (decimal))))))))
 
 ================================================================================
@@ -86,21 +88,22 @@ control c() {
 
 (source_file
   (control_declaration
-    (method_identifier)
-    (control_body
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
       (block
         (assignment_statement
-          (identifier)
-          (binary_expression
-            (unary_expression
-              (identifier))
-            (identifier)))
+          left: (identifier)
+          right: (binary_expression
+            left: (unary_expression
+              argument: (identifier))
+            right: (identifier)))
         (assignment_statement
-          (identifier)
-          (binary_expression
-            (identifier)
-            (unary_expression
-              (identifier))))))))
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (unary_expression
+              argument: (identifier))))))))
 
 ================================================================================
 Field names on declarations, statements, and expressions
@@ -118,18 +121,20 @@ control c(in bit<8> x = 1) {
 (source_file
   (control_declaration
     name: (method_identifier)
-    (parameter
-      (direction)
-      type: (bit_type
-        (number
-          (decimal)))
-      name: (identifier)
-      value: (number
-        (decimal)))
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (bit_type
+          (number
+            (decimal)))
+        name: (identifier)
+        value: (number
+          (decimal))))
     body: (control_body
       (control_body_element
         (action
           name: (method_identifier)
+          parameters: (parameter_list)
           body: (block
             (if_statement
               condition: (binary_expression
@@ -180,62 +185,63 @@ control C() {
 
 (source_file
   (control_declaration
-    (method_identifier)
-    (control_body
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
       (block
         (assignment_statement
-          (identifier)
-          (binary_expression
-            (identifier)
-            (binary_expression
-              (identifier)
-              (binary_expression
-                (identifier)
-                (binary_expression
-                  (identifier)
-                  (binary_expression
-                    (identifier)
-                    (binary_expression
-                      (identifier)
-                      (binary_expression
-                        (identifier)
-                        (binary_expression
-                          (identifier)
-                          (binary_expression
-                            (identifier)
-                            (binary_expression
-                              (identifier)
-                              (identifier))))))))))))
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (binary_expression
+              left: (identifier)
+              right: (binary_expression
+                left: (identifier)
+                right: (binary_expression
+                  left: (identifier)
+                  right: (binary_expression
+                    left: (identifier)
+                    right: (binary_expression
+                      left: (identifier)
+                      right: (binary_expression
+                        left: (identifier)
+                        right: (binary_expression
+                          left: (identifier)
+                          right: (binary_expression
+                            left: (identifier)
+                            right: (binary_expression
+                              left: (identifier)
+                              right: (identifier))))))))))))
         (assignment_statement
-          (identifier)
-          (binary_expression
-            (binary_expression
-              (binary_expression
-                (binary_expression
-                  (binary_expression
-                    (binary_expression
-                      (binary_expression
-                        (binary_expression
-                          (binary_expression
-                            (binary_expression
-                              (identifier)
-                              (identifier))
-                            (identifier))
-                          (identifier))
-                        (identifier))
-                      (identifier))
-                    (identifier))
-                  (identifier))
-                (identifier))
-              (identifier))
-            (identifier)))
+          left: (identifier)
+          right: (binary_expression
+            left: (binary_expression
+              left: (binary_expression
+                left: (binary_expression
+                  left: (binary_expression
+                    left: (binary_expression
+                      left: (binary_expression
+                        left: (binary_expression
+                          left: (binary_expression
+                            left: (binary_expression
+                              left: (identifier)
+                              right: (identifier))
+                            right: (identifier))
+                          right: (identifier))
+                        right: (identifier))
+                      right: (identifier))
+                    right: (identifier))
+                  right: (identifier))
+                right: (identifier))
+              right: (identifier))
+            right: (identifier)))
         (assignment_statement
-          (identifier)
-          (binary_expression
-            (binary_expression
-              (identifier)
-              (identifier))
-            (identifier)))))))
+          left: (identifier)
+          right: (binary_expression
+            left: (binary_expression
+              left: (identifier)
+              right: (identifier))
+            right: (identifier)))))))
 
 ================================================================================
 Named arguments and structure members
@@ -253,38 +259,39 @@ control C() {
 
 (source_file
   (instantiation
-    (type_identifier)
-    (argument_list
+    type: (type_identifier)
+    arguments: (argument_list
       (named_expression
-        (identifier)
-        (number
+        name: (identifier)
+        value: (number
           (decimal)))
       (number
         (decimal)))
-    (identifier))
+    name: (identifier))
   (control_declaration
-    (method_identifier)
-    (control_body
+    name: (method_identifier)
+    parameters: (parameter_list)
+    body: (control_body
       (block
         (call_statement
           (call_expression
-            (identifier)
-            (argument_list
+            function: (identifier)
+            arguments: (argument_list
               (named_expression
-                (identifier)
-                (number
+                name: (identifier)
+                value: (number
                   (decimal)))
               (identifier))))
         (assignment_statement
-          (identifier)
-          (tuple
+          left: (identifier)
+          right: (tuple
             (named_expression
-              (identifier)
-              (number
+              name: (identifier)
+              value: (number
                 (decimal)))
             (named_expression
-              (identifier)
-              (number
+              name: (identifier)
+              value: (number
                 (decimal)))))))))
 
 ================================================================================
@@ -304,10 +311,11 @@ parser P() {
 
 (source_file
   (parser_declaration
-    (method_identifier)
+    name: (method_identifier)
+    parameters: (parameter_list)
     (parser_state
-      (method_identifier)
-      (block
+      name: (method_identifier)
+      body: (block
         (transition_statement
           (select_expression
             (expression_list
@@ -319,9 +327,9 @@ parser P() {
                     (number
                       (hex))
                     (binary_expression
-                      (number
+                      left: (number
                         (hex))
-                      (number
+                      right: (number
                         (decimal))))))
               (identifier))
             (select_case
@@ -349,10 +357,11 @@ control C(inout H h) {
 (source_file
   (control_declaration
     name: (method_identifier)
-    (parameter
-      (direction)
-      type: (type_identifier)
-      name: (identifier))
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
     body: (control_body
       (control_body_element
         (instantiation
@@ -363,6 +372,7 @@ control C(inout H h) {
             (function_declaration
               type: (type_identifier)
               name: (method_identifier)
+              parameters: (parameter_list)
               body: (block
                 (call_statement
                   (call_expression
@@ -419,10 +429,11 @@ control C(inout H h) {
 (source_file
   (control_declaration
     name: (method_identifier)
-    (parameter
-      (direction)
-      type: (type_identifier)
-      name: (identifier))
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
     body: (control_body
       (block
         (assignment_statement
@@ -502,11 +513,12 @@ control c(in .e a) {
     name: (identifier))
   (control_declaration
     name: (method_identifier)
-    (parameter
-      (direction)
-      type: (prefixed_identifier
-        (type_identifier))
-      name: (identifier))
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (prefixed_identifier
+          (type_identifier))
+        name: (identifier)))
     body: (control_body
       (control_body_element
         (table
@@ -557,6 +569,7 @@ control C() {
 (source_file
   (control_declaration
     name: (method_identifier)
+    parameters: (parameter_list)
     body: (control_body
       (block
         (call_statement

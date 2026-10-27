@@ -29,6 +29,7 @@
   (method)
   (object_initializer)
   (package)
+  (parameter_list)
   (parenthesized_expression)
   (parser_declaration)
   (select_expression)

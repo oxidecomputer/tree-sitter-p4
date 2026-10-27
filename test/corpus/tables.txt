@@ -26,19 +26,21 @@ control C(inout H h) {
 (source_file
   (control_declaration
     name: (method_identifier)
-    (parameter
-      (direction)
-      type: (type_identifier)
-      name: (identifier))
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
     body: (control_body
       (control_body_element
         (action
           name: (method_identifier)
-          (parameter
-            type: (bit_type
-              (number
-                (decimal)))
-            name: (identifier))
+          parameters: (parameter_list
+            (parameter
+              type: (bit_type
+                (number
+                  (decimal)))
+              name: (identifier)))
           body: (block
             (assignment_statement
               left: (member_expression
@@ -48,6 +50,7 @@ control C(inout H h) {
       (control_body_element
         (action
           name: (method_identifier)
+          parameters: (parameter_list)
           body: (block)))
       (control_body_element
         (table
@@ -123,10 +126,11 @@ control C(inout H h) {
 (source_file
   (control_declaration
     name: (method_identifier)
-    (parameter
-      (direction)
-      type: (type_identifier)
-      name: (identifier))
+    parameters: (parameter_list
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
     body: (control_body
       (control_body_element
         (table

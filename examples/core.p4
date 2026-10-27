@@ -34,7 +34,7 @@ control Selected(inout headers hdr) {
 // Generic declarations with several type parameters.
 parser GenericParser<H, M>(packet_in b, out H hdr, inout M meta);
 control GenericControl<H, M>(inout H hdr, inout M meta);
-package GenericSwitch<IH, IM>(GenericParser<IH, IM> p, GenericControl<IH, IM> c,);
+package GenericSwitch<IH, IM>(GenericParser<IH, IM> p, GenericControl<IH, IM> c);
 GenericSwitch<h_t, m_t>(GenericParser(), GenericControl()) generic;
 extern GenericRegister<T, I> {
     GenericRegister(bit<32> size);

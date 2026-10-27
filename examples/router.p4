@@ -59,7 +59,7 @@ header ipv6_t {
 parser parse(
     packet_in pkt,
     out headers_t headers,
-    inout ingress_metadata_t ingress,
+    inout ingress_metadata_t ingress
 ){
     state start {
         pkt.extract(headers.ethernet);
@@ -71,7 +71,7 @@ parser parse(
 control ingress(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
 
     action drop() { }
@@ -113,7 +113,7 @@ control ingress(
 control egress(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
 
 }

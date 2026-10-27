@@ -22,17 +22,17 @@ parser NpuParser<H>(
 control NpuIngress<H>(
     inout H hdr,
     inout ingress_metadata_t ingress_meta,
-    inout egress_metadata_t egress_meta,
+    inout egress_metadata_t egress_meta
 );
 
 control NpuEgress<H>(
     inout H hdr,
     inout ingress_metadata_t ingress_meta,
-    inout egress_metadata_t egress_meta,
+    inout egress_metadata_t egress_meta
 );
 
 package SoftNPU<H>(
     NpuParser<H> p,
     NpuIngress<H> ingress,
-    NpuEgress<H> ingress,
+    NpuEgress<H> ingress
 );

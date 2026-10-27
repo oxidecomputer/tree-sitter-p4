@@ -9,7 +9,7 @@ SoftNPU(
 
 parser bump_parser(
     packet_in packet,
-    out headers_t hdr,
+    out headers_t hdr
 ) {
 
     //
@@ -41,7 +41,7 @@ parser bump_parser(
 control bump_ingress(
     inout headers_t hdr,
     inout egress_metadata_t ingress_meta,
-    inout egress_metadata_t egress_meta,
+    inout egress_metadata_t egress_meta
 ) {
 
     action bump_action(bit<8> port) {
@@ -68,7 +68,7 @@ control bump_ingress(
 control bump_egress(
     inout headers_t hdr,
     in egress_metadata_t ingress_meta,
-    inout egress_metadata_t egress_meta,
+    inout egress_metadata_t egress_meta
 ) {
 
     apply { }
@@ -77,7 +77,7 @@ control bump_egress(
 
 control bump_deparser(
     packet_out packet,
-    in headers_t hdr,
+    in headers_t hdr
 ) {
 
     apply {

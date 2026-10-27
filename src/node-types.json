@@ -282,6 +282,16 @@
             "named": true
           }
         ]
+      },
+      "parameters": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "parameter_list",
+            "named": true
+          }
+        ]
       }
     },
     "children": {
@@ -290,10 +300,6 @@
       "types": [
         {
           "type": "annotation",
-          "named": true
-        },
-        {
-          "type": "parameter",
           "named": true
         }
       ]
@@ -1124,12 +1130,32 @@
           }
         ]
       },
+      "constructor_parameters": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "parameter_list",
+            "named": true
+          }
+        ]
+      },
       "name": {
         "multiple": false,
         "required": true,
         "types": [
           {
             "type": "method_identifier",
+            "named": true
+          }
+        ]
+      },
+      "parameters": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "parameter_list",
             "named": true
           }
         ]
@@ -1141,10 +1167,6 @@
       "types": [
         {
           "type": "annotation",
-          "named": true
-        },
-        {
-          "type": "parameter",
           "named": true
         },
         {
@@ -1415,6 +1437,16 @@
           }
         ]
       },
+      "parameters": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "parameter_list",
+            "named": true
+          }
+        ]
+      },
       "type": {
         "multiple": false,
         "required": true,
@@ -1476,10 +1508,6 @@
       "types": [
         {
           "type": "annotation",
-          "named": true
-        },
-        {
-          "type": "parameter",
           "named": true
         },
         {
@@ -1783,6 +1811,16 @@
           }
         ]
       },
+      "parameters": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "parameter_list",
+            "named": true
+          }
+        ]
+      },
       "type": {
         "multiple": false,
         "required": true,
@@ -1864,10 +1902,6 @@
       "types": [
         {
           "type": "annotation",
-          "named": true
-        },
-        {
-          "type": "parameter",
           "named": true
         },
         {
@@ -2415,6 +2449,16 @@
           }
         ]
       },
+      "parameters": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "parameter_list",
+            "named": true
+          }
+        ]
+      },
       "type": {
         "multiple": false,
         "required": false,
@@ -2496,10 +2540,6 @@
       "types": [
         {
           "type": "annotation",
-          "named": true
-        },
-        {
-          "type": "parameter",
           "named": true
         },
         {
@@ -2614,6 +2654,16 @@
             "named": true
           }
         ]
+      },
+      "parameters": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "parameter_list",
+            "named": true
+          }
+        ]
       }
     },
     "children": {
@@ -2622,10 +2672,6 @@
       "types": [
         {
           "type": "annotation",
-          "named": true
-        },
-        {
-          "type": "parameter",
           "named": true
         },
         {
@@ -2651,7 +2697,7 @@
       },
       "type": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "array_type",
@@ -2750,6 +2796,21 @@
     }
   },
   {
+    "type": "parameter_list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "parameter",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "parenthesized_expression",
     "named": true,
     "fields": {},
@@ -2768,12 +2829,32 @@
     "type": "parser_declaration",
     "named": true,
     "fields": {
+      "constructor_parameters": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "parameter_list",
+            "named": true
+          }
+        ]
+      },
       "name": {
         "multiple": false,
         "required": true,
         "types": [
           {
             "type": "method_identifier",
+            "named": true
+          }
+        ]
+      },
+      "parameters": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "parameter_list",
             "named": true
           }
         ]
@@ -2785,10 +2866,6 @@
       "types": [
         {
           "type": "annotation",
-          "named": true
-        },
-        {
-          "type": "parameter",
           "named": true
         },
         {

@@ -51,7 +51,7 @@ struct headers_t {
 parser parse(
     packet_in pkt,
     out headers_t hdr,
-    inout ingress_metadata_t ingress,
+    inout ingress_metadata_t ingress
 ){
     state start {
         pkt.extract(hdr.ethernet);
@@ -187,7 +187,7 @@ parser parse(
 control ingress(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
 
     apply {
@@ -239,7 +239,7 @@ control ingress(
 control egress(
     inout headers_t hdr,
     inout ingress_metadata_t ingress,
-    inout egress_metadata_t egress,
+    inout egress_metadata_t egress
 ) {
 
 }

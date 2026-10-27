@@ -46,8 +46,11 @@
 (struct_declaration
   (field)* @class.inside) @class.around
 
-; Parameters and arguments. A parameter takes in its trailing comma.
-(parameter) @parameter.inside @parameter.around
+; Parameters and arguments, each taking in its trailing comma.
+(parameter_list
+  ((parameter) @parameter.inside
+    .
+    ","? @parameter.around) @parameter.around)
 
 (argument_list
   ((_expression) @parameter.inside

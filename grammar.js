@@ -172,9 +172,7 @@ module.exports = grammar({
         "package",
         field("name", $._method_identifier),
         optional($.type_parameters),
-        "(",
-        repeat($.parameter),
-        ")",
+        field("parameters", $.parameter_list),
         ";",
       ),
 
@@ -202,9 +200,7 @@ module.exports = grammar({
         field("type", $._type_ref),
         field("name", $._method_identifier),
         optional($.type_parameters),
-        "(",
-        repeat($.parameter),
-        ")",
+        field("parameters", $.parameter_list),
         field("body", $.block),
       ),
 
@@ -352,9 +348,7 @@ module.exports = grammar({
         ),
         field("name", $._method_identifier),
         optional($.type_parameters),
-        "(",
-        repeat($.parameter),
-        ")",
+        field("parameters", $.parameter_list),
         ";",
       ),
 
@@ -365,9 +359,7 @@ module.exports = grammar({
           "parser",
           field("name", $._method_identifier),
           optional($.type_parameters),
-          "(",
-          repeat($.parameter),
-          ")",
+          field("parameters", $.parameter_list),
           ";",
         ),
         seq(
@@ -375,11 +367,9 @@ module.exports = grammar({
           "parser",
           field("name", $._method_identifier),
           optional($.type_parameters),
-          "(",
-          repeat($.parameter),
-          ")",
+          field("parameters", $.parameter_list),
           // Constructor parameters, as for a control.
-          optional(seq("(", repeat($.parameter), ")")),
+          optional(field("constructor_parameters", $.parameter_list)),
           "{",
           repeat1(choice($.parser_local_element, $.parser_state)),
           "}",
@@ -403,9 +393,7 @@ module.exports = grammar({
           "control",
           field("name", $._method_identifier),
           optional($.type_parameters),
-          "(",
-          repeat($.parameter),
-          ")",
+          field("parameters", $.parameter_list),
           ";",
         ),
         seq(
@@ -413,11 +401,9 @@ module.exports = grammar({
           "control",
           field("name", $._method_identifier),
           optional($.type_parameters),
-          "(",
-          repeat($.parameter),
-          ")",
+          field("parameters", $.parameter_list),
           // Constructor parameters, as in `control C(...)(bit<32> size)`.
-          optional(seq("(", repeat($.parameter), ")")),
+          optional(field("constructor_parameters", $.parameter_list)),
           "{",
           optional(field("body", $.control_body)),
           "}",
@@ -806,9 +792,7 @@ module.exports = grammar({
         repeat($.annotation),
         "action",
         field("name", $._method_identifier),
-        "(",
-        repeat($.parameter),
-        ")",
+        field("parameters", $.parameter_list),
         field("body", $.block),
       ),
 
@@ -1130,41 +1114,23 @@ module.exports = grammar({
         optional(field("type", $._type_ref)),
         field("name", $._method_identifier),
         optional($.type_parameters),
-        "(",
-        repeat($.parameter),
-        ")",
+        field("parameters", $.parameter_list),
         ";",
       ),
 
-    // Annotated as in `@optional in bool zeros`.
+    // `(in bit<8> x, out bool y)`. Unlike an argument list, it takes no
+    // trailing comma.
+    parameter_list: ($) => seq("(", optional(commaSep1($.parameter)), ")"),
+
+    // Annotated as in `@optional in bool zeros`, and with a default value
+    // as a constructor parameter may be, as in `bit<32> size = 1024`.
     parameter: ($) =>
-      choice(
-        seq(
-          repeat($.annotation),
-          $.direction,
-          field("name", $.identifier),
-          optional(","),
-        ),
-        seq(
-          repeat($.annotation),
-          $.direction,
-          optional("("),
-          field("type", $._type_ref),
-          optional(")"),
-          field("name", $.identifier),
-          // A default value, as for a constructor parameter.
-          optional(seq("=", field("value", $._expression))),
-          optional(","),
-        ),
-        seq(
-          repeat($.annotation),
-          optional("("),
-          field("type", $._type_ref),
-          optional(")"),
-          field("name", $.identifier),
-          optional(seq("=", field("value", $._expression))),
-          optional(","),
-        ),
+      seq(
+        repeat($.annotation),
+        optional($.direction),
+        field("type", $._type_ref),
+        field("name", $.identifier),
+        optional(seq("=", field("value", $._expression))),
       ),
 
     direction: (_) => choice("in", "out", "inout"),

@@ -23,6 +23,7 @@
   (method)
   (object_initializer)
   (package)
+  (parameter_list)
   (parser_declaration)
   (select_expression)
   (struct_declaration)
