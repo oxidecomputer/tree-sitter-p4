@@ -689,3 +689,42 @@ control C() {
             right: (tuple))
           consequence: (block))
         (block)))))
+
+================================================================================
+Annotated actions, in a control and at the top level
+================================================================================
+
+@name("drop")
+action drop() { }
+control C() {
+    @name(".fwd") @hidden
+    action fwd() { }
+    apply { }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (action
+    (annotation
+      (identifier)
+      (annotation_body
+        (annotation_content
+          (string_literal))))
+    name: (method_identifier)
+    body: (block))
+  (control_declaration
+    name: (method_identifier)
+    body: (control_body
+      (control_body_element
+        (action
+          (annotation
+            (identifier)
+            (annotation_body
+              (annotation_content
+                (string_literal))))
+          (annotation
+            (identifier))
+          name: (method_identifier)
+          body: (block)))
+      (block))))

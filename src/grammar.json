@@ -1249,20 +1249,8 @@
           ]
         },
         {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "REPEAT",
-              "content": {
-                "type": "SYMBOL",
-                "name": "annotation"
-              }
-            },
-            {
-              "type": "SYMBOL",
-              "name": "action"
-            }
-          ]
+          "type": "SYMBOL",
+          "name": "action"
         },
         {
           "type": "SYMBOL",
@@ -2528,6 +2516,13 @@
     "action": {
       "type": "SEQ",
       "members": [
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "annotation"
+          }
+        },
         {
           "type": "STRING",
           "value": "action"

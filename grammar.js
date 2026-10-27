@@ -381,7 +381,7 @@ module.exports = grammar({
           choice($.variable_declaration, $.instantiation),
         ),
         seq(repeat($.annotation), $.table),
-        seq(repeat($.annotation), $.action),
+        $.action,
         $.constant_declaration,
         alias($._macro_declaration, $.macro_invocation),
         $._macro_use,
@@ -648,8 +648,11 @@ module.exports = grammar({
         field("right", $._expression),
       ),
 
+    // Annotated as in `@name("forward") action forward(...)`, which may also
+    // stand among the declarations at the top level.
     action: ($) =>
       seq(
+        repeat($.annotation),
         "action",
         field("name", $._method_identifier),
         "(",
