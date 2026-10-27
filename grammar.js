@@ -87,7 +87,12 @@ module.exports = grammar({
   inline: ($) => [$._prefixable_type_identifier],
 
   // Hidden rules that queries may still name, as in `(_declaration)`.
-  supertypes: ($) => [$._declaration, $._statement, $._expression],
+  supertypes: ($) => [
+    $._declaration,
+    $._statement,
+    $._parser_statement,
+    $._expression,
+  ],
 
   precedences: ($) => [
     [$.bit_type, $._type],
@@ -105,6 +110,7 @@ module.exports = grammar({
   // both readings until the next token settles it.
   conflicts: ($) => [
     [$.block, $.tuple],
+    [$._parser_block, $.tuple],
     [$.type_parameters, $._type_ref],
     [$.call_expression, $._expression, $._type_identifier],
     [$._macro_declaration, $._type_identifier],
@@ -535,13 +541,44 @@ module.exports = grammar({
     match_kind: ($) =>
       choice("range", "exact", "ternary", "lpm", "optional", $.identifier),
 
+    // A state's statements are those of parserStatement in the P4-16
+    // grammar, and only the last may be a transition: not a `return` or
+    // `switch` at the top of the state, and not a transition inside an `if`,
+    // which p4c rejects too. The body is a `block`, as other bodies are.
     parser_state: ($) =>
       seq(
         repeat($.annotation),
         "state",
         field("name", $._method_identifier),
-        field("body", $.block),
+        field("body", alias($._state_body, $.block)),
       ),
+
+    _state_body: ($) =>
+      seq(
+        "{",
+        repeat($._parser_statement),
+        // One, but the directives are extras, so `#if ... transition a;
+        // #else transition b; #endif` reaches the parser as two.
+        repeat($.transition_statement),
+        "}",
+      ),
+
+    _parser_statement: ($) =>
+      choice(
+        alias($._parser_block, $.block),
+        $.if_statement,
+        $.variable_declaration,
+        $.constant_declaration,
+        $.assignment_statement,
+        $.call_statement,
+        prec(-1, alias($.call_expression, $.macro_invocation)),
+        $.empty_statement,
+      ),
+
+    // A block among a state's statements, which takes the same statements
+    // but a transition.
+    _parser_block: ($) =>
+      seq(repeat($.annotation), "{", repeat($._parser_statement), "}"),
 
     _statement: ($) =>
       choice(
@@ -551,7 +588,6 @@ module.exports = grammar({
         $.action,
         $.variable_declaration,
         $.assignment_statement,
-        $.transition_statement,
         $.call_statement,
         // A macro invocation: a call without its semicolon. Yields to a
         // longer expression, as in `F(a)(b);`.

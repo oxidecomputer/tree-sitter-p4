@@ -21,13 +21,11 @@ parser parse(
 ){
     state start {
         pkt.extract(hdr.ethernet);
-        if (hdr.ethernet.ether_type == 16w0x0800) {
-            transition ipv4;
+        transition select(hdr.ethernet.ether_type) {
+            16w0x0800: ipv4;
+            16w0x86dd: ipv6;
+            default: reject;
         }
-        if (hdr.ethernet.ether_type == 16w0x86dd) {
-            transition ipv6;
-        }
-        transition reject;
     }
 
     state ipv4 {

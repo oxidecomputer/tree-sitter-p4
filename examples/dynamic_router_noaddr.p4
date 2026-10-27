@@ -21,21 +21,19 @@ parser parse(
 ){
     state start {
         pkt.extract(headers.ethernet);
-        if (headers.ethernet.ether_type == 16w0x86dd) {
-            transition ipv6;
+        transition select(headers.ethernet.ether_type) {
+            16w0x86dd: ipv6;
+            16w0x0901: sidecar;
+            default: reject;
         }
-        if (headers.ethernet.ether_type == 16w0x0901) {
-            transition sidecar;
-        }
-        transition reject;
     }
 
     state sidecar {
         pkt.extract(headers.sidecar);
-        if (headers.sidecar.sc_ether_type == 16w0x86dd) {
-            transition ipv6;
+        transition select(headers.sidecar.sc_ether_type) {
+            16w0x86dd: ipv6;
+            default: reject;
         }
-        transition reject;
     }
 
     state ipv6 {

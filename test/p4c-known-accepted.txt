@@ -17,11 +17,6 @@ testdata/p4_16_errors/type-in-expr-lex1.p4
 testdata/p4_16_errors/expr-call-on-type-with-arguments.p4
 testdata/p4_16_errors/issue5437_table.p4
 
-# A statement where P4-16 does not allow it: `return` in a parser state.
-# Parsers, controls, and functions share one set of statements here, since
-# x4c programs, such as those in examples/, put `transition` inside `if`.
-testdata/p4_16_errors/stmt-return-from-unsupported-scope.p4
-
 # An annotation P4-16 allows, `@pkginfo` without a body, which p4c rejects
 # when it checks the bodies of the annotations it knows.
 testdata/p4_16_errors/annotation.p4

@@ -160,6 +160,44 @@
     ]
   },
   {
+    "type": "_parser_statement",
+    "named": true,
+    "subtypes": [
+      {
+        "type": "assignment_statement",
+        "named": true
+      },
+      {
+        "type": "block",
+        "named": true
+      },
+      {
+        "type": "call_statement",
+        "named": true
+      },
+      {
+        "type": "constant_declaration",
+        "named": true
+      },
+      {
+        "type": "empty_statement",
+        "named": true
+      },
+      {
+        "type": "if_statement",
+        "named": true
+      },
+      {
+        "type": "macro_invocation",
+        "named": true
+      },
+      {
+        "type": "variable_declaration",
+        "named": true
+      }
+    ]
+  },
+  {
     "type": "_statement",
     "named": true,
     "subtypes": [
@@ -217,10 +255,6 @@
       },
       {
         "type": "switch_statement",
-        "named": true
-      },
-      {
-        "type": "transition_statement",
         "named": true
       },
       {
@@ -734,11 +768,19 @@
       "required": false,
       "types": [
         {
+          "type": "_parser_statement",
+          "named": true
+        },
+        {
           "type": "_statement",
           "named": true
         },
         {
           "type": "annotation",
+          "named": true
+        },
+        {
+          "type": "transition_statement",
           "named": true
         }
       ]

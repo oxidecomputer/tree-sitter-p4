@@ -223,3 +223,96 @@ control C() {
             arguments: (argument_list
               (number
                 (decimal)))))))))
+
+================================================================================
+A parser state's statements, and a transition in each branch of an #if
+================================================================================
+
+parser P(packet_in pkt, out H h) {
+    state start {
+        bit<8> n = 0;
+        {
+            pkt.extract(h.a);
+        }
+        if (h.a.isValid()) {
+            n = 1;
+        } else {
+            exit;
+        }
+#ifdef FAST
+        transition accept;
+#else
+        transition select(n) {
+            1: next;
+            default: reject;
+        }
+#endif
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (parser_declaration
+    name: (method_identifier)
+    (parameter
+      name: (identifier))
+    (parameter
+      (direction)
+      type: (type_identifier)
+      name: (identifier))
+    (parser_state
+      name: (method_identifier)
+      body: (block
+        (variable_declaration
+          type: (bit_type
+            (number
+              (decimal)))
+          name: (identifier)
+          value: (number
+            (decimal)))
+        (block
+          (call_statement
+            (call_expression
+              function: (member_expression
+                object: (identifier)
+                member: (identifier))
+              arguments: (argument_list
+                (member_expression
+                  object: (identifier)
+                  member: (identifier))))))
+        (if_statement
+          condition: (call_expression
+            function: (member_expression
+              object: (member_expression
+                object: (identifier)
+                member: (identifier))
+              member: (identifier))
+            arguments: (argument_list))
+          consequence: (block
+            (assignment_statement
+              left: (identifier)
+              right: (number
+                (decimal))))
+          alternative: (block
+            (exit_statement)))
+        (preproc
+          (identifier_preproc))
+        (transition_statement
+          (identifier))
+        (preproc)
+        (transition_statement
+          (select_expression
+            (expression_list
+              (identifier))
+            (select_case
+              (keyset_expression
+                (simple_keyset_expression
+                  (number
+                    (decimal))))
+              (identifier))
+            (select_case
+              (keyset_expression
+                (simple_keyset_expression))
+              (identifier))))
+        (preproc)))))

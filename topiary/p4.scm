@@ -89,14 +89,24 @@
   (comment)* @do_nothing
 )
 
-; Statements of a block, each on a line of its own. A branch of a conditional
-; is a statement too, but is not matched here, which keeps `} else {` together.
+; Statements of a block, each on a line of its own, and of a parser state,
+; whose statements are a set of their own and end in transitions. A branch of a
+; conditional is a statement too, but is not matched here, which keeps
+; `} else {` together.
 (block
-  (_statement) @allow_blank_line_before
+  [
+    (_statement)
+    (_parser_statement)
+    (transition_statement)
+  ] @allow_blank_line_before
 )
 
 (block
-  (_statement) @append_spaced_softline
+  [
+    (_statement)
+    (_parser_statement)
+    (transition_statement)
+  ] @append_spaced_softline
   .
   (comment)* @do_nothing
 )

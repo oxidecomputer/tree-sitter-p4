@@ -55,30 +55,22 @@ parser parse(
 ){
     state start {
         pkt.extract(hdr.ethernet);
-        if (hdr.ethernet.ether_type == 16w0x0800) {
-            transition ipv4;
+        transition select(hdr.ethernet.ether_type) {
+            16w0x0800: ipv4;
+            16w0x86dd: ipv6;
+            16w0x0901: sidecar;
+            16w0x0806: arp;
+            default: reject;
         }
-        if (hdr.ethernet.ether_type == 16w0x86dd) {
-            transition ipv6;
-        }
-        if (hdr.ethernet.ether_type == 16w0x0901) {
-            transition sidecar;
-        }
-        if (hdr.ethernet.ether_type == 16w0x0806) {
-            transition arp;
-        }
-        transition reject;
     }
 
     state sidecar {
         pkt.extract(hdr.sidecar);
-        if (hdr.sidecar.sc_ether_type == 16w0x86dd) {
-            transition ipv6;
+        transition select(hdr.sidecar.sc_ether_type) {
+            16w0x86dd: ipv6;
+            16w0x0800: ipv4;
+            default: reject;
         }
-        if (hdr.sidecar.sc_ether_type == 16w0x0800) {
-            transition ipv4;
-        }
-        transition reject;
     }
 
     state arp {
@@ -88,19 +80,13 @@ parser parse(
 
     state ipv6 {
         pkt.extract(hdr.ipv6);
-        if (hdr.ipv6.next_hdr == 8w0xdd) {
-            transition ddm;
+        transition select(hdr.ipv6.next_hdr) {
+            8w0xdd: ddm;
+            8w58: icmp;
+            8w17: udp;
+            8w6: tcp;
+            default: accept;
         }
-        if (hdr.ipv6.next_hdr == 8w58) {
-            transition icmp;
-        }
-        if (hdr.ipv6.next_hdr == 8w17) {
-            transition udp;
-        }
-        if (hdr.ipv6.next_hdr == 8w6) {
-            transition tcp;
-        }
-        transition accept;
     }
 
     state ddm {
@@ -132,22 +118,20 @@ parser parse(
 
     state ipv4 {
         pkt.extract(hdr.ipv4);
-        if (hdr.ipv4.protocol == 8w17) {
-            transition udp;
+        transition select(hdr.ipv4.protocol) {
+            8w17: udp;
+            8w6: tcp;
+            default: accept;
         }
-        if (hdr.ipv4.protocol == 8w6) {
-            transition tcp;
-        }
-        transition accept;
     }
 
     state udp {
         pkt.extract(hdr.udp);
         ingress.nat_id = hdr.udp.dst_port;
-        if (hdr.udp.dst_port == 16w6081) {
-            transition geneve;
+        transition select(hdr.udp.dst_port) {
+            16w6081: geneve;
+            default: accept;
         }
-        transition accept;
     }
 
     state tcp {
@@ -163,35 +147,29 @@ parser parse(
 
     state inner_eth {
         pkt.extract(hdr.inner_eth);
-        if (hdr.inner_eth.ether_type == 16w0x0800) {
-            transition inner_ipv4;
+        transition select(hdr.inner_eth.ether_type) {
+            16w0x0800: inner_ipv4;
+            16w0x86dd: inner_ipv6;
+            default: reject;
         }
-        if (hdr.inner_eth.ether_type == 16w0x86dd) {
-            transition inner_ipv6;
-        }
-        transition reject;
     }
     
     state inner_ipv4 {
         pkt.extract(hdr.inner_ipv4);
-        if (hdr.inner_ipv4.protocol == 8w17) {
-            transition inner_udp;
+        transition select(hdr.inner_ipv4.protocol) {
+            8w17: inner_udp;
+            8w6: inner_tcp;
+            default: accept;
         }
-        if (hdr.inner_ipv4.protocol == 8w6) {
-            transition inner_tcp;
-        }
-        transition accept;
     }
 
     state inner_ipv6 {
         pkt.extract(hdr.inner_ipv6);
-        if (hdr.inner_ipv6.next_hdr == 8w17) {
-            transition inner_udp;
+        transition select(hdr.inner_ipv6.next_hdr) {
+            8w17: inner_udp;
+            8w6: inner_tcp;
+            default: accept;
         }
-        if (hdr.inner_ipv6.next_hdr == 8w6) {
-            transition inner_tcp;
-        }
-        transition accept;
     }
 
     state inner_udp {
