@@ -191,6 +191,7 @@
   "default_action"
   "key"
   "meters"
+  "priority"
   "size"
   "state"
 ] @keyword

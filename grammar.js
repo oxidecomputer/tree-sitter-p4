@@ -422,15 +422,7 @@ module.exports = grammar({
           "=",
           "{",
           // Possibly empty, as when the entries come from an `#include`.
-          repeat(
-            seq(
-              $.keyset_expression,
-              ":",
-              repeat($.annotation),
-              $.action_item,
-              ";",
-            ),
-          ),
+          repeat($.entry),
           "}",
         ),
         seq(optional("const"), "default_action", "=", $.action_item, ";"),
@@ -451,6 +443,27 @@ module.exports = grammar({
       ),
 
     // `NoAction` is an ordinary action, which core.p4 declares.
+    // An entry of a table, which may be marked `const` in a mutable list,
+    // and given a priority, as in `priority=10: 0x0800 : forward();`.
+    entry: ($) =>
+      seq(
+        optional("const"),
+        optional(
+          seq(
+            "priority",
+            "=",
+            field("priority", choice($.number, $.parenthesized_expression)),
+            ":",
+          ),
+        ),
+        $.keyset_expression,
+        ":",
+        repeat($.annotation),
+        $.action_item,
+        repeat($.annotation),
+        ";",
+      ),
+
     action_item: ($) => choice($.method_identifier, $.call),
 
     // The standard match kinds, or one an architecture declares with

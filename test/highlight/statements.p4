@@ -52,6 +52,8 @@ control C(inout headers_t hdr, in bit<9> port) {
         idle_timeout = true;
 //                     ^ constant.builtin.boolean
         const entries = {
+            priority=1: 0x0806 : forward(2);
+//          ^ keyword
             0x0800 mask 0xFF00: forward(1);
 //                 ^ keyword.operator
 //                              ^ function

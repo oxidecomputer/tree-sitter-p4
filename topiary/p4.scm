@@ -32,6 +32,12 @@
   (annotation)
 )
 
+(entry
+  (action_item) @append_space
+  .
+  (annotation)
+)
+
 ; A directive has to begin a line. As an extra it may follow any token, such as
 ; the brace before `#endif` that closes an apply block inside `#if`.
 (preproc) @prepend_hardline
@@ -176,6 +182,13 @@
 (table_element
   "{"
   ";" @append_spaced_softline
+  .
+  (comment)* @do_nothing
+)
+
+; Each entry of an entry list.
+(table_element
+  (entry) @append_spaced_softline
   .
   (comment)* @do_nothing
 )
@@ -396,6 +409,7 @@
 ; A colon separates a key from its match kind, or an entry from its action. In
 ; a bit slice it separates the bounds of a range and takes no space.
 [
+  (entry ":" @prepend_antispace @append_space)
   (select_case ":" @prepend_antispace @append_space)
   (switch_case ":" @prepend_antispace @append_space)
   (table_element ":" @prepend_antispace @append_space)

@@ -843,6 +843,44 @@
     "fields": {}
   },
   {
+    "type": "entry",
+    "named": true,
+    "fields": {
+      "priority": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "action_item",
+          "named": true
+        },
+        {
+          "type": "annotation",
+          "named": true
+        },
+        {
+          "type": "keyset_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "error_declaration",
     "named": true,
     "fields": {},
@@ -2250,15 +2288,15 @@
           "named": true
         },
         {
+          "type": "entry",
+          "named": true
+        },
+        {
           "type": "identifier",
           "named": true
         },
         {
           "type": "key_type",
-          "named": true
-        },
-        {
-          "type": "keyset_expression",
           "named": true
         },
         {
@@ -3057,6 +3095,10 @@
   {
     "type": "preproc_arg",
     "named": true
+  },
+  {
+    "type": "priority",
+    "named": false
   },
   {
     "type": "range",

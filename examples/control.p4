@@ -144,3 +144,18 @@ control keyless(inout Header_t h) {
     }
     apply { t.apply(); }
 }
+
+// Entries with priorities, some of them const.
+control prioritized(inout Header_t h) {
+    action a(bit<8> x) { }
+    table t {
+        key = { h.h.e: ternary; }
+        actions = { a; }
+        entries = {
+            const priority=10: 0x0800 &&& 0xff00 : a(1);
+            priority=(5 + 5): 0x86dd : a(2); // IPv6
+            0x0806 : a(3) @name("arp");
+        }
+    }
+    apply { t.apply(); }
+}
