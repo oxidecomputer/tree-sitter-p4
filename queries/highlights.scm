@@ -88,7 +88,10 @@
   (#any-of? @constant.builtin "accept" "reject"))
 
 (annotation
-  "@" @attribute
+  [
+    "@"
+    "@pragma"
+  ] @attribute
   (identifier) @attribute)
 
 ; Literals

@@ -1120,19 +1120,36 @@ module.exports = grammar({
 
     // A following `(` always opens the body, as in the spec's grammar.
     annotation: ($) =>
-      prec.right(seq("@", $.identifier, optional($.annotation_body))),
-
-    annotation_body: ($) =>
-      seq(
-        "(",
-        optional($.annotation_content),
-        repeat(seq(",", $.annotation_content)),
-        optional(","),
-        ")",
+      choice(
+        prec.right(seq("@", $.identifier, optional($.annotation_body))),
+        // A P4-14 style pragma, whose body runs to the end of the line, as in
+        // `@pragma deprecated "Use verify_checksum instead."`.
+        seq(
+          alias(/@pragma[ \t]+/, "@pragma"),
+          $.identifier,
+          optional(alias(token.immediate(/[ \t][^\n]*/), $.annotation_text)),
+        ),
       ),
 
+    // `@name("x")`, `@p4runtime_translation("t", bit<32>)`, or, structured,
+    // `@size[16]`.
+    annotation_body: ($) =>
+      choice(
+        seq("(", optional($._annotation_contents), ")"),
+        seq("[", optional($._annotation_contents), "]"),
+      ),
+
+    _annotation_contents: ($) =>
+      seq(commaSep1($.annotation_content), optional(",")),
+
     annotation_content: ($) =>
-      choice($._expression, /["][^"]*["]/, $.annotation),
+      choice(
+        $._expression,
+        $.named_expression,
+        $._type,
+        /["][^"]*["]/,
+        $.annotation,
+      ),
 
     comment: (_) =>
       token(

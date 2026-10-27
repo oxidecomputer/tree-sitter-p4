@@ -806,3 +806,52 @@ An annotated instantiation at the top level
         object: (identifier)
         member: (identifier)))
     name: (identifier)))
+
+================================================================================
+Annotation bodies: types, key-value pairs, brackets, and pragmas
+================================================================================
+
+@pragma deprecated "Use verify_checksum instead."
+@pkginfo(name="x", version=1)
+@p4runtime_translation("p4.org/psa/v1/PortId_t", bit<32>)
+@size[16]
+type bit<9> PortId_t;
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (typedef_declaration
+    (annotation
+      (identifier)
+      (annotation_text))
+    (annotation
+      (identifier)
+      (annotation_body
+        (annotation_content
+          (named_expression
+            name: (identifier)
+            value: (string_literal)))
+        (annotation_content
+          (named_expression
+            name: (identifier)
+            value: (number
+              (decimal))))))
+    (annotation
+      (identifier)
+      (annotation_body
+        (annotation_content
+          (string_literal))
+        (annotation_content
+          (bit_type
+            (number
+              (decimal))))))
+    (annotation
+      (identifier)
+      (annotation_body
+        (annotation_content
+          (number
+            (decimal)))))
+    type: (bit_type
+      (number
+        (decimal)))
+    name: (type_identifier)))

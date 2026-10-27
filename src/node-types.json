@@ -293,6 +293,10 @@
           "named": true
         },
         {
+          "type": "annotation_text",
+          "named": true
+        },
+        {
           "type": "identifier",
           "named": true
         }
@@ -328,6 +332,34 @@
         },
         {
           "type": "annotation",
+          "named": true
+        },
+        {
+          "type": "bit_type",
+          "named": true
+        },
+        {
+          "type": "generic_type",
+          "named": true
+        },
+        {
+          "type": "int_type",
+          "named": true
+        },
+        {
+          "type": "list_type",
+          "named": true
+        },
+        {
+          "type": "named_expression",
+          "named": true
+        },
+        {
+          "type": "tuple_type",
+          "named": true
+        },
+        {
+          "type": "varbit_type",
           "named": true
         }
       ]
@@ -3331,6 +3363,10 @@
     "named": false
   },
   {
+    "type": "@pragma",
+    "named": false
+  },
+  {
     "type": "[",
     "named": false
   },
@@ -3361,6 +3397,10 @@
   {
     "type": "actions",
     "named": false
+  },
+  {
+    "type": "annotation_text",
+    "named": true
   },
   {
     "type": "apply",
