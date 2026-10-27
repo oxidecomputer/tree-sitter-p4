@@ -107,3 +107,10 @@ control call_slices(inout H h) {
     }
     apply { }
 }
+
+// Lists of compile-time values.
+control lists(inout H h) {
+    apply {
+        list<bit<8>> l = { 1, 2 };
+    }
+}

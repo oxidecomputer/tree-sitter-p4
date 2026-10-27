@@ -302,12 +302,14 @@
   "bool"
   "error"
   "int"
+  "list"
   "packet_in"
   "packet_out"
   "varbit"
   (bit_type)
   (direction)
   (int_type)
+  (list_type)
   (tuple_type)
   (type_identifier)
   (varbit_type)
@@ -411,6 +413,7 @@
   (package "<" @prepend_antispace @append_antispace)
   (call "<" @prepend_antispace @append_antispace)
   (control_var "<" @prepend_antispace @append_antispace)
+  (list_type "<" @prepend_antispace @append_antispace)
   (tuple_type "<" @prepend_antispace @append_antispace)
   (type_parameters "<" @prepend_antispace @append_antispace)
   (varbit_type "<" @prepend_antispace @append_antispace)
@@ -423,6 +426,7 @@
   (package ">" @prepend_antispace)
   (call ">" @prepend_antispace)
   (control_var ">" @prepend_antispace)
+  (list_type ">" @prepend_antispace)
   (tuple_type ">" @prepend_antispace)
   (type_parameters ">" @prepend_antispace)
   (varbit_type ">" @prepend_antispace)

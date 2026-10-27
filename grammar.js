@@ -859,6 +859,7 @@ module.exports = grammar({
         $.int_type,
         $.varbit_type,
         $.tuple_type,
+        $.list_type,
       ),
 
     bit_type: ($) => seq("bit", "<", $._width, ">"),
@@ -869,6 +870,10 @@ module.exports = grammar({
     // expression in parentheses, as in `bit<(4 * 8)>`.
     _width: ($) => choice($.number, $.identifier, seq("(", $._expression, ")")),
     tuple_type: ($) => seq("tuple", "<", $.type_argument_list, ">"),
+
+    // A list of compile-time values of one type, as in
+    // `list<bit<8>> l = { 1, 2 };`.
+    list_type: ($) => seq("list", "<", $.type_argument_list, ">"),
 
     // The type parameters of a generic declaration, as in
     // `control C<H, M>(...)` or `extern Register<T, I> { ... }`.

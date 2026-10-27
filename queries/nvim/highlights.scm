@@ -174,6 +174,7 @@
   "bool"
   "error"
   "int"
+  "list"
   "packet_in"
   "packet_out"
   "tuple"
@@ -346,6 +347,12 @@
   ] @punctuation.bracket)
 
 (tuple_type
+  [
+    "<"
+    ">"
+  ] @punctuation.bracket)
+
+(list_type
   [
     "<"
     ">"
