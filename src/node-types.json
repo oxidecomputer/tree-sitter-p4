@@ -2012,29 +2012,6 @@
     }
   },
   {
-    "type": "method_field",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "method_identifier",
-          "named": true
-        },
-        {
-          "type": "type_argument_list",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "named_expression",
     "named": true,
     "fields": {
@@ -2150,7 +2127,7 @@
           "named": true
         },
         {
-          "type": "method_field",
+          "type": "parameter",
           "named": true
         },
         {

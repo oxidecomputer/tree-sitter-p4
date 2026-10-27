@@ -280,10 +280,7 @@
 
 ; A parameter carries its own trailing comma.
 (
-  [
-    (method_field "," @append_spaced_scoped_softline)
-    (parameter "," @append_spaced_scoped_softline)
-  ]
+  (parameter "," @append_spaced_scoped_softline)
   (#scope_id! "parameter_list")
 )
 
@@ -388,12 +385,6 @@
   "=" @prepend_space @append_space
 )
 
-; A package declaration lists the types of its arguments as method identifiers,
-; each followed by the name it binds.
-(method_field
-  (identifier) @prepend_space
-)
-
 ; An instantiation names its instance after the argument list, as in
 ; `Checksum() csum;`.
 (instantiation
@@ -450,7 +441,6 @@
 [
   (bit_type "<" @prepend_antispace @append_antispace)
   (int_type "<" @prepend_antispace @append_antispace)
-  (method_field "<" @prepend_antispace @append_antispace)
   (type_arguments "<" @prepend_antispace @append_antispace)
   (list_type "<" @prepend_antispace @append_antispace)
   (tuple_type "<" @prepend_antispace @append_antispace)
@@ -461,7 +451,6 @@
 [
   (bit_type ">" @prepend_antispace)
   (int_type ">" @prepend_antispace)
-  (method_field ">" @prepend_antispace)
   (type_arguments ">" @prepend_antispace)
   (list_type ">" @prepend_antispace)
   (tuple_type ">" @prepend_antispace)

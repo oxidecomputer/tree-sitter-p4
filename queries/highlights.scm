@@ -32,9 +32,6 @@
 (package
   (method_identifier) @type)
 
-(method_field
-  (method_identifier) @type)
-
 ; Members of a value, and the fields that declare them.
 (member_expression
   member: (identifier) @variable.other.member)
@@ -66,9 +63,6 @@
   (#match? @constant "^[A-Za-z_][A-Za-z0-9_]*$"))
 
 (parameter
-  (identifier) @variable.parameter)
-
-(method_field
   (identifier) @variable.parameter)
 
 (constant_declaration
@@ -355,12 +349,6 @@
   ] @punctuation.bracket)
 
 (type_arguments
-  [
-    "<"
-    ">"
-  ] @punctuation.bracket)
-
-(method_field
   [
     "<"
     ">"

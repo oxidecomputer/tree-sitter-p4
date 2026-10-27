@@ -49,8 +49,6 @@
 ; Parameters and arguments. A parameter takes in its trailing comma.
 (parameter) @parameter.inside @parameter.around
 
-(method_field) @parameter.inside @parameter.around
-
 (argument_list
   ((_expression) @parameter.inside
     .

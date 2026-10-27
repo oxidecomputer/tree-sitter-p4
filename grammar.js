@@ -160,7 +160,7 @@ module.exports = grammar({
         field("name", $._method_identifier),
         optional($.type_parameters),
         "(",
-        repeat($.method_field),
+        repeat($.parameter),
         ")",
         ";",
       ),
@@ -1023,16 +1023,6 @@ module.exports = grammar({
         field("name", $.identifier),
         ";",
         optional($.line_continuation),
-      ),
-
-    // A parameter of a package type, carrying its comma as a parameter does;
-    // the last takes none, as in `package P<H>(Parser<H> p, Ingress c);`.
-    method_field: ($) =>
-      seq(
-        $._method_identifier,
-        optional(seq("<", $.type_argument_list, ">")),
-        $.identifier,
-        optional(","),
       ),
 
     _type: ($) =>

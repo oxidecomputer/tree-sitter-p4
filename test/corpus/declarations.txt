@@ -305,14 +305,16 @@ Pipeline(MyParser(), MyIngress()) main;
     name: (method_identifier)
     (type_parameters
       (type_identifier))
-    (method_field
-      (method_identifier)
-      (type_argument_list
-        (type_identifier))
-      (identifier))
-    (method_field
-      (method_identifier)
-      (identifier)))
+    (parameter
+      type: (generic_type
+        type: (type_identifier)
+        type_arguments: (type_arguments
+          (type_argument_list
+            (type_identifier))))
+      name: (identifier))
+    (parameter
+      type: (type_identifier)
+      name: (identifier)))
   (instantiation
     type: (type_identifier)
     arguments: (argument_list
@@ -442,19 +444,21 @@ package Single(Parser p);
     name: (method_identifier)
     (type_parameters
       (type_identifier))
-    (method_field
-      (method_identifier)
-      (type_argument_list
-        (type_identifier))
-      (identifier))
-    (method_field
-      (method_identifier)
-      (identifier)))
+    (parameter
+      type: (generic_type
+        type: (type_identifier)
+        type_arguments: (type_arguments
+          (type_argument_list
+            (type_identifier))))
+      name: (identifier))
+    (parameter
+      type: (type_identifier)
+      name: (identifier)))
   (package
     name: (method_identifier)
-    (method_field
-      (method_identifier)
-      (identifier))))
+    (parameter
+      type: (type_identifier)
+      name: (identifier))))
 
 ================================================================================
 Specialized generic types
@@ -728,3 +732,49 @@ control C() {
           name: (method_identifier)
           body: (block)))
       (block))))
+
+================================================================================
+Package parameters with annotations, defaults, and builtin types
+================================================================================
+
+package Switch<H>(Pipeline<H> p0, @optional Pipeline<H> p1, bool enable,
+                  V<H> v = EmptyV<H>());
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (package
+    name: (method_identifier)
+    (type_parameters
+      (type_identifier))
+    (parameter
+      type: (generic_type
+        type: (type_identifier)
+        type_arguments: (type_arguments
+          (type_argument_list
+            (type_identifier))))
+      name: (identifier))
+    (parameter
+      (annotation
+        (identifier))
+      type: (generic_type
+        type: (type_identifier)
+        type_arguments: (type_arguments
+          (type_argument_list
+            (type_identifier))))
+      name: (identifier))
+    (parameter
+      name: (identifier))
+    (parameter
+      type: (generic_type
+        type: (type_identifier)
+        type_arguments: (type_arguments
+          (type_argument_list
+            (type_identifier))))
+      name: (identifier)
+      value: (call_expression
+        function: (identifier)
+        type_arguments: (type_arguments
+          (type_argument_list
+            (type_identifier)))
+        arguments: (argument_list)))))
