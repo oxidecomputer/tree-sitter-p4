@@ -20,12 +20,11 @@ testdata/p4_16_samples/psa-example-register2-bmv2.p4
 testdata/p4_16_samples/spec-issue1297-string-cat.p4
 
 # Rarely used: a parenthesized assignment target, a method of a generic
-# parser's type, a struct declared inside a typedef, and annotations
-# whose bodies are free text or span lines.
+# parser's type, and annotations whose bodies are free text or span
+# lines.
 testdata/p4_16_samples/free-form-annotation.p4
 testdata/p4_16_samples/lvalue-parens.p4
 testdata/p4_16_samples/pragma-string.p4
-testdata/p4_16_samples/spec-ex12.p4
 testdata/p4_16_samples/spec-issue1068.p4
 
 # Not P4 until preprocessed: the branches of an `#if` each hold part of one

@@ -741,22 +741,66 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "STRING",
-              "value": "typedef"
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "STRING",
+                      "value": "typedef"
+                    },
+                    {
+                      "type": "STRING",
+                      "value": "type"
+                    }
+                  ]
+                },
+                {
+                  "type": "FIELD",
+                  "name": "type",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_type_ref"
+                  }
+                }
+              ]
             },
             {
-              "type": "STRING",
-              "value": "type"
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "typedef"
+                },
+                {
+                  "type": "FIELD",
+                  "name": "type",
+                  "content": {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "header_declaration"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "header_union_declaration"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "struct_declaration"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "enum_declaration"
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           ]
-        },
-        {
-          "type": "FIELD",
-          "name": "type",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_type_ref"
-          }
         },
         {
           "type": "FIELD",

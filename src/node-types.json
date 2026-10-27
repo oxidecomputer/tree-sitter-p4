@@ -3322,11 +3322,23 @@
             "named": false
           },
           {
+            "type": "enum_declaration",
+            "named": true
+          },
+          {
             "type": "error",
             "named": false
           },
           {
             "type": "generic_type",
+            "named": true
+          },
+          {
+            "type": "header_declaration",
+            "named": true
+          },
+          {
+            "type": "header_union_declaration",
             "named": true
           },
           {
@@ -3355,6 +3367,10 @@
           },
           {
             "type": "prefixed_identifier",
+            "named": true
+          },
+          {
+            "type": "struct_declaration",
             "named": true
           },
           {

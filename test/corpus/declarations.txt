@@ -1047,3 +1047,34 @@ control C() {
                 index: (identifier)))
             right: (number
               (decimal))))))))
+
+================================================================================
+A typedef that declares the type it names
+================================================================================
+
+typedef struct Point { int<32> x; } Pt;
+typedef enum bit<2> E { A = 1 } E_t;
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (typedef_declaration
+    type: (struct_declaration
+      name: (type_identifier)
+      (field
+        type: (int_type
+          (number
+            (decimal)))
+        name: (identifier)))
+    name: (type_identifier))
+  (typedef_declaration
+    type: (enum_declaration
+      type: (bit_type
+        (number
+          (decimal)))
+      name: (type_identifier)
+      (enum_member
+        name: (identifier)
+        value: (number
+          (decimal))))
+    name: (type_identifier)))

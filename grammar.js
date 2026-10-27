@@ -278,11 +278,26 @@ module.exports = grammar({
 
     // `typedef` names a type; `type` makes a new type from it, which P4Runtime
     // treats as distinct, as in `type bit<9> PortId_t;`.
+    // A typedef may also declare the type it names, as in
+    // `typedef struct Point { int<32> x; int<32> y; } Pt;`.
     typedef_declaration: ($) =>
       seq(
         repeat($.annotation),
-        choice("typedef", "type"),
-        field("type", $._type_ref),
+        choice(
+          seq(choice("typedef", "type"), field("type", $._type_ref)),
+          seq(
+            "typedef",
+            field(
+              "type",
+              choice(
+                $.header_declaration,
+                $.header_union_declaration,
+                $.struct_declaration,
+                $.enum_declaration,
+              ),
+            ),
+          ),
+        ),
         field("name", $._type_identifier),
         ";",
       ),
