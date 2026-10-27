@@ -462,3 +462,82 @@ control C(inout H h) {
           right: (binary_expression
             left: (identifier)
             right: (identifier)))))))
+
+================================================================================
+Names with a leading dot, which refer to the top level
+================================================================================
+
+const .Version v = .Version.V1;
+.m(.p()) main;
+control c(in .e a) {
+    table t {
+        actions = { .b; }
+        default_action = .b();
+    }
+    apply {
+        .x = .f(8w3);
+        .T<bit<8>> w;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (constant_declaration
+    type: (prefixed_identifier
+      (type_identifier))
+    name: (identifier)
+    value: (member_expression
+      object: (prefixed_identifier
+        (identifier))
+      member: (identifier)))
+  (instantiation
+    type: (prefixed_identifier
+      (type_identifier))
+    arguments: (argument_list
+      (call_expression
+        function: (prefixed_identifier
+          (identifier))
+        arguments: (argument_list)))
+    name: (identifier))
+  (control_declaration
+    name: (method_identifier)
+    (parameter
+      (direction)
+      type: (prefixed_identifier
+        (type_identifier))
+      name: (identifier))
+    body: (control_body
+      (control_body_element
+        (table
+          name: (type_identifier)
+          (table_property
+            (action_item
+              (prefixed_identifier
+                (method_identifier))))
+          (table_property
+            (action_item
+              (call_expression
+                function: (prefixed_identifier
+                  (identifier))
+                arguments: (argument_list))))))
+      (block
+        (assignment_statement
+          left: (prefixed_identifier
+            (identifier))
+          right: (call_expression
+            function: (prefixed_identifier
+              (identifier))
+            arguments: (argument_list
+              (number
+                (wdecimal)))))
+        (variable_declaration
+          type: (generic_type
+            type: (prefixed_identifier
+              (type_identifier))
+            type_arguments: (type_arguments
+              (type_argument_list
+                (bit_type
+                  (number
+                    (decimal))))))
+          name: (identifier))))))

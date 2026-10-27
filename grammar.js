@@ -82,6 +82,10 @@ module.exports = grammar({
     ],
   },
 
+  // Spliced into each rule that uses them, so that they add no step of
+  // their own for the parser to choose.
+  inline: ($) => [$._prefixable_type_identifier],
+
   // Hidden rules that queries may still name, as in `(_declaration)`.
   supertypes: ($) => [$._declaration, $._statement, $._expression],
 
@@ -507,7 +511,12 @@ module.exports = grammar({
         ";",
       ),
 
-    action_item: ($) => choice($._method_identifier, $.call_expression),
+    action_item: ($) =>
+      choice(
+        $._method_identifier,
+        alias($._prefixed_method_identifier, $.prefixed_identifier),
+        $.call_expression,
+      ),
 
     // The standard match kinds, or one an architecture declares with
     // `match_kind`, such as `selector` or `atcam_partition_index`.
@@ -647,6 +656,7 @@ module.exports = grammar({
         2,
         choice(
           $.identifier,
+          $.prefixed_identifier,
           $.this,
           $.member_expression,
           $.index_expression,
@@ -859,6 +869,7 @@ module.exports = grammar({
         // Level with a type name, so that `f(a);` and `T(a) t;` stay
         // ambiguous until a later token tells them apart.
         prec(1, $.identifier),
+        $.prefixed_identifier,
         $.call_expression,
         $.member_expression,
         $.index_expression,
@@ -1083,7 +1094,7 @@ module.exports = grammar({
     // `register<bit<8>> r`.
     generic_type: ($) =>
       seq(
-        field("type", $._type_identifier),
+        field("type", $._prefixable_type_identifier),
         field("type_arguments", $.type_arguments),
       ),
 
@@ -1112,7 +1123,22 @@ module.exports = grammar({
 
     // typeRef in the P4-16 grammar: any type that may be written where a
     // type is expected.
-    _type_ref: ($) => choice($._type, $._type_identifier, $.array_type),
+    _type_ref: ($) =>
+      choice($._type, $._prefixable_type_identifier, $.array_type),
+
+    // A name with a leading dot refers to the declaration at the top level,
+    // past any local of the same name, as in `.x` or `.T.c`.
+    prefixed_identifier: ($) => seq(".", $.identifier),
+
+    _prefixed_method_identifier: ($) => seq(".", $._method_identifier),
+
+    _prefixable_type_identifier: ($) =>
+      choice(
+        $._type_identifier,
+        alias($._prefixed_type_identifier, $.prefixed_identifier),
+      ),
+
+    _prefixed_type_identifier: ($) => seq(".", $._type_identifier),
 
     // An array, or header stack, as in `h_t[4]`, sized by any expression
     // known at compile time. An element may itself be an array, as in

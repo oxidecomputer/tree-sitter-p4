@@ -75,6 +75,8 @@
 (call_expression
   function: [
     (identifier) @name
+    (prefixed_identifier
+      (identifier) @name)
     (member_expression
       member: (identifier) @name)
   ]) @reference.call

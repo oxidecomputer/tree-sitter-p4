@@ -1853,6 +1853,15 @@
           "name": "_method_identifier"
         },
         {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_prefixed_method_identifier"
+          },
+          "named": true,
+          "value": "prefixed_identifier"
+        },
+        {
           "type": "SYMBOL",
           "name": "call_expression"
         }
@@ -2522,6 +2531,10 @@
           {
             "type": "SYMBOL",
             "name": "identifier"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "prefixed_identifier"
           },
           {
             "type": "SYMBOL",
@@ -3387,6 +3400,10 @@
             "type": "SYMBOL",
             "name": "identifier"
           }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "prefixed_identifier"
         },
         {
           "type": "SYMBOL",
@@ -4692,7 +4709,7 @@
           "name": "type",
           "content": {
             "type": "SYMBOL",
-            "name": "_type_identifier"
+            "name": "_prefixable_type_identifier"
           }
         },
         {
@@ -4928,11 +4945,68 @@
         },
         {
           "type": "SYMBOL",
-          "name": "_type_identifier"
+          "name": "_prefixable_type_identifier"
         },
         {
           "type": "SYMBOL",
           "name": "array_type"
+        }
+      ]
+    },
+    "prefixed_identifier": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "."
+        },
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        }
+      ]
+    },
+    "_prefixed_method_identifier": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "."
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_method_identifier"
+        }
+      ]
+    },
+    "_prefixable_type_identifier": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_type_identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_prefixed_type_identifier"
+          },
+          "named": true,
+          "value": "prefixed_identifier"
+        }
+      ]
+    },
+    "_prefixed_type_identifier": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "."
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_type_identifier"
         }
       ]
     },
@@ -5738,7 +5812,9 @@
       "name": "_error_sentinel"
     }
   ],
-  "inline": [],
+  "inline": [
+    "_prefixable_type_identifier"
+  ],
   "supertypes": [
     "_declaration",
     "_statement",

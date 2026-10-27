@@ -27,6 +27,8 @@ control C(inout headers_t hdr, in bit<9> port) {
 //                             ^ type.builtin
         hits.count(port);
 //           ^ function.method
+        .log(port);
+//       ^ function
     }
 
     table route {

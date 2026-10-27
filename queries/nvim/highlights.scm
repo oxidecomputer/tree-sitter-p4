@@ -47,6 +47,10 @@
   function: (identifier) @function)
 
 (call_expression
+  function: (prefixed_identifier
+    (identifier) @function))
+
+(call_expression
   function: (member_expression
     member: (identifier) @function.method))
 
