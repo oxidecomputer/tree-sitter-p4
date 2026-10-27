@@ -1,4 +1,432 @@
 ================================================================================
+Headers, header unions, structs, and their fields
+================================================================================
+
+header ethernet_h {
+    bit<48> dst;
+    varbit<320> options;
+    int<8> delta;
+}
+
+header_union ip_h {
+    ipv4_h v4;
+    ipv6_h v6;
+}
+
+@flexible
+struct headers_t {
+    ethernet_h ethernet;
+    vlan_h[2] vlan;
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (header_declaration
+    name: (type_identifier)
+    (field
+      type: (bit_type
+        (number
+          (decimal)))
+      name: (identifier))
+    (field
+      type: (varbit_type
+        (number
+          (decimal)))
+      name: (identifier))
+    (field
+      type: (int_type
+        (number
+          (decimal)))
+      name: (identifier)))
+  (header_union_declaration
+    name: (type_identifier)
+    (field
+      type: (type_identifier)
+      name: (identifier))
+    (field
+      type: (type_identifier)
+      name: (identifier)))
+  (struct_declaration
+    (annotation
+      (identifier))
+    name: (type_identifier)
+    (field
+      type: (type_identifier)
+      name: (identifier))
+    (field
+      type: (stack_type
+        (type_identifier)
+        (number
+          (decimal)))
+      name: (identifier))))
+
+================================================================================
+Type definitions, errors, and match kinds
+================================================================================
+
+typedef bit<9> port_t;
+type bit<32> ip_t;
+typedef tuple<bit<8>, bool> pair_t;
+typedef list<bit<8>> bytes_t;
+error { NoMatch, BadChecksum }
+match_kind { selector, dleft_hash }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (typedef_declaration
+    type: (bit_type
+      (number
+        (decimal)))
+    name: (type_identifier))
+  (typedef_declaration
+    type: (bit_type
+      (number
+        (decimal)))
+    name: (type_identifier))
+  (typedef_declaration
+    type: (tuple_type
+      (type_argument_list
+        (bit_type
+          (number
+            (decimal)))))
+    name: (type_identifier))
+  (typedef_declaration
+    type: (list_type
+      (type_argument_list
+        (bit_type
+          (number
+            (decimal)))))
+    name: (type_identifier))
+  (error_declaration
+    (identifier)
+    (identifier))
+  (match_kind_declaration
+    (identifier)
+    (identifier)))
+
+================================================================================
+Constants, functions, and extern functions
+================================================================================
+
+const bool ENABLED = true;
+const bit<4> V = 4w0b0100;
+bit<8> max(in bit<8> a, in bit<8> b) {
+    return a > b ? a : b;
+}
+T id<T>(in T x) { return x; }
+extern void log_msg(string msg);
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (constant_declaration
+    name: (identifier)
+    value: (boolean_literal))
+  (constant_declaration
+    type: (bit_type
+      (number
+        (decimal)))
+    name: (identifier)
+    value: (number
+      (wbinary)))
+  (function_declaration
+    type: (bit_type
+      (number
+        (decimal)))
+    name: (method_identifier)
+    (parameter
+      (direction)
+      type: (bit_type
+        (number
+          (decimal)))
+      name: (identifier))
+    (parameter
+      (direction)
+      type: (bit_type
+        (number
+          (decimal)))
+      name: (identifier))
+    body: (block
+      (return_statement
+        value: (conditional_expression
+          condition: (binary_expression
+            left: (identifier)
+            right: (identifier))
+          consequence: (identifier)
+          alternative: (identifier)))))
+  (function_declaration
+    type: (type_identifier)
+    name: (method_identifier)
+    (type_parameters
+      (type_identifier))
+    (parameter
+      (direction)
+      type: (type_identifier)
+      name: (identifier))
+    body: (block
+      (return_statement
+        value: (identifier))))
+  (extern_function_declaration
+    type: (type_identifier)
+    name: (method_identifier)
+    (parameter
+      type: (type_identifier)
+      name: (identifier))))
+
+================================================================================
+Externs with constructors, methods, and abstract methods
+================================================================================
+
+extern Register<T, I> {
+    Register(bit<32> size);
+    T read(in I index);
+    @synchronous(read)
+    void write(in I index, in T value);
+    abstract void apply(inout T value);
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (extern_declaration
+    name: (type_identifier)
+    (type_parameters
+      (type_identifier)
+      (type_identifier))
+    (method
+      name: (method_identifier)
+      (parameter
+        type: (bit_type
+          (number
+            (decimal)))
+        name: (identifier)))
+    (method
+      type: (type_identifier)
+      name: (method_identifier)
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
+    (method
+      (annotation
+        (identifier)
+        (annotation_body
+          (annotation_content
+            (identifier))))
+      type: (type_identifier)
+      name: (method_identifier)
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier))
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))
+    (method
+      type: (type_identifier)
+      name: (method_identifier)
+      (parameter
+        (direction)
+        type: (type_identifier)
+        name: (identifier)))))
+
+================================================================================
+Parsers, controls, and packages
+================================================================================
+
+parser P<H>(packet_in pkt, out H hdr);
+control Ingress(inout headers_t hdr)(bit<32> size) {
+    Counter<bit<32>, bit<8>>(256) hits;
+    @name("ctr") bit<8> count = 0;
+    apply { }
+}
+package Pipeline<H>(P<H> p, Ingress c);
+Pipeline(MyParser(), MyIngress()) main;
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (parser_declaration
+    name: (method_identifier)
+    (type_parameters
+      (type_identifier))
+    (parameter
+      name: (identifier))
+    (parameter
+      (direction)
+      type: (type_identifier)
+      name: (identifier)))
+  (control_declaration
+    name: (method_identifier)
+    (parameter
+      (direction)
+      type: (type_identifier)
+      name: (identifier))
+    (parameter
+      type: (bit_type
+        (number
+          (decimal)))
+      name: (identifier))
+    body: (control_body
+      (control_body_element
+        (instantiation
+          type: (type_identifier)
+          (type_argument_list
+            (bit_type
+              (number
+                (decimal)))
+            (bit_type
+              (number
+                (decimal))))
+          arguments: (argument_list
+            (number
+              (decimal)))
+          name: (identifier)))
+      (control_body_element
+        (annotation
+          (identifier)
+          (annotation_body
+            (annotation_content
+              (string_literal))))
+        (variable_declaration
+          type: (bit_type
+            (number
+              (decimal)))
+          name: (identifier)
+          value: (number
+            (decimal))))
+      (block)))
+  (package
+    name: (method_identifier)
+    (type_parameters
+      (type_identifier))
+    (method_field
+      (method_identifier)
+      (type_argument_list
+        (type_identifier))
+      (identifier))
+    (method_field
+      (method_identifier)
+      (identifier)))
+  (instantiation
+    type: (type_identifier)
+    arguments: (argument_list
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list))
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list)))
+    name: (identifier)))
+
+================================================================================
+A parser's local elements and states
+================================================================================
+
+parser MyParser(packet_in pkt, out headers_t hdr) {
+    Checksum() csum;
+    bit<16> tmp;
+    state start {
+        pkt.extract(hdr.ethernet);
+        transition select(hdr.ethernet.type, hdr.vlan[0].pcp) {
+            (0x0800, _): parse_ipv4;
+            (0x8100 &&& 0xff00, 3w0 .. 3w3): parse_vlan;
+            default: accept;
+        }
+    }
+    state parse_ipv4 {
+        transition accept;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (parser_declaration
+    name: (method_identifier)
+    (parameter
+      name: (identifier))
+    (parameter
+      (direction)
+      type: (type_identifier)
+      name: (identifier))
+    (parser_local_element
+      (instantiation
+        type: (type_identifier)
+        arguments: (argument_list)
+        name: (identifier)))
+    (parser_local_element
+      (variable_declaration
+        type: (bit_type
+          (number
+            (decimal)))
+        name: (identifier)))
+    (parser_state
+      name: (method_identifier)
+      body: (block
+        (call_statement
+          (call_expression
+            function: (member_expression
+              object: (identifier)
+              member: (identifier))
+            arguments: (argument_list
+              (member_expression
+                object: (identifier)
+                member: (identifier)))))
+        (transition_statement
+          (select_expression
+            (expression_list
+              (member_expression
+                object: (member_expression
+                  object: (identifier)
+                  member: (identifier))
+                member: (identifier))
+              (member_expression
+                object: (index_expression
+                  object: (member_expression
+                    object: (identifier)
+                    member: (identifier))
+                  index: (number
+                    (decimal)))
+                member: (identifier)))
+            (select_case
+              (keyset_expression
+                (tuple_keyset
+                  (simple_keyset_expression
+                    (number
+                      (hex)))
+                  (simple_keyset_expression)))
+              (identifier))
+            (select_case
+              (keyset_expression
+                (tuple_keyset
+                  (simple_keyset_expression
+                    (mask
+                      (number
+                        (hex))
+                      (number
+                        (hex))))
+                  (simple_keyset_expression
+                    (range
+                      (number
+                        (wdecimal))
+                      (number
+                        (wdecimal))))))
+              (identifier))
+            (select_case
+              (keyset_expression
+                (simple_keyset_expression))
+              (identifier))))))
+    (parser_state
+      name: (method_identifier)
+      body: (block
+        (transition_statement
+          (identifier))))))
+
+================================================================================
 A package's last parameter takes no comma
 ================================================================================
 

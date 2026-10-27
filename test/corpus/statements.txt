@@ -114,3 +114,63 @@ control C() {
           name: (identifier)
           collection: (identifier)
           body: (block))))))
+
+================================================================================
+Switches on an applied table's action, returns, and exits
+================================================================================
+
+control C(inout H h) {
+    apply {
+        switch (t.apply().action_run) {
+            a:
+            b: { h.x = 1; }
+            default: { exit; }
+        }
+        if (true) { return; } else ;
+        log_msg("done");
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    (parameter
+      (direction)
+      type: (type_identifier)
+      name: (identifier))
+    body: (control_body
+      (block
+        (switch_statement
+          value: (member_expression
+            object: (call_expression
+              function: (member_expression
+                object: (identifier)
+                member: (identifier))
+              arguments: (argument_list))
+            member: (identifier))
+          (switch_case
+            (identifier))
+          (switch_case
+            (identifier)
+            (block
+              (assignment_statement
+                left: (member_expression
+                  object: (identifier)
+                  member: (identifier))
+                right: (number
+                  (decimal)))))
+          (switch_case
+            (block
+              (exit_statement))))
+        (if_statement
+          condition: (boolean_literal)
+          consequence: (block
+            (return_statement))
+          alternative: (empty_statement))
+        (call_statement
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (string_literal))))))))

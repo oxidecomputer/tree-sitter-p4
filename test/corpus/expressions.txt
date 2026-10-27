@@ -401,3 +401,64 @@ control C(inout H h) {
               (decimal))
             low: (number
               (decimal))))))))
+
+================================================================================
+Calls with type arguments, beside comparisons
+================================================================================
+
+control C(inout H h) {
+    apply {
+        h.x = pkt.lookahead<bit<16>>()[7:0];
+        f<bit<8>>(1);
+        h.y = a < b;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    (parameter
+      (direction)
+      type: (type_identifier)
+      name: (identifier))
+    body: (control_body
+      (block
+        (assignment_statement
+          left: (member_expression
+            object: (identifier)
+            member: (identifier))
+          right: (slice_expression
+            value: (call_expression
+              function: (member_expression
+                object: (identifier)
+                member: (identifier))
+              type_arguments: (type_arguments
+                (type_argument_list
+                  (bit_type
+                    (number
+                      (decimal)))))
+              arguments: (argument_list))
+            high: (number
+              (decimal))
+            low: (number
+              (decimal))))
+        (call_statement
+          (call_expression
+            function: (identifier)
+            type_arguments: (type_arguments
+              (type_argument_list
+                (bit_type
+                  (number
+                    (decimal)))))
+            arguments: (argument_list
+              (number
+                (decimal)))))
+        (assignment_statement
+          left: (member_expression
+            object: (identifier)
+            member: (identifier))
+          right: (binary_expression
+            left: (identifier)
+            right: (identifier)))))))

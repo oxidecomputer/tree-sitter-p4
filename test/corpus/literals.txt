@@ -46,3 +46,29 @@ const int h = 0o7;
     (identifier)
     (number
       (octal))))
+
+================================================================================
+Booleans, strings, and binary literals with a width
+================================================================================
+
+const bool t = false;
+const bit<4> m = 4w0b1010;
+const string s = "a \"quoted\" word";
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (constant_declaration
+    name: (identifier)
+    value: (boolean_literal))
+  (constant_declaration
+    type: (bit_type
+      (number
+        (decimal)))
+    name: (identifier)
+    value: (number
+      (wbinary)))
+  (constant_declaration
+    type: (type_identifier)
+    name: (identifier)
+    value: (string_literal)))

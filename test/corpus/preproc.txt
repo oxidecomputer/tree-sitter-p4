@@ -157,3 +157,43 @@ An object-like macro holding declarations or key elements is text
     (identifier_preproc)
     (identifier)
     (preproc_arg)))
+
+================================================================================
+Includes, and a define holding fields
+================================================================================
+
+#include <core.p4>
+#include "headers.p4"
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#define FIELDS { \
+    bit<8> a; \
+    bit<8> b; \
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (include_path))
+  (preproc
+    (include_path))
+  (preproc
+    (method_not_constant)
+    (identifier)
+    (identifier)
+    (preproc_arg))
+  (preproc
+    (identifier_preproc)
+    (line_continuation)
+    (field
+      type: (bit_type
+        (number
+          (decimal)))
+      name: (identifier)
+      (line_continuation))
+    (field
+      type: (bit_type
+        (number
+          (decimal)))
+      name: (identifier)
+      (line_continuation))))
