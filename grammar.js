@@ -10,6 +10,48 @@ module.exports = grammar({
 
   word: ($) => $.identifier,
 
+  // P4-16 reserves its keywords, so a keyword never begins a name. Without
+  // this, a keyword where the parser expects no keyword is lexed as a name,
+  // and after a syntax error the parser cannot resume at the next `state` or
+  // `table`: one half-typed line could leave the rest of the file unparsed.
+  // Left out are `error`, since `error.NoMatch` is written as a member
+  // access, and `apply` and `state`, which P4-16 also allows as names, as in
+  // `void apply(...)` or `t.apply()`.
+  reserved: {
+    global: (_) => [
+      "action",
+      "bit",
+      "bool",
+      "const",
+      "control",
+      "default",
+      "else",
+      "exit",
+      "extern",
+      "false",
+      "header",
+      "header_union",
+      "if",
+      "in",
+      "inout",
+      "int",
+      "match_kind",
+      "out",
+      "package",
+      "parser",
+      "return",
+      "select",
+      "struct",
+      "switch",
+      "table",
+      "transition",
+      "true",
+      "tuple",
+      "typedef",
+      "varbit",
+    ],
+  },
+
   // Hidden rules that queries may still name, as in `(_definition)`.
   supertypes: ($) => [$._definition, $._statement, $._expression],
 

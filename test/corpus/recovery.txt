@@ -1,0 +1,55 @@
+================================================================================
+A half-typed member access leaves the next declaration intact
+================================================================================
+
+control C(inout H h) {
+    action a() {
+        h.
+        bit<16> x = 0;
+    }
+    table t { actions = { a; } }
+    apply { t.apply(); }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_definition
+    name: (method_identifier
+      (identifier))
+    (parameter
+      (direction)
+      type: (type_identifier
+        (identifier))
+      name: (identifier))
+    body: (control_body
+      (control_body_element
+        (action
+          name: (method_identifier
+            (identifier))
+          body: (block
+            (ERROR
+              (identifier))
+            (var_decl
+              type: (bit_type
+                (number
+                  (decimal)))
+              left: (lval
+                (identifier))
+              right: (number
+                (decimal))))))
+      (control_body_element
+        (table
+          name: (type_identifier
+            (identifier))
+          (table_element
+            (action_item
+              (method_identifier
+                (identifier))))))
+      (block
+        (call_statement
+          (call
+            function: (fval
+              (identifier)
+              (method_identifier
+                (identifier)))))))))
