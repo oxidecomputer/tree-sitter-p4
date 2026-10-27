@@ -623,3 +623,69 @@ control C(@optional in bool zeros, @name("h") inout H h) {
               right: (number
                 (decimal))))
           body: (block))))))
+
+================================================================================
+Generic structs and headers, empty tuples, and local constants
+================================================================================
+
+struct Pair<T> { T first; T second; }
+header Opt<W> { bit<8> kind; }
+typedef tuple<> empty_t;
+const int DEFAULT = ...;
+control C() {
+    apply {
+        const bit<8> n = 4;
+        empty_t e = {};
+        if (e == {}) { }
+        { }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (struct_declaration
+    name: (type_identifier)
+    (type_parameters
+      (type_identifier))
+    (field
+      type: (type_identifier)
+      name: (identifier))
+    (field
+      type: (type_identifier)
+      name: (identifier)))
+  (header_declaration
+    name: (type_identifier)
+    (type_parameters
+      (type_identifier))
+    (field
+      type: (bit_type
+        (number
+          (decimal)))
+      name: (identifier)))
+  (typedef_declaration
+    type: (tuple_type)
+    name: (type_identifier))
+  (constant_declaration
+    name: (identifier))
+  (control_declaration
+    name: (method_identifier)
+    body: (control_body
+      (block
+        (constant_declaration
+          type: (bit_type
+            (number
+              (decimal)))
+          name: (identifier)
+          value: (number
+            (decimal)))
+        (variable_declaration
+          type: (type_identifier)
+          name: (identifier)
+          value: (tuple))
+        (if_statement
+          condition: (binary_expression
+            left: (identifier)
+            right: (tuple))
+          consequence: (block))
+        (block)))))

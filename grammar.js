@@ -99,6 +99,7 @@ module.exports = grammar({
   // parenthesized expression otherwise. Without a symbol table the parser keeps
   // both readings until the next token settles it.
   conflicts: ($) => [
+    [$.block, $.tuple],
     [$.type_parameters, $.type_argument_list],
     [$.call_expression, $._expression, $._type_identifier],
     [$._macro_declaration, $._type_identifier],
@@ -206,6 +207,7 @@ module.exports = grammar({
           repeat($.annotation),
           "header",
           field("name", $._type_identifier),
+          optional($.type_parameters),
           "{",
           repeat($.field),
           "}",
@@ -218,6 +220,7 @@ module.exports = grammar({
         repeat($.annotation),
         "header_union",
         field("name", $._type_identifier),
+        optional($.type_parameters),
         "{",
         repeat($.field),
         "}",
@@ -228,6 +231,8 @@ module.exports = grammar({
         repeat($.annotation),
         "struct",
         field("name", $._type_identifier),
+        // Generic, as in `struct Pair<T> { T first; T second; }`.
+        optional($.type_parameters),
         "{",
         repeat($.field),
         "}",
@@ -497,6 +502,8 @@ module.exports = grammar({
         // A macro invocation: a call without its semicolon. Yields to a
         // longer expression, as in `F(a)(b);`.
         prec(-1, alias($.call_expression, $.macro_invocation)),
+        // A constant local to a block, as in `const bit<8> n = 4;`.
+        $.constant_declaration,
         $.for_statement,
         $.break_statement,
         $.continue_statement,
@@ -775,8 +782,12 @@ module.exports = grammar({
     tuple: ($) =>
       seq(
         "{",
-        commaSep1(choice($._expression, $.named_expression, "...")),
-        optional(","),
+        optional(
+          seq(
+            commaSep1(choice($._expression, $.named_expression)),
+            optional(","),
+          ),
+        ),
         "}",
       ),
 
@@ -819,6 +830,8 @@ module.exports = grammar({
         prec(1, $.tuple),
         $.invalid_header,
         $.this,
+        // A default, as in `const int c = ...;` or `{ x = 1, ... }`.
+        "...",
         prec(1, $.identifier_preproc),
         prec(1, $.string_literal),
         $.number,
@@ -1051,7 +1064,8 @@ module.exports = grammar({
     // A width is a number, a name such as a macro, or, per P4-16, any
     // expression in parentheses, as in `bit<(4 * 8)>`.
     _width: ($) => choice($.number, $.identifier, seq("(", $._expression, ")")),
-    tuple_type: ($) => seq("tuple", "<", $.type_argument_list, ">"),
+    // Possibly empty: `tuple<>`.
+    tuple_type: ($) => seq("tuple", "<", optional($.type_argument_list), ">"),
 
     // A list of compile-time values of one type, as in
     // `list<bit<8>> l = { 1, 2 };`.
