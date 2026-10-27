@@ -128,8 +128,7 @@ jobs:
         run: cargo test
 
       - name: test Go binding
-        working-directory: bindings/go
-        run: GOFLAGS=-mod=mod go test ./...
+        run: go test ./bindings/go
 
       # A query naming a node type the grammar no longer has fails to compile
       # outright rather than degrading, and `parse` stays green either way.
