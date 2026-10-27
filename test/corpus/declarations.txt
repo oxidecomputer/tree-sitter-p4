@@ -855,3 +855,66 @@ type bit<9> PortId_t;
       (number
         (decimal)))
     name: (type_identifier)))
+
+================================================================================
+Bare bit returns, match_kind and stack types, and empty selects
+================================================================================
+
+extern bit f(inout bit x, in bit y);
+typedef tuple<match_kind> mk_t;
+typedef tuple<H[10]> stacks_t;
+H[1] h() { return { { 1 } }; }
+parser P() {
+    state start {
+        transition select() {
+            default: accept;
+        }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (extern_function_declaration
+    name: (method_identifier)
+    (parameter
+      (direction)
+      name: (identifier))
+    (parameter
+      (direction)
+      name: (identifier)))
+  (typedef_declaration
+    type: (tuple_type
+      (type_argument_list))
+    name: (type_identifier))
+  (typedef_declaration
+    type: (tuple_type
+      (type_argument_list
+        (stack_type
+          (type_identifier)
+          (number
+            (decimal)))))
+    name: (type_identifier))
+  (function_declaration
+    type: (stack_type
+      (type_identifier)
+      (number
+        (decimal)))
+    name: (method_identifier)
+    body: (block
+      (return_statement
+        value: (tuple
+          (tuple
+            (number
+              (decimal)))))))
+  (parser_declaration
+    name: (method_identifier)
+    (parser_state
+      name: (method_identifier)
+      body: (block
+        (transition_statement
+          (select_expression
+            (select_case
+              (keyset_expression
+                (simple_keyset_expression))
+              (identifier))))))))

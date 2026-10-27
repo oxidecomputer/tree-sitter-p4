@@ -191,7 +191,7 @@ module.exports = grammar({
     function_declaration: ($) =>
       seq(
         repeat($.annotation),
-        field("type", choice($._type, $._type_identifier)),
+        field("type", choice($.stack_type, $._type, $._type_identifier)),
         field("name", $._method_identifier),
         optional($.type_parameters),
         "(",
@@ -283,6 +283,9 @@ module.exports = grammar({
           choice(
             "bool",
             "error",
+            "bit",
+            "int",
+            "varbit",
             $.bit_type,
             $.int_type,
             $.varbit_type,
@@ -671,7 +674,8 @@ module.exports = grammar({
       seq(
         "select",
         "(",
-        $.expression_list,
+        // Possibly empty, as in `select() { default: accept; }`.
+        optional($.expression_list),
         ")",
         "{",
         repeat($.select_case),
@@ -1030,6 +1034,7 @@ module.exports = grammar({
         "int",
         "bit",
         "varbit",
+        "match_kind",
         "packet_in",
         "packet_out",
         $.bit_type,
@@ -1068,10 +1073,7 @@ module.exports = grammar({
       seq("<", $._type_identifier, repeat(seq(",", $._type_identifier)), ">"),
 
     type_argument_list: ($) =>
-      seq(
-        choice($._type, $._type_identifier),
-        repeat(seq(",", choice($._type, $._type_identifier))),
-      ),
+      commaSep1(choice($.stack_type, $._type, $._type_identifier)),
 
     _type_identifier: ($) => prec(1, alias($.identifier, $.type_identifier)),
 

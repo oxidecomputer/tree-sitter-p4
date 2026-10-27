@@ -311,6 +311,10 @@
             "members": [
               {
                 "type": "SYMBOL",
+                "name": "stack_type"
+              },
+              {
+                "type": "SYMBOL",
                 "name": "_type"
               },
               {
@@ -737,6 +741,18 @@
               {
                 "type": "STRING",
                 "value": "error"
+              },
+              {
+                "type": "STRING",
+                "value": "bit"
+              },
+              {
+                "type": "STRING",
+                "value": "int"
+              },
+              {
+                "type": "STRING",
+                "value": "varbit"
               },
               {
                 "type": "SYMBOL",
@@ -2596,8 +2612,16 @@
           "value": "("
         },
         {
-          "type": "SYMBOL",
-          "name": "expression_list"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "expression_list"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "STRING",
@@ -4555,6 +4579,10 @@
         },
         {
           "type": "STRING",
+          "value": "match_kind"
+        },
+        {
+          "type": "STRING",
           "value": "packet_in"
         },
         {
@@ -4792,6 +4820,10 @@
           "members": [
             {
               "type": "SYMBOL",
+              "name": "stack_type"
+            },
+            {
+              "type": "SYMBOL",
               "name": "_type"
             },
             {
@@ -4812,6 +4844,10 @@
               {
                 "type": "CHOICE",
                 "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "stack_type"
+                  },
                   {
                     "type": "SYMBOL",
                     "name": "_type"

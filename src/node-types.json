@@ -832,6 +832,10 @@
             "named": true
           },
           {
+            "type": "match_kind",
+            "named": false
+          },
+          {
             "type": "packet_in",
             "named": false
           },
@@ -1122,6 +1126,10 @@
         "required": true,
         "types": [
           {
+            "type": "bit",
+            "named": false
+          },
+          {
             "type": "bit_type",
             "named": true
           },
@@ -1138,6 +1146,10 @@
             "named": true
           },
           {
+            "type": "int",
+            "named": false
+          },
+          {
             "type": "int_type",
             "named": true
           },
@@ -1152,6 +1164,10 @@
           {
             "type": "type_identifier",
             "named": true
+          },
+          {
+            "type": "varbit",
+            "named": false
           },
           {
             "type": "varbit_type",
@@ -1228,6 +1244,10 @@
           {
             "type": "list_type",
             "named": true
+          },
+          {
+            "type": "match_kind",
+            "named": false
           },
           {
             "type": "packet_in",
@@ -1378,6 +1398,10 @@
             "named": true
           },
           {
+            "type": "match_kind",
+            "named": false
+          },
+          {
             "type": "packet_in",
             "named": false
           },
@@ -1490,12 +1514,20 @@
             "named": true
           },
           {
+            "type": "match_kind",
+            "named": false
+          },
+          {
             "type": "packet_in",
             "named": false
           },
           {
             "type": "packet_out",
             "named": false
+          },
+          {
+            "type": "stack_type",
+            "named": true
           },
           {
             "type": "tuple_type",
@@ -2008,6 +2040,10 @@
             "named": true
           },
           {
+            "type": "match_kind",
+            "named": false
+          },
+          {
             "type": "packet_in",
             "named": false
           },
@@ -2228,6 +2264,10 @@
           {
             "type": "list_type",
             "named": true
+          },
+          {
+            "type": "match_kind",
+            "named": false
           },
           {
             "type": "packet_in",
@@ -2497,7 +2537,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "expression_list",
@@ -2871,6 +2911,10 @@
           "named": true
         },
         {
+          "type": "stack_type",
+          "named": true
+        },
+        {
           "type": "tuple_type",
           "named": true
         },
@@ -2964,6 +3008,10 @@
           {
             "type": "list_type",
             "named": true
+          },
+          {
+            "type": "match_kind",
+            "named": false
           },
           {
             "type": "packet_in",
@@ -3109,6 +3157,10 @@
           {
             "type": "list_type",
             "named": true
+          },
+          {
+            "type": "match_kind",
+            "named": false
           },
           {
             "type": "packet_in",
