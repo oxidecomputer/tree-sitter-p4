@@ -85,10 +85,11 @@ control c(inout H h) {
           name: (type_identifier)
           (table_property
             (macro_invocation)
-            (member_expression
-              object: (identifier)
-              member: (identifier))
-            (match_kind))
+            (key_element
+              value: (member_expression
+                object: (identifier)
+                member: (identifier))
+              match_kind: (match_kind)))
           (table_property
             (macro_invocation)
             (action_item

@@ -63,6 +63,7 @@
 ; Entries: fields, table properties, and the cases of a select or switch.
 [
   (field)
+  (key_element)
   (select_case)
   (switch_case)
   (table_property)

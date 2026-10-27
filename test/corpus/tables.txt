@@ -53,23 +53,25 @@ control C(inout H h) {
         (table
           name: (type_identifier)
           (table_property
-            (member_expression
-              object: (member_expression
-                object: (identifier)
+            (key_element
+              value: (member_expression
+                object: (member_expression
+                  object: (identifier)
+                  member: (identifier))
                 member: (identifier))
-              member: (identifier))
-            (match_kind)
-            (member_expression
-              object: (member_expression
-                object: (identifier)
+              match_kind: (match_kind))
+            (key_element
+              value: (member_expression
+                object: (member_expression
+                  object: (identifier)
+                  member: (identifier))
                 member: (identifier))
-              member: (identifier))
-            (match_kind)
-            (annotation
-              (identifier)
-              (annotation_body
-                (annotation_content
-                  (string_literal)))))
+              match_kind: (match_kind)
+              (annotation
+                (identifier)
+                (annotation_body
+                  (annotation_content
+                    (string_literal))))))
           (table_property
             (action_item
               (method_identifier))
@@ -130,14 +132,16 @@ control C(inout H h) {
         (table
           name: (type_identifier)
           (table_property
-            (member_expression
-              object: (identifier)
-              member: (identifier))
-            (match_kind)
-            (member_expression
-              object: (identifier)
-              member: (identifier))
-            (match_kind))
+            (key_element
+              value: (member_expression
+                object: (identifier)
+                member: (identifier))
+              match_kind: (match_kind))
+            (key_element
+              value: (member_expression
+                object: (identifier)
+                member: (identifier))
+              match_kind: (match_kind)))
           (table_property
             (action_item
               (method_identifier)))

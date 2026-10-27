@@ -1651,6 +1651,42 @@
     }
   },
   {
+    "type": "key_element",
+    "named": true,
+    "fields": {
+      "match_kind": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "match_kind",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "annotation",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "keyset_expression",
     "named": true,
     "fields": {},
@@ -2619,11 +2655,11 @@
           "named": true
         },
         {
-          "type": "macro_invocation",
+          "type": "key_element",
           "named": true
         },
         {
-          "type": "match_kind",
+          "type": "macro_invocation",
           "named": true
         }
       ]

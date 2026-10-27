@@ -26,7 +26,7 @@
   ";" @prepend_antispace
 )
 
-(table_property
+(key_element
   (match_kind) @append_space
   .
   (annotation)
@@ -199,9 +199,12 @@
   (comment)* @do_nothing
 )
 
-; Each entry of an entry list.
+; Each key element, and each entry of an entry list.
 (table_property
-  (entry) @append_spaced_softline
+  [
+    (entry)
+    (key_element)
+  ] @append_spaced_softline
   .
   (comment)* @do_nothing
 )
@@ -427,9 +430,9 @@
 ; a bit slice it separates the bounds of a range and takes no space.
 [
   (entry ":" @prepend_antispace @append_space)
+  (key_element ":" @prepend_antispace @append_space)
   (select_case ":" @prepend_antispace @append_space)
   (switch_case ":" @prepend_antispace @append_space)
-  (table_property ":" @prepend_antispace @append_space)
 ]
 
 (slice_expression

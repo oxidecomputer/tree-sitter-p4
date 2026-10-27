@@ -394,12 +394,7 @@ module.exports = grammar({
           "=",
           "{",
           // Either list may be empty in P4-16.
-          repeat(
-            choice(
-              seq($._expression, ":", $.match_kind, repeat($.annotation), ";"),
-              $._macro_use,
-            ),
-          ),
+          repeat(choice($.key_element, $._macro_use)),
           "}",
         ),
         seq(
@@ -435,6 +430,16 @@ module.exports = grammar({
           $._expression,
           ";",
         ),
+      ),
+
+    // `hdr.ipv4.dst : lpm @name("dst");`.
+    key_element: ($) =>
+      seq(
+        field("value", $._expression),
+        ":",
+        field("match_kind", $.match_kind),
+        repeat($.annotation),
+        ";",
       ),
 
     // `NoAction` is an ordinary action, which core.p4 declares.
