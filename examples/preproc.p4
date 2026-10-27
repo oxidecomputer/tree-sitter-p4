@@ -77,3 +77,29 @@ control Rotations(inout headers hdr) {
     apply { }
 }
 #define ipv4_lpm_partitions 2048
+
+// Macros that stand for key elements, actions, and declarations.
+#define MAC_KEY                   \
+    hdr.inner_eth.dst : ternary;  \
+    hdr.inner_eth.src : ternary;
+#define MAC_ACTIONS forward; drop;
+#define COUNTERS                  \
+    @name(".hits")                \
+    Counter<bit<32>, bit<8>>(256) hits;
+
+control mac_acl(inout headers_t hdr) {
+    action forward() { }
+    action drop() { }
+    COUNTERS
+    table acl {
+        key = {
+            MAC_KEY
+            hdr.udp.dst_port : exact;
+        }
+        actions = {
+            MAC_ACTIONS
+            NoAction;
+        }
+    }
+    apply { acl.apply(); }
+}

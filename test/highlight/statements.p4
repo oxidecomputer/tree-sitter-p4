@@ -32,6 +32,8 @@ control C(inout headers_t hdr, in bit<9> port) {
 //        ^ type
         key = {
 //      ^ keyword
+            MAC_KEY
+//          ^ constant
             hdr.ipv4.dst: lpm;
 //                   ^ variable.other.member
 //                        ^ constant.builtin

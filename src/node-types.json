@@ -2197,6 +2197,10 @@
         {
           "type": "keyset_expression",
           "named": true
+        },
+        {
+          "type": "macro_invocation",
+          "named": true
         }
       ]
     }

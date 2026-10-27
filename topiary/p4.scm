@@ -180,6 +180,14 @@
   (comment)* @do_nothing
 )
 
+; A macro standing for key elements or actions, as in `key = { MAC_KEY }`, has
+; no semicolon of its own to break after.
+(table_element
+  (macro_invocation) @append_spaced_softline
+  .
+  (comment)* @do_nothing
+)
+
 ; Elements of a tuple literal.
 (tuple
   "," @append_spaced_softline

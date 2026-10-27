@@ -58,3 +58,45 @@ V1Switch(c()) main;
         (method_identifier
           (identifier))))
     (identifier)))
+
+================================================================================
+Macros standing for declarations, key elements, and actions
+================================================================================
+
+control c(inout H h) {
+    COUNTERS
+    table t {
+        key = { MAC_KEY h.x: exact; }
+        actions = { ACTIONS NoAction; }
+    }
+    apply { }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_definition
+    name: (method_identifier
+      (identifier))
+    (parameter
+      (direction)
+      type: (type_identifier
+        (identifier))
+      name: (identifier))
+    body: (control_body
+      (control_body_element
+        (macro_invocation))
+      (control_body_element
+        (table
+          name: (type_identifier
+            (identifier))
+          (table_element
+            (macro_invocation)
+            (lval
+              (identifier)
+              (identifier))
+            (key_type))
+          (table_element
+            (macro_invocation)
+            (action_item))))
+      (block))))

@@ -154,6 +154,19 @@
         }
       ]
     },
+    "_macro_use": {
+      "type": "ALIAS",
+      "content": {
+        "type": "PREC",
+        "value": -1,
+        "content": {
+          "type": "SYMBOL",
+          "name": "identifier"
+        }
+      },
+      "named": true,
+      "value": "macro_invocation"
+    },
     "_macro_declaration": {
       "type": "SEQ",
       "members": [
@@ -1358,6 +1371,10 @@
           },
           "named": true,
           "value": "macro_invocation"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_macro_use"
         }
       ]
     },
@@ -1414,30 +1431,39 @@
             {
               "type": "REPEAT",
               "content": {
-                "type": "SEQ",
+                "type": "CHOICE",
                 "members": [
                   {
+                    "type": "SEQ",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "_expression"
+                      },
+                      {
+                        "type": "STRING",
+                        "value": ":"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "key_type"
+                      },
+                      {
+                        "type": "REPEAT",
+                        "content": {
+                          "type": "SYMBOL",
+                          "name": "annotation"
+                        }
+                      },
+                      {
+                        "type": "STRING",
+                        "value": ";"
+                      }
+                    ]
+                  },
+                  {
                     "type": "SYMBOL",
-                    "name": "_expression"
-                  },
-                  {
-                    "type": "STRING",
-                    "value": ":"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "key_type"
-                  },
-                  {
-                    "type": "REPEAT",
-                    "content": {
-                      "type": "SYMBOL",
-                      "name": "annotation"
-                    }
-                  },
-                  {
-                    "type": "STRING",
-                    "value": ";"
+                    "name": "_macro_use"
                   }
                 ]
               }
@@ -1466,22 +1492,31 @@
             {
               "type": "REPEAT",
               "content": {
-                "type": "SEQ",
+                "type": "CHOICE",
                 "members": [
                   {
-                    "type": "REPEAT",
-                    "content": {
-                      "type": "SYMBOL",
-                      "name": "annotation"
-                    }
+                    "type": "SEQ",
+                    "members": [
+                      {
+                        "type": "REPEAT",
+                        "content": {
+                          "type": "SYMBOL",
+                          "name": "annotation"
+                        }
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "action_item"
+                      },
+                      {
+                        "type": "STRING",
+                        "value": ";"
+                      }
+                    ]
                   },
                   {
                     "type": "SYMBOL",
-                    "name": "action_item"
-                  },
-                  {
-                    "type": "STRING",
-                    "value": ";"
+                    "name": "_macro_use"
                   }
                 ]
               }

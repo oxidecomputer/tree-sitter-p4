@@ -124,6 +124,11 @@ module.exports = grammar({
         ")",
       ),
 
+    // An object-like macro standing for declarations, key elements, or
+    // actions, as in `key = { MAC_ACL_KEY }`. Only the token after the name
+    // tells it apart from the start of what it stands for.
+    _macro_use: ($) => alias(prec(-1, $.identifier), $.macro_invocation),
+
     // The same among declarations, where it shares its prefix with an
     // instantiation, `T(args) name;`, and is told apart only by the missing
     // name. The prefix has to be the instantiation's, type and all, because
@@ -371,6 +376,7 @@ module.exports = grammar({
         $.const_definition,
         $.var_decl,
         alias($._macro_declaration, $.macro_invocation),
+        $._macro_use,
       ),
 
     table: ($) =>
@@ -390,7 +396,10 @@ module.exports = grammar({
           "{",
           // Either list may be empty in P4-16.
           repeat(
-            seq($._expression, ":", $.key_type, repeat($.annotation), ";"),
+            choice(
+              seq($._expression, ":", $.key_type, repeat($.annotation), ";"),
+              $._macro_use,
+            ),
           ),
           "}",
         ),
@@ -398,7 +407,9 @@ module.exports = grammar({
           "actions",
           "=",
           "{",
-          repeat(seq(repeat($.annotation), $.action_item, ";")),
+          repeat(
+            choice(seq(repeat($.annotation), $.action_item, ";"), $._macro_use),
+          ),
           "}",
         ),
         seq(

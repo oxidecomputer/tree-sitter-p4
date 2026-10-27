@@ -66,6 +66,11 @@
     (method_identifier
       (identifier) @function.macro)))
 
+; A macro standing for declarations, key elements, or actions, as in
+; `key = { MAC_KEY }`, which is a bare name.
+((macro_invocation) @constant
+  (#match? @constant "^[A-Za-z_][A-Za-z0-9_]*$"))
+
 ; Members of a value, and the fields that declare them.
 (lval
   "."
