@@ -1311,7 +1311,12 @@ module.exports = grammar({
             // (statements, annotations, `#` and `##`), so it is kept as text
             // to the end of the logical line; see src/scanner.c.
             seq(
-              choice($.method_not_constant, $.identifier_preproc),
+              choice(
+                $.method_not_constant,
+                $.identifier_preproc,
+                // As in `#define _STR(x) #x`.
+                alias(/_[A-Za-z0-9_]*/, $.identifier_preproc),
+              ),
               token.immediate("("),
               repeat(seq($.identifier, optional(","))),
               ")",
@@ -1324,7 +1329,7 @@ module.exports = grammar({
         // A condition or message, kept as text to the end of the logical
         // line, which a backslash continues.
         seq(
-          choice("#if", "#elif", "#error", "#warning", "#pragma"),
+          choice("#if", "#elif", "#error", "#warning", "#pragma", "#line"),
           alias(/([^\\\r\n]|\\(.|\r?\n))*/, $.preproc_arg),
         ),
         // Only a comment may follow these, and it is lexed as one.

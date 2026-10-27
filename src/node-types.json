@@ -3619,6 +3619,10 @@
     "named": false
   },
   {
+    "type": "#line",
+    "named": false
+  },
+  {
     "type": "#pragma",
     "named": false
   },

@@ -19,8 +19,10 @@
 //         hdr.eth.src : ternary;  \
 //         hdr.eth.dst : ternary;
 //
-// which is told by a `;`, `@`, or brace that no expression contains. A value
-// that begins with a brace is a list of fields, which the grammar parses.
+// which is told by a `;`, `@`, or brace that no expression contains, or by a
+// `:` outside brackets that no `?` before it accounts for, as in the bounds of
+// a slice, `#define RANGE (W - 1):0`. A value that begins with a brace is a
+// list of fields, which the grammar parses.
 
 #include "tree_sitter/parser.h"
 
@@ -62,10 +64,14 @@ static bool at_line_end(TSLexer *lexer) {
 // Scans to the end of the logical line, marking the token's end after the last
 // character that is not whitespace, a line continuation, or a trailing
 // comment. Returns whether there was any such character, and sets
-// `*statements` if one of them can only belong to a statement or declaration.
+// `*statements` if the text cannot be an expression or a list of them.
 static bool scan_body(TSLexer *lexer, bool *statements) {
   bool has_text = false;
   *statements = false;
+  // Brackets open around the current character, and the `?`s outside them
+  // not yet matched by a `:`.
+  unsigned depth = 0;
+  unsigned questions = 0;
   while (!at_line_end(lexer)) {
     int32_t c = lexer->lookahead;
     if (c == ' ' || c == '\t') {
@@ -123,6 +129,18 @@ static bool scan_body(TSLexer *lexer, bool *statements) {
     } else {
       if (c == ';' || c == '@' || c == '{' || c == '}') {
         *statements = true;
+      } else if (c == '(' || c == '[') {
+        depth++;
+      } else if ((c == ')' || c == ']') && depth > 0) {
+        depth--;
+      } else if (c == '?' && depth == 0) {
+        questions++;
+      } else if (c == ':' && depth == 0) {
+        if (questions == 0) {
+          *statements = true;
+        } else {
+          questions--;
+        }
       }
       advance(lexer);
       lexer->mark_end(lexer);

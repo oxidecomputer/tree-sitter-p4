@@ -5632,6 +5632,15 @@
                         {
                           "type": "SYMBOL",
                           "name": "identifier_preproc"
+                        },
+                        {
+                          "type": "ALIAS",
+                          "content": {
+                            "type": "PATTERN",
+                            "value": "_[A-Za-z0-9_]*"
+                          },
+                          "named": true,
+                          "value": "identifier_preproc"
                         }
                       ]
                     },
@@ -5758,6 +5767,10 @@
                 {
                   "type": "STRING",
                   "value": "#pragma"
+                },
+                {
+                  "type": "STRING",
+                  "value": "#line"
                 }
               ]
             },

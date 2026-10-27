@@ -124,6 +124,7 @@
   "#ifdef"
   "#ifndef"
   "#include"
+  "#line"
   "#pragma"
   "#undef"
   "#warning"

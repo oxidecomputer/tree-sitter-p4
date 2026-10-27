@@ -159,6 +159,49 @@ An object-like macro holding declarations or key elements is text
     (preproc_arg)))
 
 ================================================================================
+A slice's bounds are text, while a conditional is an expression
+================================================================================
+
+#define RANGE (W - 1):0
+#define PICK c ? x[7:0] : 0
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (identifier_preproc)
+    (preproc_arg))
+  (preproc
+    (identifier_preproc)
+    (conditional_expression
+      condition: (identifier)
+      consequence: (slice_expression
+        value: (identifier)
+        high: (number
+          (decimal))
+        low: (number
+          (decimal)))
+      alternative: (number
+        (decimal)))))
+
+================================================================================
+Line markers, and a function-like macro beginning with an underscore
+================================================================================
+
+#line 3 "file.p4"
+#define _STR(x) #x
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (preproc_arg))
+  (preproc
+    (identifier_preproc)
+    (identifier)
+    (preproc_arg)))
+
+================================================================================
 Includes, and a define holding fields
 ================================================================================
 
