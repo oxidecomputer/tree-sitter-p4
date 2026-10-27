@@ -987,10 +987,11 @@ module.exports = grammar({
         ),
         seq("#include", $.include_path),
         seq(choice("#ifdef", "#ifndef", "#undef"), $._macro_name),
-        // A condition or message, kept as text to the end of the line.
+        // A condition or message, kept as text to the end of the logical
+        // line, which a backslash continues.
         seq(
           choice("#if", "#elif", "#error", "#warning", "#pragma"),
-          alias(/.*/, $.preproc_arg),
+          alias(/([^\\\r\n]|\\(.|\r?\n))*/, $.preproc_arg),
         ),
         // Only a comment may follow these, and it is lexed as one.
         "#else",

@@ -59,3 +59,26 @@ const bit<8> A = 1;
     (identifier)
     (number
       (decimal))))
+
+================================================================================
+A condition continues on the next line after a backslash
+================================================================================
+
+#if defined(A) \
+    || defined(B)
+const bit<8> X = 1;
+#endif
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (preproc
+    (preproc_arg))
+  (const_definition
+    (bit_type
+      (number
+        (decimal)))
+    (identifier)
+    (number
+      (decimal)))
+  (preproc))

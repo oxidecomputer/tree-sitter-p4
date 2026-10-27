@@ -4672,7 +4672,7 @@
               "type": "ALIAS",
               "content": {
                 "type": "PATTERN",
-                "value": ".*"
+                "value": "([^\\\\\\r\\n]|\\\\(.|\\r?\\n))*"
               },
               "named": true,
               "value": "preproc_arg"
