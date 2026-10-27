@@ -30,3 +30,6 @@ _obj/
 *.wasm
 *.obj
 *.o
+
+# Upstream programs that CI checks out to parse
+/.real-world/

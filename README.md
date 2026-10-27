@@ -121,6 +121,11 @@ hdr.ethernet.dst = mac;
 
 where `^` marks the column above it.
 
+CI also parses p4c's sample programs and dendrite's P4, at pinned commits. The
+p4c samples the grammar cannot parse yet are listed, with the reason, in
+[`test/p4c-known-failures.txt`][known-failures]; when a change makes one parse,
+CI asks for it to be taken off the list.
+
 The repository also contains formatting queries for [Topiary][topiary]. See
 [`topiary/README.md`][topiary-readme] for setup and usage.
 
@@ -134,6 +139,7 @@ To contribute, just open a pull request!
 This project is licensed under the [Mozilla Public License, version 2.0][mpl].
 
 [grammar-js]: grammar.js
+[known-failures]: test/p4c-known-failures.txt
 [mpl]: https://www.mozilla.org/en-US/MPL/2.0/
 [nvim-queries]: queries/nvim
 [p4-16-spec]: https://p4.org/p4-spec/docs/P4-16-v1.0.0-spec.html
