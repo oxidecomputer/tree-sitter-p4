@@ -174,3 +174,52 @@ control C(inout H h) {
             function: (identifier)
             arguments: (argument_list
               (string_literal))))))))
+
+================================================================================
+A parenthesized assignment target, and a method of a specialized type
+================================================================================
+
+control C() {
+    apply {
+        (x) = 1;
+        (h.f[0]) = 2;
+        MyParser<bit<8>>.apply(1);
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    body: (control_body
+      (block
+        (assignment_statement
+          left: (parenthesized_expression
+            (identifier))
+          right: (number
+            (decimal)))
+        (assignment_statement
+          left: (parenthesized_expression
+            (index_expression
+              object: (member_expression
+                object: (identifier)
+                member: (identifier))
+              index: (number
+                (decimal))))
+          right: (number
+            (decimal)))
+        (call_statement
+          (call_expression
+            function: (member_expression
+              object: (generic_type
+                type: (type_identifier)
+                type_arguments: (type_arguments
+                  (type_argument_list
+                    (bit_type
+                      (number
+                        (decimal))))))
+              member: (identifier))
+            arguments: (argument_list
+              (number
+                (decimal)))))))))

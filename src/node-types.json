@@ -507,6 +507,10 @@
             "named": true
           },
           {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
             "type": "prefixed_identifier",
             "named": true
           },
@@ -2315,6 +2319,10 @@
         "types": [
           {
             "type": "_expression",
+            "named": true
+          },
+          {
+            "type": "generic_type",
             "named": true
           }
         ]

@@ -2084,8 +2084,22 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "SYMBOL",
-            "name": "call_expression"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "call_expression"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_specialized_call"
+                },
+                "named": true,
+                "value": "call_expression"
+              }
+            ]
           },
           {
             "type": "STRING",
@@ -2093,6 +2107,57 @@
           }
         ]
       }
+    },
+    "_specialized_call": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "function",
+          "content": {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_specialized_member"
+            },
+            "named": true,
+            "value": "member_expression"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "arguments",
+          "content": {
+            "type": "SYMBOL",
+            "name": "argument_list"
+          }
+        }
+      ]
+    },
+    "_specialized_member": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "object",
+          "content": {
+            "type": "SYMBOL",
+            "name": "generic_type"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "."
+        },
+        {
+          "type": "FIELD",
+          "name": "member",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        }
+      ]
     },
     "return_statement": {
       "type": "SEQ",
@@ -2595,9 +2660,35 @@
           {
             "type": "SYMBOL",
             "name": "slice_expression"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_parenthesized_lvalue"
+            },
+            "named": true,
+            "value": "parenthesized_expression"
           }
         ]
       }
+    },
+    "_parenthesized_lvalue": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "("
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_lvalue"
+        },
+        {
+          "type": "STRING",
+          "value": ")"
+        }
+      ]
     },
     "assignment_statement": {
       "type": "SEQ",

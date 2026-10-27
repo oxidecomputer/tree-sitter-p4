@@ -573,7 +573,30 @@ module.exports = grammar({
     block: ($) => seq(repeat($.annotation), "{", repeat($._statement), "}"),
 
     // Preferred to a macro invocation followed by an empty statement.
-    call_statement: ($) => prec(1, seq($.call_expression, ";")),
+    call_statement: ($) =>
+      prec(
+        1,
+        seq(
+          choice(
+            $.call_expression,
+            alias($._specialized_call, $.call_expression),
+          ),
+          ";",
+        ),
+      ),
+
+    // A method of a generic type given its arguments, as in
+    // `MyParser<bit>.apply(1);`, which applies an instance the call makes.
+    // Only a statement may begin this way: in an expression, `a<b>.c` would
+    // be a comparison with `.c`.
+    _specialized_call: ($) =>
+      seq(
+        field("function", alias($._specialized_member, $.member_expression)),
+        field("arguments", $.argument_list),
+      ),
+
+    _specialized_member: ($) =>
+      seq(field("object", $.generic_type), ".", field("member", $.identifier)),
 
     return_statement: ($) =>
       seq("return", optional(field("value", $._expression)), ";"),
@@ -676,8 +699,12 @@ module.exports = grammar({
           $.member_expression,
           $.index_expression,
           $.slice_expression,
+          // As in `(x) = 1;`.
+          alias($._parenthesized_lvalue, $.parenthesized_expression),
         ),
       ),
+
+    _parenthesized_lvalue: ($) => seq("(", $._lvalue, ")"),
 
     // A slice may be assigned to, as in `x[15:8] = y;`.
     assignment_statement: ($) => seq($._assignment, ";"),
