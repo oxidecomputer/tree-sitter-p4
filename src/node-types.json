@@ -202,10 +202,6 @@
     "named": true,
     "subtypes": [
       {
-        "type": "action",
-        "named": true
-      },
-      {
         "type": "assignment_statement",
         "named": true
       },

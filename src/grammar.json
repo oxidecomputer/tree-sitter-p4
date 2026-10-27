@@ -2094,10 +2094,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "action"
-        },
-        {
-          "type": "SYMBOL",
           "name": "variable_declaration"
         },
         {

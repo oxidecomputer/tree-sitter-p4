@@ -584,7 +584,6 @@ module.exports = grammar({
         $.block,
         $.if_statement,
         $.switch_statement,
-        $.action,
         $.variable_declaration,
         $.assignment_statement,
         $.call_statement,
