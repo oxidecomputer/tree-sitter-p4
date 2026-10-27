@@ -864,13 +864,17 @@ module.exports = grammar({
       ),
 
     // A list, `{ a, b }`, or a structure, `{ x = a, y = b }`, whose last
-    // member may be `...` to leave the rest at their defaults.
+    // member may be `...` to leave the rest at their defaults. One may not
+    // mix the two kinds of member.
     tuple: ($) =>
       seq(
         "{",
         optional(
           seq(
-            commaSep1(choice($._expression, $.named_expression)),
+            choice(
+              commaSep1($._expression),
+              seq(commaSep1($.named_expression), optional(seq(",", "..."))),
+            ),
             optional(","),
           ),
         ),
