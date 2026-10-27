@@ -5330,7 +5330,7 @@
                     "type": "IMMEDIATE_TOKEN",
                     "content": {
                       "type": "PATTERN",
-                      "value": "[ \\t][^\\n]*"
+                      "value": "[ \\t]([^\\n\"]|\"([^\"\\\\]|\\\\(.|\\n))*\")*"
                     }
                   },
                   "named": true,

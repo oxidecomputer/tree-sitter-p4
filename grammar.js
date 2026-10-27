@@ -1236,11 +1236,17 @@ module.exports = grammar({
       choice(
         prec.right(seq("@", $.identifier, optional($.annotation_body))),
         // A P4-14 style pragma, whose body runs to the end of the line, as in
-        // `@pragma deprecated "Use verify_checksum instead."`.
+        // `@pragma deprecated "Use verify_checksum instead."`. As in p4c, a
+        // string in it may span lines.
         seq(
           alias(/@pragma[ \t]+/, "@pragma"),
           $.identifier,
-          optional(alias(token.immediate(/[ \t][^\n]*/), $.annotation_text)),
+          optional(
+            alias(
+              token.immediate(/[ \t]([^\n"]|"([^"\\]|\\(.|\n))*")*/),
+              $.annotation_text,
+            ),
+          ),
         ),
       ),
 

@@ -13,9 +13,8 @@ testdata/p4_16_samples/externArray1.p4
 testdata/p4_16_samples/generic-extern-inference.p4
 testdata/p4_16_samples/unreach1.p4
 
-# Annotations whose bodies are free text or span lines.
+# An annotation whose body is free text.
 testdata/p4_16_samples/free-form-annotation.p4
-testdata/p4_16_samples/pragma-string.p4
 
 # Not P4 until preprocessed: the branches of an `#if` each hold part of one
 # declaration, as in `#if ... extern register<T, I> #else extern register<T>
