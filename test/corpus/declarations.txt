@@ -288,12 +288,12 @@ Pipeline(MyParser(), MyIngress()) main;
               (decimal)))
           name: (identifier)))
       (control_body_element
-        (annotation
-          (identifier)
-          (annotation_body
-            (annotation_content
-              (string_literal))))
         (variable_declaration
+          (annotation
+            (identifier)
+            (annotation_body
+              (annotation_content
+                (string_literal))))
           type: (bit_type
             (number
               (decimal)))
@@ -778,3 +778,31 @@ package Switch<H>(Pipeline<H> p0, @optional Pipeline<H> p1, bool enable,
           (type_argument_list
             (type_identifier)))
         arguments: (argument_list)))))
+
+================================================================================
+An annotated instantiation at the top level
+================================================================================
+
+@name("namedmeter") direct_meter<bit<32>>(MeterType.packets) my_meter;
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (instantiation
+    (annotation
+      (identifier)
+      (annotation_body
+        (annotation_content
+          (string_literal))))
+    type: (generic_type
+      type: (type_identifier)
+      type_arguments: (type_arguments
+        (type_argument_list
+          (bit_type
+            (number
+              (decimal))))))
+    arguments: (argument_list
+      (member_expression
+        object: (identifier)
+        member: (identifier)))
+    name: (identifier)))

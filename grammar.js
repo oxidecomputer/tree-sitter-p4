@@ -333,10 +333,8 @@ module.exports = grammar({
     parser_local_element: ($) =>
       choice(
         $.constant_declaration,
-        seq(
-          repeat($.annotation),
-          choice($.variable_declaration, $.instantiation),
-        ),
+        $.variable_declaration,
+        $.instantiation,
         alias($._macro_declaration, $.macro_invocation),
       ),
 
@@ -376,10 +374,8 @@ module.exports = grammar({
 
     control_body_element: ($) =>
       choice(
-        seq(
-          repeat($.annotation),
-          choice($.variable_declaration, $.instantiation),
-        ),
+        $.variable_declaration,
+        $.instantiation,
         seq(repeat($.annotation), $.table),
         $.action,
         $.constant_declaration,
@@ -596,7 +592,8 @@ module.exports = grammar({
       prec.right(seq(choice("default", $._expression), ":", optional($.block))),
 
     // `bit<8> x;` or `bit<8> x = 0;`.
-    variable_declaration: ($) => seq($._variable, ";"),
+    // Annotated as in `@pa_no_overlay("ingress") bit<8> x;`.
+    variable_declaration: ($) => seq(repeat($.annotation), $._variable, ";"),
 
     // Without its semicolon, as a for loop's initializer takes it.
     _variable: ($) =>
@@ -945,6 +942,7 @@ module.exports = grammar({
     // `RegisterAction<...>(reg) ra = { ... };`.
     instantiation: ($) =>
       seq(
+        repeat($.annotation),
         field("type", choice($._type_identifier, $.generic_type)),
         field("arguments", $.argument_list),
         field("name", $.identifier),
