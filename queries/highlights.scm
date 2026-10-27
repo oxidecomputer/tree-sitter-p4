@@ -249,7 +249,9 @@
   "ternary"
 ] @constant.builtin
 
-"NoAction" @function.builtin
+; The action core.p4 declares, as in `NoAction;` or `NoAction()`.
+((identifier) @function.builtin
+  (#eq? @function.builtin "NoAction"))
 
 ; The methods P4-16 gives headers, header stacks, packets, and tables, and its
 ; built-in functions. The properties of a header stack, such as `next`, are

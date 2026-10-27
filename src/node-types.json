@@ -227,7 +227,7 @@
     "fields": {},
     "children": {
       "multiple": false,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "call",
@@ -2772,10 +2772,6 @@
   },
   {
     "type": "@",
-    "named": false
-  },
-  {
-    "type": "NoAction",
     "named": false
   },
   {

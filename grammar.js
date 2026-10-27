@@ -446,7 +446,8 @@ module.exports = grammar({
         ),
       ),
 
-    action_item: ($) => choice($.method_identifier, $.call, "NoAction"),
+    // `NoAction` is an ordinary action, which core.p4 declares.
+    action_item: ($) => choice($.method_identifier, $.call),
 
     // The standard match kinds, or one an architecture declares with
     // `match_kind`, such as `selector` or `atcam_partition_index`.

@@ -1739,10 +1739,6 @@
         {
           "type": "SYMBOL",
           "name": "call"
-        },
-        {
-          "type": "STRING",
-          "value": "NoAction"
         }
       ]
     },

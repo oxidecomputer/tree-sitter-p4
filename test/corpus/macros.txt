@@ -98,5 +98,7 @@ control c(inout H h) {
             (key_type))
           (table_element
             (macro_invocation)
-            (action_item))))
+            (action_item
+              (method_identifier
+                (identifier))))))
       (block))))

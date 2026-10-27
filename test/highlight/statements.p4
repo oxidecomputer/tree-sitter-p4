@@ -44,6 +44,8 @@ control C(inout headers_t hdr, in bit<9> port) {
 //      ^ keyword
 //                  ^ function
 //                           ^ function.builtin
+        default_action = NoAction();
+//                       ^ function.builtin
         size = 1024;
 //      ^ keyword
 //             ^ constant.numeric
