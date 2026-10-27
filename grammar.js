@@ -196,8 +196,10 @@ module.exports = grammar({
 
     function_declaration: ($) =>
       seq(
+        repeat($.annotation),
         field("type", choice($._type, $.type_identifier)),
         field("name", $.method_identifier),
+        optional($.type_parameters),
         "(",
         repeat($.parameter),
         ")",

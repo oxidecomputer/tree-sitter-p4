@@ -18,3 +18,9 @@ bool validate_ipv4_mcast_mac(
 action stop() {
 	exit;
 }
+
+// A generic, annotated function.
+@pure
+T max<T>(in T a, in T b) {
+    return a > b ? a : b;
+}
