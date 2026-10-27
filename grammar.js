@@ -149,11 +149,13 @@ module.exports = grammar({
     // semicolon, as in `ROTATE_BY_N(1)`. The grammar does not expand macros,
     // so this is the closest it gets to the expansion. It shares its prefix
     // with an instantiation, `T(args) name;`, and is told apart only by the
-    // missing name.
+    // missing name. Annotations may precede it, as they may when it expands
+    // to more annotations for the declaration that follows.
     _macro_declaration: ($) =>
       prec(
         1,
         seq(
+          repeat($.annotation),
           field("name", alias($.identifier, $.method_identifier)),
           field("arguments", $.argument_list),
         ),

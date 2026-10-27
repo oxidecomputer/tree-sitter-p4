@@ -95,3 +95,42 @@ control c(inout H h) {
             (action_item
               (method_identifier)))))
       (block))))
+
+================================================================================
+Annotations before a macro that expands to more of them
+================================================================================
+
+@pa_allow_pov_on_mocha
+CONTAINERS("ingress", hdr.main0)
+CONTAINERS("ingress", hdr.main1)
+@pa_solitary("ingress", "x")
+struct metadata {}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (macro_invocation
+    (annotation
+      (identifier))
+    name: (method_identifier)
+    arguments: (argument_list
+      (string_literal)
+      (member_expression
+        object: (identifier)
+        member: (identifier))))
+  (macro_invocation
+    name: (method_identifier)
+    arguments: (argument_list
+      (string_literal)
+      (member_expression
+        object: (identifier)
+        member: (identifier))))
+  (struct_declaration
+    (annotation
+      (identifier)
+      (annotation_body
+        (annotation_content
+          (string_literal))
+        (annotation_content
+          (string_literal))))
+    name: (type_identifier)))
