@@ -17,46 +17,38 @@ V1Switch(c()) main;
 
 (source_file
   (macro_invocation
-    (method_identifier
-      (identifier))
+    (method_identifier)
     (number
       (decimal)))
   (control_definition
-    (method_identifier
-      (identifier))
+    (method_identifier)
     (control_body
       (control_body_element
         (macro_invocation
-          (method_identifier
-            (identifier))
+          (method_identifier)
           (number
             (decimal))))
       (control_body_element
         (control_var
-          (type_identifier
-            (identifier))
+          (type_identifier)
           (identifier)))
       (block
         (macro_invocation
           (fval
-            (method_identifier
-              (identifier)))
+            (method_identifier))
           (number
             (decimal)))
         (call_statement
           (call
             (fval
-              (method_identifier
-                (identifier)))
+              (method_identifier))
             (number
               (decimal)))))))
   (package
-    (method_identifier
-      (identifier))
+    (method_identifier)
     (call
       (fval
-        (method_identifier
-          (identifier))))
+        (method_identifier)))
     (identifier)))
 
 ================================================================================
@@ -76,20 +68,17 @@ control c(inout H h) {
 
 (source_file
   (control_definition
-    name: (method_identifier
-      (identifier))
+    name: (method_identifier)
     (parameter
       (direction)
-      type: (type_identifier
-        (identifier))
+      type: (type_identifier)
       name: (identifier))
     body: (control_body
       (control_body_element
         (macro_invocation))
       (control_body_element
         (table
-          name: (type_identifier
-            (identifier))
+          name: (type_identifier)
           (table_element
             (macro_invocation)
             (lval
@@ -99,6 +88,5 @@ control c(inout H h) {
           (table_element
             (macro_invocation)
             (action_item
-              (method_identifier
-                (identifier))))))
+              (method_identifier)))))
       (block))))

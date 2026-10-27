@@ -20,28 +20,20 @@
 
 (type_identifier) @type
 
-(type_identifier
-  (identifier) @type)
-
-(method_identifier
-  (identifier) @function)
+(method_identifier) @function
 
 ; Declarations named after a type: controls, parsers, and packages.
 (control_definition
-  (method_identifier
-    (identifier) @type))
+  (method_identifier) @type)
 
 (parser_definition
-  (method_identifier
-    (identifier) @type))
+  (method_identifier) @type)
 
 (package
-  (method_identifier
-    (identifier) @type))
+  (method_identifier) @type)
 
 (method_field
-  (method_identifier
-    (identifier) @type))
+  (method_identifier) @type)
 
 ; Calls through a member, such as `pkt.extract(...)`, and method declarations.
 ;
@@ -50,21 +42,17 @@
 ; Only the head of a chain has no dot before it.
 (fval
   "."
-  (method_identifier
-    (identifier) @function.method))
+  (method_identifier) @function.method)
 
 (method
-  (method_identifier
-    (identifier) @function.method))
+  (method_identifier) @function.method)
 
 (macro_invocation
-  (method_identifier
-    (identifier) @function.macro))
+  (method_identifier) @function.macro)
 
 (macro_invocation
   (fval
-    (method_identifier
-      (identifier) @function.macro)))
+    (method_identifier) @function.macro))
 
 ; A macro standing for declarations, key elements, or actions, as in
 ; `key = { MAC_KEY }`, which is a bare name.
@@ -98,8 +86,7 @@
 
 ; Parser states, and the transitions that name them.
 (state
-  (method_identifier
-    (identifier) @label))
+  (method_identifier) @label)
 
 (transition
   (identifier) @label)
@@ -254,7 +241,10 @@
 ] @constant.builtin
 
 ; The action core.p4 declares, as in `NoAction;` or `NoAction()`.
-((identifier) @function.builtin
+([
+  (identifier)
+  (method_identifier)
+] @function.builtin
   (#eq? @function.builtin "NoAction"))
 
 ; The methods P4-16 gives headers, header stacks, packets, and tables, and its
@@ -262,8 +252,7 @@
 ; left out, since they are common field names too.
 (fval
   "."
-  (method_identifier
-    (identifier) @function.builtin)
+  (method_identifier) @function.builtin
   (#any-of? @function.builtin
     "advance" "apply" "emit" "extract" "isValid" "length" "lookahead"
     "maxSizeInBits" "maxSizeInBytes" "minSizeInBits" "minSizeInBytes"
@@ -272,8 +261,7 @@
 (call
   function: (fval
     .
-    (method_identifier
-      (identifier) @function.builtin)
+    (method_identifier) @function.builtin
     .)
   (#any-of? @function.builtin "static_assert" "verify"))
 
