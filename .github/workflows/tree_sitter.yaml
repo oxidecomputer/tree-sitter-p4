@@ -64,8 +64,8 @@ jobs:
           fi
 
       # Real programs use far more of the language than the examples do:
-      # p4c's 1,300 sample programs and its architecture includes, and
-      # dendrite's sidecar. Both are pinned, so that a change upstream
+      # p4c's 1,300 sample programs, its architecture includes, and its 600
+      # error tests, and dendrite's sidecar. Both are pinned, so that a change upstream
       # cannot turn this job red; move a pin deliberately.
       - name: check out p4c's samples
         uses: actions/checkout@v4
@@ -76,6 +76,8 @@ jobs:
           filter: blob:none
           sparse-checkout: |
             testdata/p4_16_samples
+            testdata/p4_16_errors
+            testdata/p4_16_errors_outputs
             p4include
           persist-credentials: false
 
@@ -89,18 +91,25 @@ jobs:
           sparse-checkout: dpd/p4
           persist-credentials: false
 
-      # The p4c files the grammar does not parse yet are listed, with the
-      # reason, in test/p4c-known-failures.txt. A listed file that parses
-      # fails the step too, so that the list only ever shrinks. Only regular
-      # files are parsed: some samples are links into p4c's backends, which
-      # the sparse checkout leaves out, and one missing file stops the CLI.
+      # Every program here should parse but for those listed, with the
+      # reason, in test/p4c-known-failures.txt. That includes p4c's error
+      # tests that p4c rejects only after parsing, which it tells by the
+      # absence of "syntax error" in the expected output. A listed file that
+      # parses fails the step too, so that the list only ever shrinks. Only
+      # regular files are parsed: some samples are links into p4c's backends,
+      # which the sparse checkout leaves out, and one missing file stops the
+      # CLI.
       - name: parse real-world programs
         run: |
           sed -e '/^#/d' -e '/^$/d' -e 's|^|.real-world/p4c/|' \
             test/p4c-known-failures.txt | sort > "$RUNNER_TEMP/known.txt"
-          find .real-world/p4c/testdata/p4_16_samples .real-world/p4c/p4include \
-            .real-world/dendrite/dpd/p4 -maxdepth 1 -type f -name '*.p4' |
-            sort | comm -23 - "$RUNNER_TEMP/known.txt" > "$RUNNER_TEMP/paths.txt"
+          grep -l "syntax error" .real-world/p4c/testdata/p4_16_errors_outputs/*.p4-stderr |
+            sed -e 's|_outputs/|/|' -e 's|-stderr$||' | sort > "$RUNNER_TEMP/syntax-errors.txt"
+          find .real-world/p4c/testdata/p4_16_samples .real-world/p4c/testdata/p4_16_errors \
+            .real-world/p4c/p4include .real-world/dendrite/dpd/p4 \
+            -maxdepth 1 -type f -name '*.p4' | sort |
+            comm -23 - "$RUNNER_TEMP/syntax-errors.txt" |
+            comm -23 - "$RUNNER_TEMP/known.txt" > "$RUNNER_TEMP/paths.txt"
           echo "parsing $(wc -l < "$RUNNER_TEMP/paths.txt") files"
 
           set +e
@@ -120,6 +129,32 @@ jobs:
             printf '%s\n' "$fixed"
             exit 1
           fi
+
+      # p4c's error tests that it rejects with a syntax error should not
+      # parse either, but for those listed, with the reason, in
+      # test/p4c-known-accepted.txt. A listed file that stops parsing fails
+      # the step too.
+      - name: reject p4c's syntax errors
+        run: |
+          sed -e '/^#/d' -e '/^$/d' -e 's|^|.real-world/p4c/|' \
+            test/p4c-known-accepted.txt | sort > "$RUNNER_TEMP/accepted.txt"
+          grep -l "syntax error" .real-world/p4c/testdata/p4_16_errors_outputs/*.p4-stderr |
+            sed -e 's|_outputs/|/|' -e 's|-stderr$||' | sort > "$RUNNER_TEMP/syntax-errors.txt"
+          echo "parsing $(wc -l < "$RUNNER_TEMP/syntax-errors.txt") files"
+          tree-sitter parse -q --paths "$RUNNER_TEMP/syntax-errors.txt" 2>&1 |
+            grep -E "ERROR|MISSING" | awk '{print $1}' | sort > "$RUNNER_TEMP/rejected.txt" || true
+          parsed=$(comm -23 "$RUNNER_TEMP/syntax-errors.txt" "$RUNNER_TEMP/rejected.txt")
+          unlisted=$(comm -23 <(printf '%s\n' "$parsed") "$RUNNER_TEMP/accepted.txt" | sed '/^$/d')
+          rejected=$(comm -12 "$RUNNER_TEMP/accepted.txt" "$RUNNER_TEMP/rejected.txt")
+          if [ -n "$unlisted" ]; then
+            echo "These parse, though p4c reports a syntax error in each:"
+            printf '%s\n' "$unlisted"
+          fi
+          if [ -n "$rejected" ]; then
+            echo "These no longer parse; take them off test/p4c-known-accepted.txt:"
+            printf '%s\n' "$rejected"
+          fi
+          [ -z "$unlisted" ] && [ -z "$rejected" ]
 
       # The bindings declare the language function by name, and nothing else
       # here links them: a misspelled symbol or a source file missing from a
