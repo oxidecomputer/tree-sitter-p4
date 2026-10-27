@@ -205,6 +205,15 @@
 "transition" @keyword
 
 [
+  "break"
+  "continue"
+  "for"
+] @keyword.repeat
+
+(for_statement
+  "in" @keyword.repeat)
+
+[
   "exit"
   "return"
 ] @keyword.return

@@ -47,13 +47,16 @@ module.exports = grammar({
       "action",
       "bit",
       "bool",
+      "break",
       "const",
+      "continue",
       "control",
       "default",
       "else",
       "exit",
       "extern",
       "false",
+      "for",
       "header",
       "header_union",
       "if",
@@ -483,6 +486,9 @@ module.exports = grammar({
         // A macro invocation: a call without its semicolon. Yields to a
         // longer expression, as in `F(a)(b);`.
         prec(-1, alias($.call_expression, $.macro_invocation)),
+        $.for_statement,
+        $.break_statement,
+        $.continue_statement,
         $.return_statement,
         $.exit_statement,
         $.empty_statement,
@@ -498,6 +504,57 @@ module.exports = grammar({
       seq("return", optional(field("value", $._expression)), ";"),
 
     exit_statement: (_) => seq("exit", ";"),
+
+    break_statement: (_) => seq("break", ";"),
+
+    continue_statement: (_) => seq("continue", ";"),
+
+    // `for (bit<8> i = 0; i < 4; i = i + 1) ...`, whose initializer and
+    // update are comma-separated statements without their semicolons, or
+    // `for (bit<8> i in 0 .. 3) ...`.
+    for_statement: ($) =>
+      seq(
+        "for",
+        "(",
+        choice(
+          seq(
+            optional(
+              commaSep1(
+                field(
+                  "initializer",
+                  choice(
+                    alias($._variable, $.variable_declaration),
+                    alias($._assignment, $.assignment_statement),
+                    $.call_expression,
+                  ),
+                ),
+              ),
+            ),
+            ";",
+            field("condition", $._expression),
+            ";",
+            optional(
+              commaSep1(
+                field(
+                  "update",
+                  choice(
+                    alias($._assignment, $.assignment_statement),
+                    $.call_expression,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          seq(
+            field("type", choice($._type, $._type_identifier)),
+            field("name", $.identifier),
+            "in",
+            field("collection", choice($._expression, $.range)),
+          ),
+        ),
+        ")",
+        field("body", $._statement),
+      ),
 
     empty_statement: (_) => ";",
 
@@ -519,12 +576,14 @@ module.exports = grammar({
       prec.right(seq(choice("default", $._expression), ":", optional($.block))),
 
     // `bit<8> x;` or `bit<8> x = 0;`.
-    variable_declaration: ($) =>
+    variable_declaration: ($) => seq($._variable, ";"),
+
+    // Without its semicolon, as a for loop's initializer takes it.
+    _variable: ($) =>
       seq(
         field("type", choice($.stack_type, $._type, $._type_identifier)),
         field("name", $.identifier),
         optional(seq("=", field("value", $._expression))),
-        ";",
       ),
 
     // What may be assigned to. Preferred to an expression, which `=` may also
@@ -1105,3 +1164,13 @@ module.exports = grammar({
       ),
   },
 });
+
+/**
+ * One or more of a rule, separated by commas.
+ *
+ * @param {RuleOrLiteral} rule
+ * @returns {SeqRule}
+ */
+function commaSep1(rule) {
+  return seq(rule, repeat(seq(",", rule)));
+}

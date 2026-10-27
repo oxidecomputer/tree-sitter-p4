@@ -36,3 +36,81 @@ control C() {
               (decimal)))
           (number
             (decimal)))))))
+
+================================================================================
+For loops, with break and continue
+================================================================================
+
+control C() {
+    apply {
+        for (bit<8> i = 0, j = 1; i < 4; i = i + 1, f(i)) {
+            continue;
+        }
+        for (; i < 4; ) { break; }
+        for (bit<8> x in 0 .. 3) f(x);
+        for (H h in hs) { }
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    name: (method_identifier)
+    body: (control_body
+      (block
+        (for_statement
+          initializer: (variable_declaration
+            type: (bit_type
+              (number
+                (decimal)))
+            name: (identifier)
+            value: (number
+              (decimal)))
+          initializer: (assignment_statement
+            left: (identifier)
+            right: (number
+              (decimal)))
+          condition: (binary_expression
+            left: (identifier)
+            right: (number
+              (decimal)))
+          update: (assignment_statement
+            left: (identifier)
+            right: (binary_expression
+              left: (identifier)
+              right: (number
+                (decimal))))
+          update: (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (identifier)))
+          body: (block
+            (continue_statement)))
+        (for_statement
+          condition: (binary_expression
+            left: (identifier)
+            right: (number
+              (decimal)))
+          body: (block
+            (break_statement)))
+        (for_statement
+          type: (bit_type
+            (number
+              (decimal)))
+          name: (identifier)
+          collection: (range
+            (number
+              (decimal))
+            (number
+              (decimal)))
+          body: (call_statement
+            (call_expression
+              function: (identifier)
+              arguments: (argument_list
+                (identifier)))))
+        (for_statement
+          type: (type_identifier)
+          name: (identifier)
+          collection: (identifier)
+          body: (block))))))

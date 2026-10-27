@@ -101,6 +101,7 @@ queries/nvim/highlights.scm: queries/highlights.scm
 	      -e 's/@constant\.builtin\.boolean/@boolean/g' \
 	      -e 's/@constant\.numeric/@number/g' \
 	      -e 's/@keyword\.control\.conditional/@keyword.conditional/g' \
+	      -e 's/@keyword\.control\.repeat/@keyword.repeat/g' \
 	      -e 's/@keyword\.control\.return/@keyword.return/g' \
 	      -e 's/@keyword\.control/@keyword/g' \
 	      -e 's/@keyword\.storage\.modifier/@keyword.modifier/g' \

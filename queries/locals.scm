@@ -12,6 +12,7 @@
   (block)
   (control_declaration)
   (extern_function_declaration)
+  (for_statement)
   (function_declaration)
   (method)
   (package)
@@ -25,6 +26,10 @@
   name: (identifier) @local.definition.variable)
 
 (instantiation
+  name: (identifier) @local.definition.variable)
+
+; The variable of `for (bit<8> i in l)`.
+(for_statement
   name: (identifier) @local.definition.variable)
 
 (constant_declaration

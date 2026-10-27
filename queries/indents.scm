@@ -44,6 +44,11 @@
   (#not-kind-eq? @indent "block")
   (#set! "scope" "all"))
 
+(for_statement
+  body: (_) @indent
+  (#not-kind-eq? @indent "block")
+  (#set! "scope" "all"))
+
 (if_statement
   alternative: (_) @indent
   (#not-kind-eq? @indent "block")

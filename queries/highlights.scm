@@ -203,6 +203,15 @@
 "transition" @keyword.control
 
 [
+  "break"
+  "continue"
+  "for"
+] @keyword.control.repeat
+
+(for_statement
+  "in" @keyword.control.repeat)
+
+[
   "exit"
   "return"
 ] @keyword.control.return

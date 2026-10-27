@@ -106,6 +106,19 @@
   ")" @append_space
 )
 
+; So does a loop's body. The clauses of a for loop are spaced as arguments.
+(for_statement
+  ")" @append_space
+)
+
+(for_statement
+  ";" @append_space
+)
+
+(for_statement
+  "in" @prepend_space @append_space
+)
+
 ; Braces. A softline breaks only where the construct holding it already spans
 ; several lines in the input, which is what keeps a guarded extract such as
 ; `if (h.isValid()) { pkt.extract(h); }` on one line.
@@ -281,6 +294,7 @@
   "default"
   "else"
   "extern"
+  "for"
   "header"
   "header_union"
   "if"

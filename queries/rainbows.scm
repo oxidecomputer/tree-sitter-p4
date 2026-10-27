@@ -16,6 +16,7 @@
   (error_declaration)
   (extern_declaration)
   (extern_function_declaration)
+  (for_statement)
   (function_declaration)
   (header_declaration)
   (header_union_declaration)
