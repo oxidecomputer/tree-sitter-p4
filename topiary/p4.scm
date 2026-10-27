@@ -284,6 +284,7 @@
   "switch"
   "table"
   "transition"
+  "type"
   "typedef"
   (binop)
 ] @prepend_space @append_space

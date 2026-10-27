@@ -204,6 +204,7 @@
   "parser"
   "struct"
   "table"
+  "type"
   "typedef"
 ] @keyword.type
 

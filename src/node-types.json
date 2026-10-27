@@ -2451,6 +2451,10 @@
             "named": false
           },
           {
+            "type": "stack_type",
+            "named": true
+          },
+          {
             "type": "tuple_type",
             "named": true
           },
@@ -3017,6 +3021,10 @@
   },
   {
     "type": "tuple",
+    "named": false
+  },
+  {
+    "type": "type",
     "named": false
   },
   {

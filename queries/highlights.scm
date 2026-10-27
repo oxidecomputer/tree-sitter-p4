@@ -202,6 +202,7 @@
   "parser"
   "struct"
   "table"
+  "type"
   "typedef"
 ] @keyword.storage.type
 

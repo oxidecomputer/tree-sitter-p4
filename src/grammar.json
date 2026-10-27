@@ -681,8 +681,17 @@
           }
         },
         {
-          "type": "STRING",
-          "value": "typedef"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "typedef"
+            },
+            {
+              "type": "STRING",
+              "value": "type"
+            }
+          ]
         },
         {
           "type": "FIELD",
@@ -690,6 +699,10 @@
           "content": {
             "type": "CHOICE",
             "members": [
+              {
+                "type": "SYMBOL",
+                "name": "stack_type"
+              },
               {
                 "type": "SYMBOL",
                 "name": "_type"

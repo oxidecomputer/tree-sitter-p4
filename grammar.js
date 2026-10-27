@@ -238,11 +238,13 @@ module.exports = grammar({
         "}",
       ),
 
+    // `typedef` names a type; `type` makes a new type from it, which P4Runtime
+    // treats as distinct, as in `type bit<9> PortId_t;`.
     typedef_definition: ($) =>
       seq(
         repeat($.annotation),
-        "typedef",
-        field("type", choice($._type, $.type_identifier)),
+        choice("typedef", "type"),
+        field("type", choice($.stack_type, $._type, $.type_identifier)),
         field("name", $.type_identifier),
         ";",
       ),

@@ -9,6 +9,10 @@
 //      ^ function.macro
 //             ^ variable.parameter
 
+type bit<9> PortId_t;
+// <- keyword.storage.type
+//          ^ type
+
 const bit<8> LIMIT = 0x0F;
 // <- keyword.storage.modifier
 //    ^ type.builtin
