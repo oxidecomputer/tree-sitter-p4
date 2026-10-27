@@ -279,6 +279,9 @@
 (unary_expression
   operator: _ @operator)
 
+(assignment_statement
+  operator: _ @operator)
+
 "mask" @keyword.operator
 
 [

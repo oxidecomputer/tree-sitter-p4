@@ -344,7 +344,7 @@
 )
 
 (assignment_statement
-  "=" @prepend_space @append_space
+  operator: _ @prepend_space @append_space
 )
 
 (parameter

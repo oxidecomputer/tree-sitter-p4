@@ -1,0 +1,38 @@
+================================================================================
+Compound assignments
+================================================================================
+
+control C() {
+    apply {
+        x += 1;
+        y <<= 2;
+        h.f[7:0] |+|= 1;
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (control_declaration
+    (method_identifier)
+    (control_body
+      (block
+        (assignment_statement
+          (identifier)
+          (number
+            (decimal)))
+        (assignment_statement
+          (identifier)
+          (number
+            (decimal)))
+        (assignment_statement
+          (slice_expression
+            (member_expression
+              (identifier)
+              (identifier))
+            (number
+              (decimal))
+            (number
+              (decimal)))
+          (number
+            (decimal)))))))

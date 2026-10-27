@@ -20,6 +20,8 @@ control C(inout headers_t hdr, in bit<9> port) {
 //                       ^ operator
         hdr.ipv4.ttl = hdr.ipv4.ttl |-| 1;
 //                                  ^ operator
+        hdr.ipv4.ttl |-|= 1;
+//                   ^ operator
         hdr.ipv4.flags[2:0] = (bit<3>)port;
 //                    ^ punctuation.bracket
 //                             ^ type.builtin

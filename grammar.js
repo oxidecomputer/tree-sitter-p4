@@ -541,8 +541,32 @@ module.exports = grammar({
       ),
 
     // A slice may be assigned to, as in `x[15:8] = y;`.
-    assignment_statement: ($) =>
-      seq(field("left", $._lvalue), "=", field("right", $._expression), ";"),
+    assignment_statement: ($) => seq($._assignment, ";"),
+
+    // Without its semicolon, as a for loop's initializer and update take it.
+    _assignment: ($) =>
+      seq(
+        field("left", $._lvalue),
+        field(
+          "operator",
+          choice(
+            "=",
+            "+=",
+            "-=",
+            "*=",
+            "/=",
+            "%=",
+            "<<=",
+            ">>=",
+            "&=",
+            "|=",
+            "^=",
+            "|+|=",
+            "|-|=",
+          ),
+        ),
+        field("right", $._expression),
+      ),
 
     action: ($) =>
       seq(
