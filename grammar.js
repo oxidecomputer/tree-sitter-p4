@@ -795,6 +795,9 @@ module.exports = grammar({
     // `Register(bit<32> size);`.
     method: ($) =>
       seq(
+        repeat($.annotation),
+        // A method an instance must define, in its initializer.
+        optional("abstract"),
         optional(field("type", choice($._type, $.type_identifier))),
         field("name", $.method_identifier),
         optional($.type_parameters),

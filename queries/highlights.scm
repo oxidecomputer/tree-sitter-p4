@@ -208,6 +208,7 @@
 ] @keyword.storage.type
 
 [
+  "abstract"
   "const"
   (direction)
 ] @keyword.storage.modifier

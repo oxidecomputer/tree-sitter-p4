@@ -1510,6 +1510,10 @@
       "required": false,
       "types": [
         {
+          "type": "annotation",
+          "named": true
+        },
+        {
           "type": "parameter",
           "named": true
         },
@@ -2859,6 +2863,10 @@
   },
   {
     "type": "_",
+    "named": false
+  },
+  {
+    "type": "abstract",
     "named": false
   },
   {

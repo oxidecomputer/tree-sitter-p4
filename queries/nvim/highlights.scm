@@ -210,6 +210,7 @@
 ] @keyword.type
 
 [
+  "abstract"
   "const"
   (direction)
 ] @keyword.modifier

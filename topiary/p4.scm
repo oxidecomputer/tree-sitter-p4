@@ -265,6 +265,7 @@
 
 ; Surround spaces
 [
+  "abstract"
   "action"
   "apply"
   "const"

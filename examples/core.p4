@@ -40,6 +40,7 @@ extern GenericRegister<T, I> {
     GenericRegister(bit<32> size);
     T read(in I index);
     void write<V>(in I index, in V value);
+    @synchronous(write) abstract T update(in T value);
 }
 
 // Functions the target provides.
