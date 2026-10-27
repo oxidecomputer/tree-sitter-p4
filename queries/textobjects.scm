@@ -13,7 +13,7 @@
 (function_declaration
   body: (_) @function.inside) @function.around
 
-(state
+(parser_state
   body: (_) @function.inside) @function.around
 
 [
@@ -22,28 +22,28 @@
 ] @function.around
 
 ; Classes: the declarations that hold other declarations.
-(control_definition
+(control_declaration
   body: (_) @class.inside) @class.around
 
-(parser_definition
+(parser_declaration
   [
     (parser_local_element)
-    (state)
+    (parser_state)
   ]+ @class.inside) @class.around
 
-(extern_definition
+(extern_declaration
   (method)+ @class.inside) @class.around
 
 (table
-  (table_element)+ @class.inside) @class.around
+  (table_property)+ @class.inside) @class.around
 
-(header_definition
+(header_declaration
   (field)* @class.inside) @class.around
 
-(header_union_definition
+(header_union_declaration
   (field)* @class.inside) @class.around
 
-(struct_definition
+(struct_declaration
   (field)* @class.inside) @class.around
 
 ; Parameters and arguments. A parameter takes in its trailing comma.
@@ -65,7 +65,7 @@
   (field)
   (select_case)
   (switch_case)
-  (table_element)
+  (table_property)
 ] @entry.around
 
 (tuple

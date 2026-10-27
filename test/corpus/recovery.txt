@@ -14,7 +14,7 @@ control C(inout H h) {
 --------------------------------------------------------------------------------
 
 (source_file
-  (control_definition
+  (control_declaration
     name: (method_identifier)
     (parameter
       (direction)
@@ -37,7 +37,7 @@ control C(inout H h) {
       (control_body_element
         (table
           name: (type_identifier)
-          (table_element
+          (table_property
             (action_item
               (method_identifier)))))
       (block

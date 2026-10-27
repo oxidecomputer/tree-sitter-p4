@@ -10,7 +10,7 @@
         "members": [
           {
             "type": "SYMBOL",
-            "name": "_definition"
+            "name": "_declaration"
           },
           {
             "type": "STRING",
@@ -19,7 +19,7 @@
         ]
       }
     },
-    "_definition": {
+    "_declaration": {
       "type": "CHOICE",
       "members": [
         {
@@ -36,27 +36,27 @@
         },
         {
           "type": "SYMBOL",
-          "name": "header_definition"
+          "name": "header_declaration"
         },
         {
           "type": "SYMBOL",
-          "name": "header_union_definition"
+          "name": "header_union_declaration"
         },
         {
           "type": "SYMBOL",
-          "name": "struct_definition"
+          "name": "struct_declaration"
         },
         {
           "type": "SYMBOL",
-          "name": "typedef_definition"
+          "name": "typedef_declaration"
         },
         {
           "type": "SYMBOL",
-          "name": "const_definition"
+          "name": "constant_declaration"
         },
         {
           "type": "SYMBOL",
-          "name": "extern_definition"
+          "name": "extern_declaration"
         },
         {
           "type": "SYMBOL",
@@ -64,11 +64,11 @@
         },
         {
           "type": "SYMBOL",
-          "name": "parser_definition"
+          "name": "parser_declaration"
         },
         {
           "type": "SYMBOL",
-          "name": "control_definition"
+          "name": "control_declaration"
         },
         {
           "type": "SYMBOL",
@@ -365,7 +365,7 @@
         }
       ]
     },
-    "header_definition": {
+    "header_declaration": {
       "type": "CHOICE",
       "members": [
         {
@@ -430,7 +430,7 @@
         }
       ]
     },
-    "header_union_definition": {
+    "header_union_declaration": {
       "type": "SEQ",
       "members": [
         {
@@ -469,7 +469,7 @@
         }
       ]
     },
-    "struct_definition": {
+    "struct_declaration": {
       "type": "SEQ",
       "members": [
         {
@@ -508,7 +508,7 @@
         }
       ]
     },
-    "typedef_definition": {
+    "typedef_declaration": {
       "type": "SEQ",
       "members": [
         {
@@ -566,7 +566,7 @@
         }
       ]
     },
-    "const_definition": {
+    "constant_declaration": {
       "type": "SEQ",
       "members": [
         {
@@ -623,7 +623,7 @@
         }
       ]
     },
-    "extern_definition": {
+    "extern_declaration": {
       "type": "SEQ",
       "members": [
         {
@@ -766,7 +766,7 @@
         }
       ]
     },
-    "parser_definition": {
+    "parser_declaration": {
       "type": "CHOICE",
       "members": [
         {
@@ -916,7 +916,7 @@
                   },
                   {
                     "type": "SYMBOL",
-                    "name": "state"
+                    "name": "parser_state"
                   }
                 ]
               }
@@ -934,7 +934,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "const_definition"
+          "name": "constant_declaration"
         },
         {
           "type": "SEQ",
@@ -972,7 +972,7 @@
         }
       ]
     },
-    "control_definition": {
+    "control_declaration": {
       "type": "CHOICE",
       "members": [
         {
@@ -1222,7 +1222,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "const_definition"
+          "name": "constant_declaration"
         },
         {
           "type": "ALIAS",
@@ -1262,7 +1262,7 @@
           "type": "REPEAT",
           "content": {
             "type": "SYMBOL",
-            "name": "table_element"
+            "name": "table_property"
           }
         },
         {
@@ -1271,7 +1271,7 @@
         }
       ]
     },
-    "table_element": {
+    "table_property": {
       "type": "CHOICE",
       "members": [
         {
@@ -1307,7 +1307,7 @@
                       },
                       {
                         "type": "SYMBOL",
-                        "name": "key_type"
+                        "name": "match_kind"
                       },
                       {
                         "type": "REPEAT",
@@ -1668,7 +1668,7 @@
         }
       ]
     },
-    "key_type": {
+    "match_kind": {
       "type": "CHOICE",
       "members": [
         {
@@ -1697,7 +1697,7 @@
         }
       ]
     },
-    "state": {
+    "parser_state": {
       "type": "SEQ",
       "members": [
         {
@@ -1738,7 +1738,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "conditional"
+          "name": "if_statement"
         },
         {
           "type": "SYMBOL",
@@ -1758,7 +1758,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "transition"
+          "name": "transition_statement"
         },
         {
           "type": "SYMBOL",
@@ -2116,7 +2116,7 @@
         }
       ]
     },
-    "transition": {
+    "transition_statement": {
       "type": "CHOICE",
       "members": [
         {
@@ -2148,7 +2148,7 @@
               },
               {
                 "type": "SYMBOL",
-                "name": "select_expr"
+                "name": "select_expression"
               },
               {
                 "type": "CHOICE",
@@ -2167,7 +2167,7 @@
         }
       ]
     },
-    "select_expr": {
+    "select_expression": {
       "type": "SEQ",
       "members": [
         {
@@ -2805,7 +2805,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "bool"
+          "name": "boolean_literal"
         }
       ]
     },
@@ -3460,7 +3460,7 @@
         ]
       }
     },
-    "conditional": {
+    "if_statement": {
       "type": "PREC_RIGHT",
       "value": 0,
       "content": {
@@ -3589,7 +3589,7 @@
                   "name": "initializer",
                   "content": {
                     "type": "SYMBOL",
-                    "name": "obj_initializer"
+                    "name": "object_initializer"
                   }
                 }
               ]
@@ -3605,7 +3605,7 @@
         }
       ]
     },
-    "obj_initializer": {
+    "object_initializer": {
       "type": "SEQ",
       "members": [
         {
@@ -4394,7 +4394,7 @@
       "type": "PATTERN",
       "value": "[A-Z][A-Z0-9_]*"
     },
-    "bool": {
+    "boolean_literal": {
       "type": "CHOICE",
       "members": [
         {
@@ -5036,7 +5036,7 @@
   ],
   "inline": [],
   "supertypes": [
-    "_definition",
+    "_declaration",
     "_statement",
     "_expression"
   ],

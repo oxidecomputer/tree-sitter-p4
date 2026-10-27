@@ -17,7 +17,7 @@ const bit<8> A = 1;
     (identifier_preproc))
   (preproc
     (identifier_preproc))
-  (const_definition
+  (constant_declaration
     (bit_type
       (number
         (decimal)))
@@ -50,7 +50,7 @@ const bit<8> A = 1;
       (identifier)
       (identifier)))
   (comment)
-  (const_definition
+  (constant_declaration
     (bit_type
       (number
         (decimal)))
@@ -72,7 +72,7 @@ const bit<8> X = 1;
 (source_file
   (preproc
     (preproc_arg))
-  (const_definition
+  (constant_declaration
     (bit_type
       (number
         (decimal)))
@@ -112,7 +112,7 @@ const bit<8> X = 1;
     (identifier_preproc)
     (identifier)
     (preproc_arg))
-  (const_definition
+  (constant_declaration
     (bit_type
       (number
         (decimal)))

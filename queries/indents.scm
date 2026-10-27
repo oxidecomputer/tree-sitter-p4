@@ -10,24 +10,24 @@
   (action)
   (argument_list)
   (block)
-  (control_definition)
+  (control_declaration)
   (error_declaration)
-  (extern_definition)
+  (extern_declaration)
   (extern_function_declaration)
   (function_declaration)
-  (header_definition)
-  (header_union_definition)
+  (header_declaration)
+  (header_union_declaration)
   (macro_invocation)
   (match_kind_declaration)
   (method)
-  (obj_initializer)
+  (object_initializer)
   (package)
-  (parser_definition)
-  (select_expr)
-  (struct_definition)
+  (parser_declaration)
+  (select_expression)
+  (struct_declaration)
   (switch_statement)
   (table)
-  (table_element)
+  (table_property)
   (tuple)
   (tuple_keyset)
 ] @indent
@@ -39,13 +39,13 @@
 ] @outdent
 
 ; A branch that is not a block is indented under its condition.
-(conditional
+(if_statement
   consequence: (_) @indent
   (#not-kind-eq? @indent "block")
   (#set! "scope" "all"))
 
-(conditional
+(if_statement
   alternative: (_) @indent
   (#not-kind-eq? @indent "block")
-  (#not-kind-eq? @indent "conditional")
+  (#not-kind-eq? @indent "if_statement")
   (#set! "scope" "all"))

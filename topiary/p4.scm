@@ -26,8 +26,8 @@
   ";" @prepend_antispace
 )
 
-(table_element
-  (key_type) @append_space
+(table_property
+  (match_kind) @append_space
   .
   (annotation)
 )
@@ -51,10 +51,10 @@
   (parser_local_element)
   (preproc)
   (select_case)
-  (state)
+  (parser_state)
   (switch_case)
-  (table_element)
-  (_definition)
+  (table_property)
+  (_declaration)
 ] @allow_blank_line_before
 
 ; Input softlines before comments, so that the input decides whether a comment
@@ -80,10 +80,10 @@
     (parser_local_element)
     (preproc)
     (select_case)
-    (state)
+    (parser_state)
     (switch_case)
-    (table_element)
-    (_definition)
+    (table_property)
+    (_declaration)
   ] @append_spaced_softline
   .
   (comment)* @do_nothing
@@ -102,7 +102,7 @@
 )
 
 ; A branch that is not a block follows its condition on the same line.
-(conditional
+(if_statement
   ")" @append_space
 )
 
@@ -115,54 +115,54 @@
 ; then collect the indentation markers four times over.
 [
   (block "{" @prepend_space)
-  (control_definition "{" @prepend_space)
-  (extern_definition "{" @prepend_space)
-  (header_definition "{" @prepend_space)
-  (header_union_definition "{" @prepend_space)
+  (control_declaration "{" @prepend_space)
+  (extern_declaration "{" @prepend_space)
+  (header_declaration "{" @prepend_space)
+  (header_union_declaration "{" @prepend_space)
   (error_declaration "{" @prepend_space)
   (match_kind_declaration "{" @prepend_space)
-  (obj_initializer "{" @prepend_space)
-  (parser_definition "{" @prepend_space)
-  (select_expr "{" @prepend_space)
-  (struct_definition "{" @prepend_space)
+  (object_initializer "{" @prepend_space)
+  (parser_declaration "{" @prepend_space)
+  (select_expression "{" @prepend_space)
+  (struct_declaration "{" @prepend_space)
   (switch_statement "{" @prepend_space)
   (table "{" @prepend_space)
-  (table_element "{" @prepend_space)
+  (table_property "{" @prepend_space)
 ]
 
 [
   (block "{" @append_spaced_softline @append_indent_start)
-  (control_definition "{" @append_spaced_softline @append_indent_start)
-  (extern_definition "{" @append_spaced_softline @append_indent_start)
-  (header_definition "{" @append_spaced_softline @append_indent_start)
-  (header_union_definition "{" @append_spaced_softline @append_indent_start)
+  (control_declaration "{" @append_spaced_softline @append_indent_start)
+  (extern_declaration "{" @append_spaced_softline @append_indent_start)
+  (header_declaration "{" @append_spaced_softline @append_indent_start)
+  (header_union_declaration "{" @append_spaced_softline @append_indent_start)
   (error_declaration "{" @append_spaced_softline @append_indent_start)
   (match_kind_declaration "{" @append_spaced_softline @append_indent_start)
-  (obj_initializer "{" @append_spaced_softline @append_indent_start)
-  (parser_definition "{" @append_spaced_softline @append_indent_start)
-  (select_expr "{" @append_spaced_softline @append_indent_start)
-  (struct_definition "{" @append_spaced_softline @append_indent_start)
+  (object_initializer "{" @append_spaced_softline @append_indent_start)
+  (parser_declaration "{" @append_spaced_softline @append_indent_start)
+  (select_expression "{" @append_spaced_softline @append_indent_start)
+  (struct_declaration "{" @append_spaced_softline @append_indent_start)
   (switch_statement "{" @append_spaced_softline @append_indent_start)
   (table "{" @append_spaced_softline @append_indent_start)
-  (table_element "{" @append_spaced_softline @append_indent_start)
+  (table_property "{" @append_spaced_softline @append_indent_start)
   (tuple "{" @append_empty_softline @append_indent_start)
 ]
 
 [
   (block "}" @prepend_spaced_softline @prepend_indent_end)
-  (control_definition "}" @prepend_spaced_softline @prepend_indent_end)
-  (extern_definition "}" @prepend_spaced_softline @prepend_indent_end)
-  (header_definition "}" @prepend_spaced_softline @prepend_indent_end)
-  (header_union_definition "}" @prepend_spaced_softline @prepend_indent_end)
+  (control_declaration "}" @prepend_spaced_softline @prepend_indent_end)
+  (extern_declaration "}" @prepend_spaced_softline @prepend_indent_end)
+  (header_declaration "}" @prepend_spaced_softline @prepend_indent_end)
+  (header_union_declaration "}" @prepend_spaced_softline @prepend_indent_end)
   (error_declaration "}" @prepend_spaced_softline @prepend_indent_end)
   (match_kind_declaration "}" @prepend_spaced_softline @prepend_indent_end)
-  (obj_initializer "}" @prepend_spaced_softline @prepend_indent_end)
-  (parser_definition "}" @prepend_spaced_softline @prepend_indent_end)
-  (select_expr "}" @prepend_spaced_softline @prepend_indent_end)
-  (struct_definition "}" @prepend_spaced_softline @prepend_indent_end)
+  (object_initializer "}" @prepend_spaced_softline @prepend_indent_end)
+  (parser_declaration "}" @prepend_spaced_softline @prepend_indent_end)
+  (select_expression "}" @prepend_spaced_softline @prepend_indent_end)
+  (struct_declaration "}" @prepend_spaced_softline @prepend_indent_end)
   (switch_statement "}" @prepend_spaced_softline @prepend_indent_end)
   (table "}" @prepend_spaced_softline @prepend_indent_end)
-  (table_element "}" @prepend_spaced_softline @prepend_indent_end)
+  (table_property "}" @prepend_spaced_softline @prepend_indent_end)
   (tuple "}" @prepend_empty_softline @prepend_indent_end)
 ]
 
@@ -171,7 +171,7 @@
   "apply" @prepend_spaced_softline @allow_blank_line_before
 )
 
-; Entries of the braced forms of table_element (`key`, `actions`, entry lists)
+; Entries of the braced forms of table_property (`key`, `actions`, entry lists)
 ; are separated by semicolons, unlike the one in `size = 1024;`, which closes
 ; the element and breaks by the rule above.
 ;
@@ -179,7 +179,7 @@
 ; on the line sits inside the parent. Anchoring a quantified comment after the
 ; parent instead matched the wrong node and took time cubic in the number of
 ; entries: about 3 s for a table of 400 const entries.
-(table_element
+(table_property
   "{"
   ";" @append_spaced_softline
   .
@@ -187,7 +187,7 @@
 )
 
 ; Each entry of an entry list.
-(table_element
+(table_property
   (entry) @append_spaced_softline
   .
   (comment)* @do_nothing
@@ -195,7 +195,7 @@
 
 ; A macro standing for key elements or actions, as in `key = { MAC_KEY }`, has
 ; no semicolon of its own to break after.
-(table_element
+(table_property
   (macro_invocation) @append_spaced_softline
   .
   (comment)* @do_nothing
@@ -213,12 +213,12 @@
 (
   [
     (action "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-    (control_definition "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
+    (control_declaration "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
     (extern_function_declaration "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
     (function_declaration "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
     (method "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
     (package "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
-    (parser_definition "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
+    (parser_declaration "(" @prepend_begin_scope @append_empty_scoped_softline @append_indent_start)
   ]
   (#scope_id! "parameter_list")
 )
@@ -226,12 +226,12 @@
 (
   [
     (action ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-    (control_definition ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
+    (control_declaration ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
     (extern_function_declaration ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
     (function_declaration ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
     (method ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
     (package ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
-    (parser_definition ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
+    (parser_declaration ")" @append_end_scope @prepend_empty_scoped_softline @prepend_indent_end)
   ]
   (#scope_id! "parameter_list")
 )
@@ -335,7 +335,7 @@
   (varbit_type)
 ] @append_space
 
-(const_definition
+(constant_declaration
   "=" @prepend_space @append_space
 )
 
@@ -356,7 +356,7 @@
 )
 
 ; The methods of an instance's initializer, one per line.
-(obj_initializer
+(object_initializer
   [
     (function_declaration)
     (instantiation)
@@ -366,7 +366,7 @@
   (comment)* @do_nothing
 )
 
-(table_element
+(table_property
   "=" @prepend_space @append_space
 )
 
@@ -388,13 +388,13 @@
 [
   (action "(" @prepend_antispace)
   (argument_list "(" @prepend_antispace)
-  (control_definition "(" @prepend_antispace)
+  (control_declaration "(" @prepend_antispace)
   (extern_function_declaration "(" @prepend_antispace)
   (function_declaration "(" @prepend_antispace)
   (method "(" @prepend_antispace)
   (package "(" @prepend_antispace)
-  (parser_definition "(" @prepend_antispace)
-  (select_expr "(" @prepend_antispace)
+  (parser_declaration "(" @prepend_antispace)
+  (select_expression "(" @prepend_antispace)
 ]
 
 ; Never put a space before a comma or a semicolon
@@ -415,7 +415,7 @@
   (entry ":" @prepend_antispace @append_space)
   (select_case ":" @prepend_antispace @append_space)
   (switch_case ":" @prepend_antispace @append_space)
-  (table_element ":" @prepend_antispace @append_space)
+  (table_property ":" @prepend_antispace @append_space)
 ]
 
 (slice_expression

@@ -77,8 +77,8 @@ module.exports = grammar({
     ],
   },
 
-  // Hidden rules that queries may still name, as in `(_definition)`.
-  supertypes: ($) => [$._definition, $._statement, $._expression],
+  // Hidden rules that queries may still name, as in `(_declaration)`.
+  supertypes: ($) => [$._declaration, $._statement, $._expression],
 
   precedences: ($) => [
     [$.bit_type, $._type],
@@ -103,22 +103,22 @@ module.exports = grammar({
 
   rules: {
     // A stray semicolon is an empty declaration, as after `struct S { };`.
-    source_file: ($) => repeat(choice($._definition, ";")),
+    source_file: ($) => repeat(choice($._declaration, ";")),
 
-    _definition: ($) =>
+    _declaration: ($) =>
       choice(
         $.function_declaration,
         $.match_kind_declaration,
         $.error_declaration,
-        $.header_definition,
-        $.header_union_definition,
-        $.struct_definition,
-        $.typedef_definition,
-        $.const_definition,
-        $.extern_definition,
+        $.header_declaration,
+        $.header_union_declaration,
+        $.struct_declaration,
+        $.typedef_declaration,
+        $.constant_declaration,
+        $.extern_declaration,
         $.extern_function_declaration,
-        $.parser_definition,
-        $.control_definition,
+        $.parser_declaration,
+        $.control_declaration,
         $.package,
         // A package instance, as in `V1Switch(p(), c()) main;`.
         $.instantiation,
@@ -193,7 +193,7 @@ module.exports = grammar({
         field("body", $.block),
       ),
 
-    header_definition: ($) =>
+    header_declaration: ($) =>
       choice(
         seq("header", field("name", $._type_identifier), $.identifier_preproc),
         seq(
@@ -207,7 +207,7 @@ module.exports = grammar({
       ),
 
     // A header union holds at most one valid header of its members.
-    header_union_definition: ($) =>
+    header_union_declaration: ($) =>
       seq(
         repeat($.annotation),
         "header_union",
@@ -217,7 +217,7 @@ module.exports = grammar({
         "}",
       ),
 
-    struct_definition: ($) =>
+    struct_declaration: ($) =>
       seq(
         repeat($.annotation),
         "struct",
@@ -229,7 +229,7 @@ module.exports = grammar({
 
     // `typedef` names a type; `type` makes a new type from it, which P4Runtime
     // treats as distinct, as in `type bit<9> PortId_t;`.
-    typedef_definition: ($) =>
+    typedef_declaration: ($) =>
       seq(
         repeat($.annotation),
         choice("typedef", "type"),
@@ -238,7 +238,7 @@ module.exports = grammar({
         ";",
       ),
 
-    const_definition: ($) =>
+    constant_declaration: ($) =>
       seq(
         repeat($.annotation),
         "const",
@@ -249,7 +249,7 @@ module.exports = grammar({
         ";",
       ),
 
-    extern_definition: ($) =>
+    extern_declaration: ($) =>
       seq(
         repeat($.annotation),
         "extern",
@@ -287,7 +287,7 @@ module.exports = grammar({
         ";",
       ),
 
-    parser_definition: ($) =>
+    parser_declaration: ($) =>
       choice(
         seq(
           repeat($.annotation),
@@ -310,7 +310,7 @@ module.exports = grammar({
           // Constructor parameters, as for a control.
           optional(seq("(", repeat($.parameter), ")")),
           "{",
-          repeat1(choice($.parser_local_element, $.state)),
+          repeat1(choice($.parser_local_element, $.parser_state)),
           "}",
         ),
       ),
@@ -319,7 +319,7 @@ module.exports = grammar({
     // sit between the states.
     parser_local_element: ($) =>
       choice(
-        $.const_definition,
+        $.constant_declaration,
         seq(
           repeat($.annotation),
           choice($.variable_declaration, $.instantiation),
@@ -327,7 +327,7 @@ module.exports = grammar({
         alias($._macro_declaration, $.macro_invocation),
       ),
 
-    control_definition: ($) =>
+    control_declaration: ($) =>
       choice(
         seq(
           repeat($.annotation),
@@ -369,7 +369,7 @@ module.exports = grammar({
         ),
         seq(repeat($.annotation), $.table),
         seq(repeat($.annotation), $.action),
-        $.const_definition,
+        $.constant_declaration,
         alias($._macro_declaration, $.macro_invocation),
         $._macro_use,
       ),
@@ -379,11 +379,11 @@ module.exports = grammar({
         "table",
         field("name", $._type_identifier),
         "{",
-        repeat($.table_element),
+        repeat($.table_property),
         "}",
       ),
 
-    table_element: ($) =>
+    table_property: ($) =>
       choice(
         seq(
           "key",
@@ -392,7 +392,7 @@ module.exports = grammar({
           // Either list may be empty in P4-16.
           repeat(
             choice(
-              seq($._expression, ":", $.key_type, repeat($.annotation), ";"),
+              seq($._expression, ":", $.match_kind, repeat($.annotation), ";"),
               $._macro_use,
             ),
           ),
@@ -459,10 +459,10 @@ module.exports = grammar({
 
     // The standard match kinds, or one an architecture declares with
     // `match_kind`, such as `selector` or `atcam_partition_index`.
-    key_type: ($) =>
+    match_kind: ($) =>
       choice("range", "exact", "ternary", "lpm", "optional", $.identifier),
 
-    state: ($) =>
+    parser_state: ($) =>
       seq(
         repeat($.annotation),
         "state",
@@ -473,12 +473,12 @@ module.exports = grammar({
     _statement: ($) =>
       choice(
         $.block,
-        $.conditional,
+        $.if_statement,
         $.switch_statement,
         $.action,
         $.variable_declaration,
         $.assignment_statement,
-        $.transition,
+        $.transition_statement,
         $.call_statement,
         // A macro invocation: a call without its semicolon. Yields to a
         // longer expression, as in `F(a)(b);`.
@@ -557,13 +557,13 @@ module.exports = grammar({
     // The select form takes no trailing semicolon in the P4-16 grammar,
     // where selectExpression ends at the closing brace. One is accepted
     // anyway since it is common in existing code.
-    transition: ($) =>
+    transition_statement: ($) =>
       choice(
         seq("transition", $.identifier, ";"),
-        prec.right(seq("transition", $.select_expr, optional(";"))),
+        prec.right(seq("transition", $.select_expression, optional(";"))),
       ),
 
-    select_expr: ($) =>
+    select_expression: ($) =>
       seq(
         "select",
         "(",
@@ -711,7 +711,7 @@ module.exports = grammar({
         prec(1, $.identifier_preproc),
         prec(1, $.string_literal),
         $.number,
-        $.bool,
+        $.boolean_literal,
       ),
 
     conditional_expression: ($) =>
@@ -799,10 +799,10 @@ module.exports = grammar({
         ),
       ),
 
-    // As in P4-16, each branch is any statement, so `else if` is a
-    // conditional nested in the else branch, and a branch need not be a
+    // As in P4-16, each branch is any statement, so `else if` is an
+    // if_statement nested in the else branch, and a branch need not be a
     // block. An `else` belongs to the nearest `if`.
-    conditional: ($) =>
+    if_statement: ($) =>
       prec.right(
         seq(
           "if",
@@ -822,13 +822,13 @@ module.exports = grammar({
         optional(seq("<", $.type_argument_list, ">")),
         field("arguments", $.argument_list),
         field("name", $.identifier),
-        optional(seq("=", field("initializer", $.obj_initializer))),
+        optional(seq("=", field("initializer", $.object_initializer))),
         ";",
       ),
 
     // The methods an instance defines, as in
     // `RegisterAction<...>(reg) ra = { void apply(...) { ... } };`.
-    obj_initializer: ($) =>
+    object_initializer: ($) =>
       seq(
         "{",
         repeat(
@@ -951,7 +951,7 @@ module.exports = grammar({
     identifier: (_) => /[a-zA-Z_][a-zA-Z0-9_]*/,
     identifier_preproc: (_) => /[A-Z][A-Z0-9_]*/,
 
-    bool: (_) => choice("true", "false"),
+    boolean_literal: (_) => choice("true", "false"),
 
     number: ($) =>
       choice(

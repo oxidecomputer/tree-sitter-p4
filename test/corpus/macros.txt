@@ -21,7 +21,7 @@ V1Switch(c()) main;
     (argument_list
       (number
         (decimal))))
-  (control_definition
+  (control_declaration
     (method_identifier)
     (control_body
       (control_body_element
@@ -71,7 +71,7 @@ control c(inout H h) {
 --------------------------------------------------------------------------------
 
 (source_file
-  (control_definition
+  (control_declaration
     name: (method_identifier)
     (parameter
       (direction)
@@ -83,13 +83,13 @@ control c(inout H h) {
       (control_body_element
         (table
           name: (type_identifier)
-          (table_element
+          (table_property
             (macro_invocation)
             (member_expression
               object: (identifier)
               member: (identifier))
-            (key_type))
-          (table_element
+            (match_kind))
+          (table_property
             (macro_invocation)
             (action_item
               (method_identifier)))))

@@ -25,10 +25,10 @@
 (method_identifier) @function
 
 ; Declarations named after a type: controls, parsers, and packages.
-(control_definition
+(control_declaration
   (method_identifier) @type)
 
-(parser_definition
+(parser_declaration
   (method_identifier) @type)
 
 (package
@@ -73,21 +73,21 @@
 (method_field
   (identifier) @variable.parameter)
 
-(const_definition
+(constant_declaration
   (identifier) @constant)
 
 ; Parser states, and the transitions that name them.
-(state
+(parser_state
   (method_identifier) @label)
 
-(transition
+(transition_statement
   (identifier) @label)
 
 (select_case
   (identifier) @label)
 
 ; The parser states every parser has.
-((transition
+((transition_statement
   (identifier) @constant.builtin)
   (#any-of? @constant.builtin "accept" "reject"))
 
@@ -104,7 +104,7 @@
 
 (number) @number
 
-(bool) @boolean
+(boolean_literal) @boolean
 
 (string_literal) @string
 
@@ -214,7 +214,7 @@
 "_" @variable.builtin
 
 ; Match kinds.
-(key_type
+(match_kind
   (identifier) @constant.builtin)
 
 (match_kind_declaration

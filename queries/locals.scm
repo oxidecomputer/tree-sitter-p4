@@ -10,12 +10,12 @@
 [
   (action)
   (block)
-  (control_definition)
+  (control_declaration)
   (extern_function_declaration)
   (function_declaration)
   (method)
   (package)
-  (parser_definition)
+  (parser_declaration)
 ] @local.scope
 
 (parameter
@@ -27,7 +27,7 @@
 (instantiation
   name: (identifier) @local.definition.variable)
 
-(const_definition
+(constant_declaration
   name: (identifier) @local.definition.constant)
 
 ; A name used as a value refers to a variable; a member's name does not, so

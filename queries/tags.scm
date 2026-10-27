@@ -18,13 +18,13 @@
 (method
   name: (method_identifier) @name @definition.function)
 
-(control_definition
+(control_declaration
   name: (method_identifier) @name @definition.class)
 
-(parser_definition
+(parser_declaration
   name: (method_identifier) @name @definition.class)
 
-(extern_definition
+(extern_declaration
   name: (type_identifier) @name @definition.interface)
 
 (package
@@ -34,22 +34,22 @@
 (table
   name: (type_identifier) @name @definition.section)
 
-(state
+(parser_state
   name: (method_identifier) @name @definition.section)
 
-(header_definition
+(header_declaration
   name: (type_identifier) @name @definition.struct)
 
-(header_union_definition
+(header_union_declaration
   name: (type_identifier) @name @definition.struct)
 
-(struct_definition
+(struct_declaration
   name: (type_identifier) @name @definition.struct)
 
-(typedef_definition
+(typedef_declaration
   name: (type_identifier) @name @definition.type)
 
-(const_definition
+(constant_declaration
   name: (identifier) @name @definition.constant)
 
 (match_kind_declaration
