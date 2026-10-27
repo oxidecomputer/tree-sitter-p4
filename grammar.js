@@ -183,16 +183,11 @@ module.exports = grammar({
         "}",
       ),
 
-    // The errors a program adds, as in `error { InvalidIPv4Header }`.
+    // The errors a program adds, as in `error { InvalidIPv4Header }`. Unlike
+    // the lists of match kinds and enum members, this one takes no trailing
+    // comma in P4-16.
     error_declaration: ($) =>
-      seq(
-        "error",
-        "{",
-        $.identifier,
-        repeat(seq(",", $.identifier)),
-        optional(","),
-        "}",
-      ),
+      seq("error", "{", $.identifier, repeat(seq(",", $.identifier)), "}"),
 
     function_declaration: ($) =>
       seq(
